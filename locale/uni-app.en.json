@@ -1,0 +1,12 @@
+{
+	"common": {
+		"uni.scanCode.title": "Scan",
+		"uni.scanCode.album": "Photo",
+		"uni.scanCode.fail": "Identification Failed",
+		"uni.scanCode.flash.on": "Light Touch",
+		"uni.scanCode.flash.off": "Tap Close",
+		"NSPhotoLibraryUsageDescription": "For users to change the profile picture, upload the picture and scan the QR code",
+		"NSPhotoLibraryAddUsageDescription": "For saving QR code, pictures",
+		"NSCameraUsageDescription": "It is used to shoot the profile picture and scan the QR code"
+	}
+}
