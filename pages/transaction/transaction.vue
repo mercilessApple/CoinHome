@@ -2,7 +2,7 @@
 	<view>
 		<u-navbar placeholder @rightClick="rightClick" bgColor="#f6f6f6">
 			<view class="u-nav-slot" slot="left">
-				<view class="nav-coin">
+				<view class="nav-coin" @click="show = true">
 					<u-image src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
 					<text class="name">BTC/USDT</text>
 					<text class="proportion add">+0.25%</text>
@@ -35,8 +35,7 @@
 						</view>
 
 						<view class="down-box" v-show="showMoreSelect">
-							<view @click.stop="selectItem">限价委托</view>
-							<view @click.stop="selectItem">限价委托</view>
+							<view @click.stop="selectItem">{{$t('限价委托')}}</view>
 						</view>
 					</view>
 					<u-gap height="16rpx"></u-gap>
@@ -56,23 +55,220 @@
 					<u-gap height="16rpx"></u-gap>
 
 					<view class="total-amount">
-						<u-input type="number" inputAlign="center" border="none" :placeholder="`${$t('总额')}(USDT)`"></u-input>
+						<u-input type="number" inputAlign="center" border="none" :placeholder="`${$t('总额')}(USDT)`">
+						</u-input>
 					</view>
 					<u-gap height="30rpx"></u-gap>
 
 					<view class="usable">
 						<view class="tip">
-							<view>可用</view>
+							<view>{{$t('可用')}}</view>
 							<view>10000.0154 USDT</view>
 						</view>
 					</view>
 					<u-gap height="30rpx"></u-gap>
 					<view class="btn">{{$t('买入')}}BTC</view>
 				</view>
+				<view class="right">
+					<view class="lab-box">
+						<view class="lab">
+							<view>{{$t('价格')}}</view>
+							<text>(USDT)</text>
+						</view>
+						<view class="lab">
+							<view>{{$t('数量')}}</view>
+							<text>(BTC)</text>
+						</view>
+					</view>
+					<view class="price-box">
+						<view>
+
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+						</view>
+						<view>
+
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+						</view>
+					</view>
+					<view class="area">
+						<view>35700.88</view>
+						<view>≈ ¥ 35606.32</view>
+					</view>
+					<view class="price-box bottom">
+						<view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+							<view class="price">35700.88</view>
+						</view>
+						<view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+							<view class="price">0.1452</view>
+						</view>
+					</view>
+				</view>
 			</view>
-			<u-gap height="60rpx"></u-gap>
+
+			<view class="lower">
+				<view class="tab u-border-bottom">
+					<u-tabs lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click">
+					</u-tabs>
+					<view class="icon" @click="$u.route('/pages/order/order')">
+						<u-image width="40rpx" height="40rpx" src="/static/icon35.png"></u-image>
+					</view>
+				</view>
+				<block v-if="false">
+					<u-empty icon="/static/icon34.png" :text="$t('无当前委托')"></u-empty>
+					<u-gap height="300rpx"></u-gap>
+				</block>
+				<view class="list">
+					<view class="item u-border-bottom" @click="$u.route({
+						url:'/pages/orderDetail/orderDetail'
+					})">
+						<view class="left">
+							<view>
+								<view class="business">
+									<text>{{$t('买入')}}</text> BTC
+								</view>
+								<view>
+									<view>{{$t('价格')}}[USDT]</view>
+									<view>35700.88</view>
+								</view>
+							</view>
+							<view>
+								<view class="date">04:07 01/29</view>
+								<view class="info">
+									<view>{{$t('数量')}}[BTC]</view>
+									<view>0.14</view>
+								</view>
+							</view>
+						</view>
+						<view class="right">
+							<view class="right-status btn">{{$t('撤销')}}</view>
+							<view>
+								<view>{{$t('实际成交')}}[BTC]</view>
+								<view>0</view>
+							</view>
+						</view>
+					</view>
+					<view class="item u-border-bottom">
+						<view class="left">
+							<view>
+								<view class="business">
+									<text class="err">{{$t('卖出')}}</text> BTC
+								</view>
+								<view>
+									<view>{{$t('价格')}}[USDT]</view>
+									<view>35700.88</view>
+								</view>
+							</view>
+							<view>
+								<view class="date">04:07 01/29</view>
+								<view class="info">
+									<view>{{$t('数量')}}[BTC]</view>
+									<view>0.14</view>
+								</view>
+							</view>
+						</view>
+						<view class="right">
+							<view class="right-status text">
+								<text>{{$t('成交')}}</text>
+								<u-icon size="20rpx" name="arrow-right"></u-icon>
+							</view>
+							<view>
+								<view>{{$t('实际成交')}}[BTC]</view>
+								<view>0</view>
+							</view>
+						</view>
+					</view>
+					<view class="item">
+						<view class="left">
+							<view>
+								<view class="business">
+									<text class="err">{{$t('卖出')}}</text> BTC
+								</view>
+								<view>
+									<view>{{$t('价格')}}[USDT]</view>
+									<view>35700.88</view>
+								</view>
+							</view>
+							<view>
+								<view class="date">04:07 01/29</view>
+								<view class="info">
+									<view>{{$t('数量')}}[BTC]</view>
+									<view>0.14</view>
+								</view>
+							</view>
+						</view>
+						<view class="right">
+							<view class="right-status text">
+								<text>{{$t('已撤销')}}</text>
+								<u-icon size="20rpx" name="arrow-right"></u-icon>
+							</view>
+							<view>
+								<view>{{$t('实际成交')}}[BTC]</view>
+								<view>0</view>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<!-- <u-gap height="60rpx"></u-gap> -->
 		</view>
 		<view class="mask" v-show="showMoreSelect" @click="showMoreSelect = false"></view>
+
+		<u-popup @close="show = false" :show="show" mode="left" :customStyle="{
+			'border-radius':'0 60rpx 60rpx 0',
+			'width':'640rpx'
+		}">
+			<view class="popup">
+				<u-status-bar></u-status-bar>
+				<view class="title">{{$t('市场')}}</view>
+				<view class="search">
+					<u-search height="64rpx" placeholder="" :showAction="false" bgColor="#F6F6F6"></u-search>
+				</view>
+				<view class="popup-tab">
+					<u-tabs activeStyle="color:#000000" inactiveStyle="color:#848B9B" lineHeight="8rpx"
+						lineWidth="48rpx" lineColor="#FEFA05" :list="popupTabs" @click="click"></u-tabs>
+				</view>
+				<view class="list-tab">
+					<view>{{$t('名称')}}</view>
+					<view>{{$t('最新价格')}}/{{$t('24h涨跌幅')}}</view>
+				</view>
+				<view class="list">
+					<view class="item active">
+						<view class="left">
+							GODE<text>/USDT</text>
+						</view>
+						<view class="right">
+							<view>0.0217</view>
+							<view>+6.12%</view>
+						</view>
+					</view>
+					<view class="item">
+						<view class="left">
+							GODE<text>/USDT</text>
+						</view>
+						<view class="right">
+							<view>0.0217</view>
+							<view class="err">-6.12%</view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -80,7 +276,20 @@
 	export default {
 		data() {
 			return {
+				popupTabs: [{
+						name: this.$t('自选')
+					},
+					{
+						name: 'USDT'
+					}
+				],
+				show: false,
 				block: ['25%', '50%', '75%', '100%'],
+				tabs: [{
+					name: this.$t('currentDelegation', {
+						number: 0
+					})
+				}],
 				barIndex: 0,
 				count: 1,
 				number: 35606.32,
@@ -88,6 +297,9 @@
 			};
 		},
 		methods: {
+			click(e) {
+
+			},
 			rightClick() {
 
 			},
@@ -99,6 +311,93 @@
 </script>
 
 <style lang="scss">
+	page {
+		::v-deep {
+			.u-tabs__wrapper__nav__line {
+				bottom: 0 !important;
+			}
+		}
+	}
+
+
+	.popup {
+		.list {
+
+			.item {
+				display: flex;
+				justify-content: space-between;
+				padding: 0 30rpx;
+				height: 96rpx;
+				align-items: center;
+				&.active{
+					background-color: #F6F6F6;
+				}
+				.right {
+					view {
+						&:first-child {
+							font-weight: bold;
+							color: #000000;
+							font-size: 30rpx;
+						}
+
+						&:last-child {
+							font-weight: bold;
+							color: #2DBE87;
+							font-size: 24rpx;
+							&.err{
+								color: #F5475E;
+							}
+						}
+					}
+				}
+
+				.left {
+					font-weight: bold;
+					font-size: 30rpx;
+					padding-top: 20rpx;
+					align-self: flex-start;
+					text {
+						color: #848D96;
+						font-size: 24rpx;
+					}
+				}
+			}
+		}
+
+		.list-tab {
+			padding: 0 30rpx;
+			display: flex;
+			justify-content: space-between;
+			height: 92rpx;
+			align-items: center;
+			color: #BAB9BE;
+			font-size: 24rpx;
+		}
+
+		.popup-tab {
+			border-bottom: 2rpx solid #EFEFEF;
+		}
+
+		::v-deep {
+			.u-tabs__wrapper__nav__line {
+				// bottom: 0 !important;
+			}
+		}
+
+		.search {
+			margin-bottom: 15rpx;
+			padding: 0 30rpx;
+		}
+
+		.title {
+			padding: 0 30rpx;
+			padding-top: 70rpx;
+			font-weight: 500;
+			margin-bottom: 30rpx;
+			font-size: 48rpx;
+		}
+	}
+
 	.mask {
 		position: fixed;
 		width: 100%;
@@ -114,12 +413,255 @@
 		border-radius: 40rpx 40rpx 0px 0px;
 		padding: 0 30rpx;
 
+		.lower {
+			padding-top: 60rpx;
+
+			.tab {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.list {
+				.item {
+					display: flex;
+					padding: 24rpx 30rpx;
+					margin-top: 22rpx;
+
+					.right {
+						text-align: right;
+
+						>view {
+							&:last-child {
+								view {
+									&:first-child {
+										color: #929BA2;
+										margin-bottom: 16rpx;
+										font-size: 24rpx;
+									}
+
+									&:last-child {
+										font-weight: 500;
+										font-size: 32rpx;
+									}
+								}
+							}
+						}
+
+						.right-status {
+							margin-bottom: 44rpx;
+							line-height: 40rpx;
+
+							&.text {
+								display: flex;
+								justify-content: flex-end;
+								align-items: center;
+
+								text {
+									font-weight: 500;
+									color: #2D270D;
+									margin-right: 10rpx;
+									font-size: 24rpx;
+								}
+							}
+
+							&.btn {
+								display: inline-block;
+								padding: 0 24rpx;
+								border-radius: 8rpx;
+								background-color: #FEFA05;
+								font-weight: 500;
+								color: #2D270D;
+								font-size: 24rpx;
+							}
+						}
+					}
+
+					.left {
+						flex: 1;
+						display: flex;
+
+						>view {
+							width: 50%;
+
+							&:last-child {
+								.date {
+									margin-bottom: 44rpx;
+									color: #929BA2;
+									line-height: 40rpx;
+									font-size: 24rpx;
+								}
+
+								.info {
+									view {
+										&:first-child {
+											color: #929BA2;
+											margin-bottom: 16rpx;
+											font-size: 24rpx;
+										}
+
+										&:last-child {
+											font-weight: 500;
+											font-size: 32rpx;
+										}
+									}
+								}
+							}
+
+							&:first-child {
+								margin-right: 20rpx;
+
+								>view {
+									&:last-child {
+										view {
+											&:first-child {
+												color: #929BA2;
+												margin-bottom: 16rpx;
+												font-size: 24rpx;
+											}
+
+											&:last-child {
+												font-weight: 500;
+												word-break: break-all;
+												font-size: 32rpx;
+											}
+										}
+									}
+								}
+
+								.business {
+									font-weight: 500;
+									color: #333333;
+									margin-bottom: 44rpx;
+									line-height: 40rpx;
+
+									text {
+										font-size: 32rpx;
+										color: #2DBE87;
+
+										&.err {
+											color: #F5475E;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+
+		}
+
 		.upper {
 			display: flex;
+			padding-top: 30rpx;
+
+			.right {
+				flex: 1;
+				padding-left: 30rpx;
+				display: flex;
+				flex-direction: column;
+
+				.lab-box {
+					display: flex;
+					justify-content: space-between;
+					text-align: left;
+					margin-bottom: 24rpx;
+
+					.lab {
+
+						&:last-child {
+							text-align: right;
+						}
+
+						view,
+						text {
+							color: #929BA2;
+							font-size: 24rpx;
+						}
+					}
+				}
+
+				.area {
+					padding: 36rpx 0;
+
+					view {
+						font-weight: 500;
+						text-align: center;
+
+						&:first-child {
+							color: #2DBE87;
+							font-size: 36rpx;
+						}
+
+						&:last-child {
+							font-weight: 500;
+							margin-top: 5rpx;
+							color: #929BA2;
+							font-size: 24rpx;
+						}
+					}
+				}
+
+				.price-box {
+					display: flex;
+					justify-content: space-between;
+					flex: 1;
+
+					&.bottom {
+						>view {
+							&:first-child {
+								.price {
+									color: #F5475E;
+								}
+							}
+						}
+
+						.price {
+							&:first-child {
+								margin-top: 0;
+							}
+						}
+					}
+
+					>view {
+
+						.price {
+							font-weight: 500;
+							padding: 10rpx 0;
+							font-size: 22rpx;
+
+							&:first-child {
+								padding-top: 0;
+							}
+
+							&:last-child {
+								padding-bottom: 0;
+							}
+						}
+
+						&:last-child {
+							text-align: right;
+
+							.price {
+								color: #000000;
+							}
+						}
+
+
+
+						&:first-child {
+							.price {
+								color: #2DBE87;
+							}
+						}
+					}
+				}
+			}
 
 			.left {
 				width: 60%;
-				padding-top: 30rpx;
 
 				.btn {
 					line-height: 80rpx;

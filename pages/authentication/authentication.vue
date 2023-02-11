@@ -90,13 +90,15 @@
 				<text v-if="!standardSuccess">
 					{{$t('不适用')}}
 				</text>
-				<text v-if="!advancedSuccess && !advancedFail"
-					@click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
-					{{$t('立即开始')}}
-				</text>
-				<text v-if="advancedFail" @click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
-					{{$t('继续验证')}}
-				</text>
+				<block v-else>
+					<text v-if="!advancedSuccess && !advancedFail"
+						@click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
+						{{$t('立即开始')}}
+					</text>
+					<text v-if="advancedFail" @click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
+						{{$t('继续验证')}}
+					</text>
+				</block>
 			</view>
 		</block>
 		<u-gap height="88rpx"></u-gap>
@@ -189,8 +191,9 @@
 			background-color: rgba(45, 190, 135, 0.16);
 
 			&.err {
-				background-color:rgba(245, 71, 94, 0.16);
-				text{
+				background-color: rgba(245, 71, 94, 0.16);
+
+				text {
 					color: #F5475E;
 				}
 			}

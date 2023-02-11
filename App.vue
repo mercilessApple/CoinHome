@@ -15,8 +15,8 @@
 <style lang="scss">
 	/*每个页面公共css */
 	@import "@/uni_modules/uview-ui/index.scss";
-	
 	@import "@/uni_modules/mescroll-uni/components/mescroll-uni/components/mescroll-up.css";
+	
 	page {
 		background-color: #fff;
 		box-sizing: border-box;

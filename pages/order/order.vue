@@ -255,7 +255,6 @@
 	::v-deep {
 		.u-tabs__wrapper__nav__line {
 			bottom: 0;
-			// font-size: 28rpx;
 		}
 	}
 </style>
