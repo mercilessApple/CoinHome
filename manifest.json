@@ -103,7 +103,10 @@
         }
     },
     "h5" : {
-        "darkmode" : true
+        "darkmode" : true,
+        "devServer" : {
+            "port" : 8080
+        }
     },
     /* 快应用特有相关 */
     "quickapp" : {},

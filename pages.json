@@ -167,125 +167,115 @@
 
 			}
 
-		}
-	    ,{
-            "path" : "pages/safeAuthentication/safeAuthentication",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%safeAuthentication%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/safety/safety",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/loginPassword/loginPassword",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%loginPassword%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/modifyPassword/modifyPassword",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%loginPassword%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/fundPassword/fundPassword",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%fundPassword%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/modifyFundPassword/modifyFundPassword",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%fundPassword%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/googleCaptcha/googleCaptcha",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%googleCaptcha%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/googleCaptchaNext/googleCaptchaNext",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%googleCaptcha%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/order/order",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%orderManagement%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/orderDetail/orderDetail",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%orderDetail%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/authentication/authentication",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%authentication%",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/standardAuthentication/standardAuthentication",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "%standard%",
-                "enablePullDownRefresh": false
-            }
-            
-        },
+		}, {
+			"path": "pages/safeAuthentication/safeAuthentication",
+			"style": {
+				"navigationBarTitleText": "%safeAuthentication%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/safety/safety",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/loginPassword/loginPassword",
+			"style": {
+				"navigationBarTitleText": "%loginPassword%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/modifyPassword/modifyPassword",
+			"style": {
+				"navigationBarTitleText": "%loginPassword%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/fundPassword/fundPassword",
+			"style": {
+				"navigationBarTitleText": "%fundPassword%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/modifyFundPassword/modifyFundPassword",
+			"style": {
+				"navigationBarTitleText": "%fundPassword%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/googleCaptcha/googleCaptcha",
+			"style": {
+				"navigationBarTitleText": "%googleCaptcha%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/googleCaptchaNext/googleCaptchaNext",
+			"style": {
+				"navigationBarTitleText": "%googleCaptcha%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/order/order",
+			"style": {
+				"navigationBarTitleText": "%orderManagement%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/orderDetail/orderDetail",
+			"style": {
+				"navigationBarTitleText": "%orderDetail%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/authentication/authentication",
+			"style": {
+				"navigationBarTitleText": "%authentication%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/standardAuthentication/standardAuthentication",
+			"style": {
+				"navigationBarTitleText": "%standard%",
+				"enablePullDownRefresh": false
+			}
+
+		},
 		{
-		    "path" : "pages/advancedAuthentication/advancedAuthentication",
-		    "style" :                                                                                    
-		    {
-		        "navigationBarTitleText": "%advanced%",
-		        "enablePullDownRefresh": false
-		    }
-		    
+			"path": "pages/advancedAuthentication/advancedAuthentication",
+			"style": {
+				"navigationBarTitleText": "%advanced%",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/kLine/kLine",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/test/test",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
 		}
-    ],
+	],
 	"tabBar": {
 		"color": "#8F919D",
 		"fontSize": "13px",

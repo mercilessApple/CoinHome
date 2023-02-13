@@ -301,7 +301,7 @@
 
 			},
 			rightClick() {
-
+				uni.$u.route('/pages/kLine/kLine')
 			},
 			selectItem() {
 
@@ -342,6 +342,7 @@
 
 						&:last-child {
 							font-weight: bold;
+							text-align: right;
 							color: #2DBE87;
 							font-size: 24rpx;
 							&.err{
