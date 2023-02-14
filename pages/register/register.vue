@@ -67,7 +67,7 @@
 
 			<view class="clause">
 				<u-checkbox-group v-model="checked">
-					<u-checkbox name="check" size="24rpx" activeColor="#FEFA05" shape="circle"></u-checkbox>
+					<u-checkbox iconColor="#000" name="check" size="24rpx" activeColor="#FEFA05" shape="circle"></u-checkbox>
 				</u-checkbox-group>
 				<view class="text">
 					{{$t('我已阅读并同意CoinHome的')}}<text>{{$t('服务条款')}}</text>{{$t('和')}}<text>{{$t("隐私政策")}}</text>。

@@ -33,7 +33,7 @@ page{
 			width: auto !important;
 		}
 		.u-form-item__body__left__content__label{
-			color: #8B8F92;
+			color: #8B8F92 !important;
 			font-size: 26rpx;
 		}
 	}
@@ -45,6 +45,7 @@ page{
 		color: #757980;
 		padding: 20rpx 30rpx;
 		font-size: 28rpx;
+		border-radius: 8rpx;
 		&.active{
 			background: #F6F6F6;
 			color: #2B323C;
@@ -122,4 +123,50 @@ page{
 		color: #060606;
 		font-size: 28rpx;
 	}
+}
+
+@media (prefers-color-scheme: dark) {
+	page{
+		::v-deep{
+			.u-input__content__field-wrapper__field{
+				color: #fff !important;
+			}
+		}
+	}
+	.phone-area{
+	
+		>text{
+	
+			color: #FFFFFF;
+		}
+	}
+	.clause{
+
+		.text{
+			text{
+				color: #fff;
+			}
+		}
+	}
+	.title{
+		color: #FFFFFF;
+	}
+	.form {
+		.input-box {
+			background: #29313C;
+			::v-deep{
+				input{
+					color: #fff !important;
+				}
+			}
+		}
+	}
+		.tab{
+			view{
+				&.active{
+					background: #434A5A;
+					color: #FFFFFF;
+				}
+			}
+		}
 }

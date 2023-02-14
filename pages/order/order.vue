@@ -254,7 +254,7 @@
 
 	::v-deep {
 		.u-tabs__wrapper__nav__line {
-			bottom: 0;
+			bottom: 0 !important;
 		}
 	}
 </style>

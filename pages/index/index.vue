@@ -2,7 +2,9 @@
 	<view class="content">
 		<u-navbar leftIcon="">
 			<view slot="left">
-				<u-image @click="toUserCenter" src="@/static/icon4.png" width="48rpx" height="48rpx"></u-image>
+				<u-image @click="toUserCenter"
+					:src="theme == 'light' ? require('@/static/icon4.png') : require('@/static/icon37.png')"
+					width="48rpx" height="48rpx"></u-image>
 			</view>
 
 			<view class="u-nav-slot" slot="right">
@@ -37,7 +39,7 @@
 						}
 					})" color="#969AA6" icon="" bgColor="transparent" :text="notices[0].title">
 					</u-notice-bar>
-					<u-image src="@/static/icon7.png" width="60rpx" height="48rpx"></u-image>
+					<u-image :src="theme == 'light' ? require('@/static/icon7.png') : require('@/static/icon38.png')" width="60rpx" height="48rpx"></u-image>
 				</view>
 				<view class="tab-bar">
 					<view v-for="(item,index) in tabBarList" :key="index" @click="toUrl(index)">
@@ -60,14 +62,18 @@
 					<view>
 						<view class="name">{{$t('名称')}}</view>
 						<view class="column">
-							<view class="val" v-for="(item,index) in list" :key="index">{{item.coinMarket}}
+							<view class="val" @click="$u.route({
+								url:'/pages/kLine/kLine'
+							})" v-for="(item,index) in list" :key="index">{{item.coinMarket}}
 							</view>
 						</view>
 					</view>
 					<view>
 						<view class="name">{{$t('最新价格')}}</view>
 						<view class="column">
-							<view class="val" v-for="(item,index) in list" :key="index">
+							<view class="val" @click="$u.route({
+								url:'/pages/kLine/kLine'
+							})" v-for="(item,index) in list" :key="index">
 								<view class="box">
 									<view>{{item.lastPrice}}</view>
 									<view>¥{{item.lastPriceCny}}</view>
@@ -78,7 +84,9 @@
 					<view>
 						<view class="name">{{$t('24h涨跌幅')}}</view>
 						<view class="column">
-							<view class="val" v-for="(item,index) in list" :key="index">
+							<view class="val" @click="$u.route({
+								url:'/pages/kLine/kLine'
+							})" v-for="(item,index) in list" :key="index">
 								<view class="btn" :class="{
 									green:item.rangeAbility >= 0 && item.onDealing === 1,
 									red:item.rangeAbility < 0 && item.onDealing === 1,
@@ -119,9 +127,24 @@
 				downOption: {
 					auto: false, //是否在初始化完毕之后自动执行下拉回调callback; 默认true
 				},
-				tabBarList: [{
+				tabBarList: [],
+				refreshHeight: (uni.getSystemInfoSync().statusBarHeight + 44) + "px",
+				list: [],
+			}
+		},
+		watch: {
+			theme(newValue, oldValue) {
+				console.log(newValue);
+			}
+		},
+		onLoad() {
+			this.init('onload')
+			this.timer = null
+			this.startLoad = false
+			
+			this.tabBarList = [{
 						name: this.$t('充币'),
-						icon: require("@/static/icon8.png")
+						icon: require(this.theme == 'light' ? "@/static/icon8.png" : "@/static/icon39.png")
 					},
 					{
 						name: this.$t('交易'),
@@ -135,15 +158,8 @@
 						name: this.$t('认证'),
 						icon: require("@/static/icon11.png")
 					}
-				],
-				refreshHeight: (uni.getSystemInfoSync().statusBarHeight + 44) + "px",
-				list: []
-			}
-		},
-		onLoad() {
-			this.init('onload')
-			this.timer = null
-			this.startLoad = false
+				]
+
 		},
 		onHide() {
 			clearInterval(this.timer)
@@ -459,5 +475,30 @@
 	.search {
 		width: 256rpx;
 		padding-right: 30rpx;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		page {
+			::v-deep {
+
+				.u-search__content,
+				.u-search__content__input {
+					background-color: #2C303C !important;
+				}
+
+				.u-navbar__content,
+				.u-status-bar {
+					background-color: #1F282F !important;
+				}
+			}
+
+		}
+
+		.subsection {
+			.active {
+				color: #FFFFFF !important;
+				background: #434B58 !important;
+			}
+		}
 	}
 </style>

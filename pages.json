@@ -51,8 +51,8 @@
 		}, {
 			"path": "pages/accountVerification/accountVerification",
 			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
+				"navigationBarBackgroundColor": "@accountVerificationNavBG",
+				"navigationBarTitleText": ""
 			}
 
 		}, {

@@ -1074,7 +1074,11 @@ function FrameSplitKLineX()
             }
             else if (lastMonth == null || lastMonth != month) 
             {
-                text = month.toString() + "月";
+				if (uni.getLocale() == 'en'){
+					text = month.toString() + "M";
+				}else{
+					text = month.toString() + "月";
+				}
             }
 
             lastYear = year;

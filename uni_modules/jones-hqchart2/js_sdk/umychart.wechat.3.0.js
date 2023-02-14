@@ -7322,7 +7322,7 @@ function KLineChartContainer(uielement)
     this.MaxRequestMinuteDayCount = 5;    //分钟数据请求的天数
     this.PageSize = 200;                  //每页数据个数
     this.KLineDrawType = 0;               //0=K线 1=收盘价线 2=美国线
-    this.LoadDataSplashTitle = '下载历史数据';
+    this.LoadDataSplashTitle = 'Loading...';
     this.IsAutoUpdate = false;                    //是否自动更新行情数据
     this.AutoUpdateFrequency = 30000;             //30秒更新一次数据
     this.AutoUpdateTimer=null;                         //自动定时器

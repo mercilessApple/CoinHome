@@ -2,6 +2,12 @@
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
+			
+			uni.$emit("setMescrollGlobalOption", {
+				i18n: {
+					type: uni.getLocale()
+				}
+			})
 		},
 		onShow: function() {
 			console.log('App Show')
@@ -25,7 +31,7 @@
 
 	@media (prefers-color-scheme: dark) {
 		page {
-			background-color: #000;
+			background-color: #1F282F;
 		}
 	}
 </style>

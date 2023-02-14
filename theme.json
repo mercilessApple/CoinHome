@@ -2,11 +2,13 @@
 	"light": {
 		"backgroundColor":"#ffffff",
 		"navigationBarBackgroundColor":"#ffffff",
-		"navigationBarTextStyle":"black"
+		"navigationBarTextStyle":"black",
+		"accountVerificationNavBG":"#fff"
 	},
 	"dark": {
-		"backgroundColor":"#000000",
-		"navigationBarBackgroundColor":"#000000",
-		"navigationBarTextStyle":"white"
+		"backgroundColor":"#1F282F",
+		"navigationBarBackgroundColor":"#202632",
+		"navigationBarTextStyle":"white",
+		"accountVerificationNavBG":"#1F282F"
 	}
 }

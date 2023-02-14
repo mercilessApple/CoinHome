@@ -27,7 +27,11 @@
 			<slot></slot>
 
 			<!-- 空布局 -->
-			<mescroll-empty v-if="isShowEmpty" :option="mescroll.optUp.empty" @emptyclick="emptyClick"></mescroll-empty>
+			<!-- <mescroll-empty v-if="isShowEmpty" :option="mescroll.optUp.empty" @emptyclick="emptyClick"></mescroll-empty> -->
+			<block v-if="isShowEmpty">
+				<u-gap height="300rpx"></u-gap>
+				<u-empty @emptyclick="emptyClick" :text="$t('暂无数据')"></u-empty>
+			</block>
 
 			<!-- 上拉加载区域 (下拉刷新时不显示, 支付宝小程序子组件传参给子子组件仍报单项数据流的异常,暂时不通过mescroll-up组件实现)-->
 			<!-- <mescroll-up v-if="mescroll.optUp.use && !isDownLoading && upLoadType!==3" :option="mescroll.optUp" :type="upLoadType"></mescroll-up> -->

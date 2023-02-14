@@ -31,7 +31,9 @@
 					<view>
 						<view class="name">{{$t('名称/成交量')}}</view>
 						<view class="column">
-							<view class="val" v-for="(item,index) in list" :key="index">
+							<view class="val" @click="$u.route({
+								url:'/pages/kLine/kLine'
+							})" v-for="(item,index) in list" :key="index">
 								<view class="val-box">
 									<view class="unit">{{item.coinMarket[0]}}<text>/{{item.coinMarket[1]}}</text></view>
 									<view class="volume">
@@ -44,7 +46,9 @@
 					<view>
 						<view class="name">{{$t('最新价格')}}</view>
 						<view class="column">
-							<view class="val" v-for="(item,index) in list" :key="index">
+							<view class="val" @click="$u.route({
+								url:'/pages/kLine/kLine'
+							})" v-for="(item,index) in list" :key="index">
 								<view class="box">
 									<view :class="{
 									green:item.rangeAbility >= 0 && item.onDealing === 1,
@@ -59,7 +63,9 @@
 					<view>
 						<view class="name">{{$t('24h涨跌幅')}}</view>
 						<view class="column">
-							<view class="val" v-for="(item,index) in list" :key="index">
+							<view class="val" @click="$u.route({
+								url:'/pages/kLine/kLine'
+							})" v-for="(item,index) in list" :key="index">
 								<view class="btn" :class="{
 		 						green:item.rangeAbility >= 0 && item.onDealing === 1,
 		 						red:item.rangeAbility < 0 && item.onDealing === 1,

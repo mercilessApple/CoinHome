@@ -60,7 +60,7 @@
 			</view>
 		</view>
 
-		<view class="btn">
+		<view class="btn" @click="submit">
 			{{$t('提交')}}
 		</view>
 		<u-gap height="88rpx"></u-gap>
@@ -73,7 +73,12 @@
 			return {
 				idType: 0
 			};
-		}
+		},
+		methods: {
+			submit() {
+				
+			}
+		},
 	}
 </script>
 

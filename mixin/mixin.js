@@ -1,6 +1,13 @@
 export default {
-	onLoad() {
-
+	data() {
+		return {
+			theme: uni.getSystemInfoSync().theme
+		}
+	},
+	created() {
+		uni.onThemeChange(({theme})=>{
+			this.theme = theme
+		})
 	},
 	methods: {
 		geTel(tel) {

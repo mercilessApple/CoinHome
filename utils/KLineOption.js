@@ -27,8 +27,8 @@ export const KLineOption = {
 	},
 	Border: //边框
 	{
-		Left: 5,
-		Right: 5, //右边间距
+		Left: 1,
+		Right: 2, //右边间距
 		Top: 0,
 		Bottom: 25,
 	},
@@ -37,7 +37,7 @@ export const KLineOption = {
 		Right: 1, //复权 0 不复权 1 前复权 2 后复权
 		Period: 0, //周期: 0 日线 1 周线 2 月线 3 年线 
 		PageSize: 30,
-		IsShowTooltip: false,
+		IsShowTooltip: false
 	},
 
 	Frame: //子框架设置 (Height 窗口高度比例值)

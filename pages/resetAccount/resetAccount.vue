@@ -61,7 +61,7 @@
 			}
 
 			.u-form-item__body__left__content__label {
-				color: #8B8F92;
+				color: #8B8F92 !important;
 				font-size: 26rpx;
 			}
 
@@ -111,5 +111,21 @@
 		font-weight: bold;
 		color: #2B323C;
 		font-size: 52rpx;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.tip-title {
+			color: #FFFFFF;
+		}
+
+		.input-box {
+
+			background: #29313C !important;
+			::v-deep{
+				input{
+					color: #fff !important;
+				}
+			}
+		}
 	}
 </style>

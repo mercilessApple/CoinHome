@@ -23,7 +23,9 @@ const app = new Vue({
 	...App
 })
 
-// uni.$u.props.empty.text = app.$t("暂无数据")
+Vue.prototype.$T = (text)=>{
+	return app.$t(text)
+}
 
 app.$mount()
 // 引入请求封装，将app参数传递到配置中

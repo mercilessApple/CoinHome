@@ -18,25 +18,25 @@
 			</view>
 			<view class="right">
 				<view>
-					<view class="lab">24h最高价</view>
+					<view class="lab">{{$t('24h最高价')}}</view>
 					<view class="val">23,771.80</view>
 				</view>
 				<view>
-					<view class="lab">24h成交量(BTC)</view>
+					<view class="lab">{{$t('24h成交量')}}(BTC)</view>
 					<view class="val">23,771.80</view>
 				</view>
 				<view>
-					<view class="lab">24h最低价</view>
+					<view class="lab">{{$t('24h最低价')}}</view>
 					<view class="val">23,771.80</view>
 				</view>
 				<view>
-					<view class="lab">24h成交额(USDT)</view>
+					<view class="lab">{{$t('24h成交额')}}(USDT)</view>
 					<view class="val">23,771.80</view>
 				</view>
 			</view>
 		</view>
 		<view class="time-box">
-			<view class="lab">分时</view>
+			<view class="lab">{{$t('分时')}}</view>
 			<view class="box">
 				<view :class="{
 					'active':index == timeIndex
@@ -46,7 +46,7 @@
 			</view>
 			<view @click="createDeep" class="deep" :class="{
 				active:isShowDeep
-			}">深度图</view>
+			}">{{$t('深度图')}}</view>
 		</view>
 
 		<view>
@@ -66,11 +66,110 @@
 				}" v-for="(item,index) in otherNav" :key="index" @click="ChangeKLineIndex(item.key,item.text,index)">{{item.text}}
 			</view>
 		</view>
+		<u-gap height="30rpx"></u-gap>
+		<u-gap height="10rpx" bgColor="#F6F6F6"></u-gap>
+		<view class="tabs-box u-border-bottom">
+			<u-tabs lineColor="#FEFA05" lineWidth="60rpx" lineHeight="8rpx" activeStyle="color:#1E1F29"
+				inactiveStyle="color:#898D99" :itemStyle="{
+			'height':'80rpx',
+			'font-size':'30rpx'
+		}" :scrollable="false" :list="tabs" @click="tabClick"></u-tabs>
+		</view>
+		<u-gap height="20rpx"></u-gap>
+		<view class="tab-content">
 
+			<view class="tab-box" v-show="tabIndex == 0">
+				<view class="tab-box-item" style="padding-right: 10rpx;">
+					<view class="title">{{$t('买')}}</view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+				</view>
+				<view class="tab-box-item sell" style="padding-left: 10rpx;">
+					<view class="title">{{$t('卖')}}</view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+				</view>
+			</view>
+
+			<view class="tab-box deal" v-show="tabIndex == 1">
+				<view class="tab-box-item">
+					<view class="title">
+						<text>{{$t('时间')}}</text>
+						<text>{{$t('方向')}}</text>
+					</view>
+					<view class="item"><text>14:14:05</text><text>{{$t('买入')}}</text></view>
+					<view class="item"><text>14:14:05</text><text class="err">{{$t('卖出')}}</text></view>
+				</view>
+
+
+				<view class="tab-box-item">
+					<view class="title">
+						<text>{{$t('价格')}}</text>
+						<text>{{$t('数量')}}</text>
+					</view>
+					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item"><text class="err">67.193</text><text>310.4</text></view>
+				</view>
+			</view>
+
+			<view class="tab-box info" v-show="tabIndex == 2">
+				<u-gap height="20rpx"></u-gap>
+				<view class="logo">
+					<u-image width="48rpx" height="48rpx"></u-image>
+					<text>BTC</text>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('发行时间')}}</view>
+					<view>2008-11-01</view>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('发行总量')}}</view>
+					<view>21,000,000</view>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('流通总量')}}</view>
+					<view>18,374,575</view>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('发行价格')}}</view>
+					<view>0.0025</view>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('白皮书')}}</view>
+					<view>https://bitcoin.org/bitcoin.pdf</view>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('官网')}}</view>
+					<view><text selectable>https://bitcoin.org</text></view>
+				</view>
+				<view class="lab-item">
+					<view>{{$t('介绍')}}</view>
+				</view>
+				<view class="desc">
+					比特币（BitCoin）概念最初由中本聪在2008年提出，根据中本聪的思路设计发布的开源软件以及建构其上的P2P网络。比特币是一种P2P形式的数字货币。点对点的传输意味着一个去中心化的支付系统。
+					与大多数货币不同，比特币不依靠特定货币机构发行，它依据特定算法，通过大量的计算产生，比特币经济使用整个p2p网络中众多节点构成的分布式数据库来确认并记录所有的交易行为，并使用密码学的设计来确保货币流通各个环节安全性。
+					p2p的去中心化特性与算法本身可以确保无法通过大量制造比特币来人为操控币值。基于密码学的设计可以使比特币只能被真实的拥有者转移或支付。这同样确保了货币所有权与流通交易的匿名性。比特币与其他虚拟货币最大的不同，是其总数量非常有限，具有极强的稀缺性。该货币系统曾在4年内只有不超过1050万个，之后的总数量将被永久限制在2100万个。
+					比特，是一种计算机专业术语，是信息量单位，是由英文BIT音译而来。二进制数的一位所包含的信息就是一比特，如二进制数0100就是4比特。那么，比特这个概念和货币联系到一起，不难看出，比特币非现实货币，而是一种计算机电子虚拟货币，存储在你的电脑上。
+					目前，这种崭新的虚拟货币不受任何政府、任何银行控制。因此，它还未被合法化。
+				</view>
+			</view>
+		</view>
 		<!-- 		<view class="button-sp-area">
 			<button class="mini-btn" type="default" size="mini" @click="ChangeSymbol('000001.sz')">000001.sz</button>
 			<button class="mini-btn" type="default" size="mini" @click="ChangeSymbol('600000.sh')">600000.sh</button>
 		</view> -->
+
+		<view class="fix-bar">
+			<view class="box">
+				<view>{{$t('买入')}}</view>
+				<view>{{$t('卖出')}}</view>
+			</view>
+			<u-safe-bottom></u-safe-bottom>
+		</view>
+		<u-gap height="120rpx"></u-gap>
+		<u-safe-bottom></u-safe-bottom>
 	</view>
 
 </template>
@@ -118,6 +217,17 @@
 	export default {
 		data() {
 			let data = {
+				tabs: [{
+						name: this.$t('委托订单')
+					},
+					{
+						name: this.$t('最新成交')
+					},
+					{
+						name: this.$t('简介信息')
+					}
+				],
+				tabIndex: 0,
 				isShowDeep: false,
 				Symbol: '600000.sh',
 				timeIndex: null,
@@ -149,39 +259,49 @@
 
 				],
 				timeNav: [{
-						text: '1分钟',
+						text: this.$t('minute', {
+							num: 1
+						}),
 						id: PERIOD_ID.KLINE_MINUTE_ID
 					},
 					{
-						text: '5分钟',
+						text: this.$t('minute', {
+							num: 5
+						}),
 						id: PERIOD_ID.KLINE_5MINUTE_ID
 					},
 					{
-						text: '15分钟',
+						text: this.$t('minute', {
+							num: 15
+						}),
 						id: PERIOD_ID.KLINE_15MINUTE_ID
 					},
 					{
-						text: '30分钟',
+						text: this.$t('minute', {
+							num: 30
+						}),
 						id: PERIOD_ID.KLINE_30MINUTE_ID
 					},
 					{
-						text: '60分钟',
+						text: this.$t('minute', {
+							num: 60
+						}),
 						id: PERIOD_ID.KLINE_60MINUTE_ID
 					},
 					{
-						text: '日线',
+						text:this.$t('日线'),
 						id: PERIOD_ID.KLINE_DAY_ID
 					},
 					{
-						text: '周线',
+						text:this.$t('周线'),
 						id: PERIOD_ID.KLINE_WEEK_ID
 					},
 					{
-						text: '月线',
+						text:this.$t('月线'),
 						id: PERIOD_ID.KLINE_MONTH_ID
 					},
 					{
-						text: '年线',
+						text:this.$t('年线'),
 						id: PERIOD_ID.KLINE_YEAR_ID
 					}
 				],
@@ -201,23 +321,46 @@
 		},
 
 		onLoad() {
-			uni.onThemeChange(({
-				theme
-			}) => {
-				let themeId, themeStyle
-				if (theme == 'dark') themeStyle = JSCommonHQStyle.GetStyleConfig(JSCommonHQStyle.STYLE_TYPE_ID
-					.BLACK_ID)
-				else themeStyle = JSCommonHQStyle.GetStyleConfig(JSCommonHQStyle.STYLE_TYPE_ID.WHITE_ID)
-				JSCommon.JSChart.SetStyle(themeStyle);
-			})
+			
+		},
 
+		onShow() {
+			this.ChangeKLinePeriod(PERIOD_ID.KLINE_DAY_ID, this.timeIndex || 5);
 		},
 
 		onReady() {
-			this.ChangeKLinePeriod(PERIOD_ID.KLINE_DAY_ID, 5);
+
 		},
 
+		onHide() {
+			if (g_KLine.JSChart) {
+				g_KLine.JSChart.StopAutoUpdate();
+				g_KLine.JSChart = null;
+			}
+
+			if (d_Line.JSChart) {
+				d_Line.JSChart.StopAutoUpdate();
+				d_Line.JSChart = null;
+			}
+		},
+
+		onUnload() {
+			if (g_KLine.JSChart) {
+				g_KLine.JSChart.StopAutoUpdate();
+				g_KLine.JSChart = null;
+			}
+
+			if (d_Line.JSChart) {
+				d_Line.JSChart.StopAutoUpdate();
+				d_Line.JSChart = null;
+			}
+		},
 		methods: {
+			tabClick({
+				index
+			}) {
+				this.tabIndex = index
+			},
 			createDeep() {
 				this.isShowDeep = true
 				setTimeout(() => {
@@ -235,6 +378,13 @@
 
 				element.Height = this.KLine.Height; //高度宽度需要手动绑定!!
 				element.Width = this.KLine.Width;
+
+				const theme = uni.getSystemInfoSync().theme
+				let style
+				if (theme == "light") style = 'WHITE_ID'
+				else style = 'BLACK_ID'
+				const themeStyle = JSCommonHQStyle.GetStyleConfig(JSCommonHQStyle.STYLE_TYPE_ID[style])
+				JSCommon.JSChart.SetStyle(themeStyle);
 
 				d_Line.JSChart = JSCommon.JSChart.Init(element);
 				this.deepKLine.Option.IsFullDraw = true; //每次手势移动全屏重绘
@@ -280,6 +430,13 @@
 				element.ID = 'kline';
 				element.Height = this.KLine.Height; //高度宽度需要手动绑定!!
 				element.Width = this.KLine.Width;
+
+				const theme = uni.getSystemInfoSync().theme
+				let style
+				if (theme == "light") style = 'WHITE_ID'
+				else style = 'BLACK_ID'
+				const themeStyle = JSCommonHQStyle.GetStyleConfig(JSCommonHQStyle.STYLE_TYPE_ID[style])
+				JSCommon.JSChart.SetStyle(themeStyle);
 
 				g_KLine.JSChart = JSCommon.JSChart.Init(element);
 				this.KLine.Option.NetworkFilter = this.NetworkFilter;
@@ -350,8 +507,171 @@
 </script>
 
 <style lang="scss">
+	.fix-bar {
+		position: fixed;
+		width: 100%;
+		bottom: 0;
+		z-index: 100;
+		left: 0;
+		background: #F6F6F6;
+
+		.box {
+			display: flex;
+			justify-content: space-between;
+			padding: 20rpx 30rpx;
+
+			>view {
+				width: 340rpx;
+				line-height: 80rpx;
+				text-align: center;
+				border-radius: 8rpx;
+				color: #fff;
+				font-weight: 500;
+				font-size: 30rpx;
+
+				&:first-child {
+					background-color: #2DBE87;
+				}
+
+				&:last-child {
+
+					background: #F5475E;
+				}
+			}
+		}
+	}
+
 	page {
 		/* background-color: #000; */
+	}
+
+	.tab-content {
+		padding: 0 30rpx;
+		padding-bottom: 20rpx;
+
+		.tab-box {
+			display: flex;
+
+			&.info {
+				display: block;
+				padding-bottom: 20rpx;
+
+				.desc {
+					color: #232531;
+					font-size: 28rpx;
+					margin-top: 40rpx;
+					line-height: 45rpx;
+				}
+
+				.lab-item {
+					display: flex;
+					margin-top: 40rpx;
+					justify-content: space-between;
+
+					view {
+						&:last-child {
+							font-weight: 500;
+							color: #232531;
+							font-size: 30rpx;
+						}
+
+						&:first-child {
+							color: #858C9C;
+
+							font-size: 30rpx;
+						}
+					}
+				}
+
+				.logo {
+					display: flex;
+					align-items: center;
+
+					text {
+						font-weight: bold;
+						color: #1F272A;
+						font-size: 32rpx;
+						margin-left: 10rpx;
+					}
+				}
+			}
+
+			&.deal {
+				justify-content: space-between;
+
+				.tab-box-item {
+					width: 40%;
+
+					&:last-child {
+						.item {
+							text {
+								&:last-child {
+									color: #1E1F29;
+								}
+							}
+						}
+					}
+
+					text {
+						&.err {
+							color: #F5475E !important;
+						}
+					}
+
+					.title {
+						display: flex;
+						justify-content: space-between;
+					}
+				}
+			}
+
+			.tab-box-item {
+				width: 50%;
+
+				&.sell {
+					.item {
+						text {
+							&:first-child {
+								color: #F5475E;
+							}
+
+							&:last-child {
+								color: #1E1F29;
+							}
+						}
+					}
+				}
+
+				.item {
+					color: #1E1F29;
+					font-size: 22rpx;
+					display: flex;
+					justify-content: space-between;
+
+					text {
+						&:last-child {
+							color: #2DBE87;
+						}
+					}
+
+					margin-top: 16rpx;
+				}
+
+				.title {
+					padding-bottom: 16rpx;
+					color: #80858B;
+					font-size: 24rpx;
+				}
+			}
+		}
+	}
+
+	.tabs-box {
+		::v-deep {
+			.u-tabs__wrapper__nav__line {
+				bottom: 0 !important;
+			}
+		}
 	}
 
 	.other-box {
@@ -436,20 +756,19 @@
 
 				&:first-child,
 				&:nth-child(2) {
-					margin-bottom: 5rpx;
+					margin-bottom: 15rpx;
 				}
 			}
 
 			.lab {
 				color: #838B93;
-
+				white-space: nowrap;
 				font-size: 20rpx;
 			}
 
 			.val {
-				margin-top: 6rpx;
+				margin-top: 8rpx;
 				color: #000000;
-
 				font-size: 20rpx;
 			}
 		}
@@ -486,31 +805,5 @@
 			margin-left: 20rpx;
 			font-size: 36rpx;
 		}
-	}
-
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.logo {
-		height: 200upx;
-		width: 200upx;
-		margin-top: 200upx;
-		margin-left: auto;
-		margin-right: auto;
-		margin-bottom: 50upx;
-	}
-
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
-
-	.title {
-		font-size: 36upx;
-		color: #8f8f94;
 	}
 </style>
