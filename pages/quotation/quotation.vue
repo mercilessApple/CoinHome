@@ -1,17 +1,18 @@
 <template>
 	<view class="container">
 		<view class="upper">
-			<u-navbar leftIcon="" placeholder bgColor="#F6F6F6">
+			<u-navbar leftIcon="" placeholder :bgColor="theme == 'light' ? '#F6F6F6' : '#171E28'">
 				<view class="u-nav-slot" slot="center">
 					<view class="search">
-						<u-search disabled height="64rpx" bgColor='#EBECF0' placeholder="" :showAction="false">
+						<u-search disabled height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'"
+							placeholder="" :showAction="false">
 						</u-search>
 					</view>
 				</view>
 			</u-navbar>
 			<view class="tabs-box">
 				<u-tabs :current="curNow" lineWidth="64rpx" itemStyle="height:80rpx" lineColor="#FEFA05" :activeStyle="{
-			 color:'#22222C'
+			 color:theme == 'light' ? '#22222C' : '#fff'
 		 }" :inactiveStyle="{
 			 color:'#838B93'
 		 }" :list="uTabs" lineHeight="8rpx" @change="onTabsChange"></u-tabs>
@@ -393,5 +394,25 @@
 
 	.search {
 		margin: 0 30rpx;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		page {
+			background-color: #171E28;
+		}
+
+		.list>view:first-child .val .unit {
+			color: #fff;
+		}
+
+		.list-tab>view.active {
+
+			background: #434A5A;
+			color: #fff;
+		}
+
+		.context {
+			background-color: #1F282F;
+		}
 	}
 </style>

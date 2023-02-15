@@ -27,7 +27,8 @@
 						<text>{{$t('身份证')}}</text>
 					</view>
 					<view class="right">
-						<u-icon :color="idType == 0 ? '#FEFA05' : '#B9B9BB'" :name="idType == 0 ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
+						<u-icon :color="idType == 0 ? '#FEFA05' : '#B9B9BB'"
+							:name="idType == 0 ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
 					</view>
 				</view>
 				<view @click="idType = 1" class="item" style="margin-top: 20rpx;" :class="{
@@ -38,7 +39,8 @@
 						<text>{{$t('护照')}}</text>
 					</view>
 					<view class="right">
-						<u-icon :color="idType == 1 ? '#FEFA05' : '#B9B9BB'" :name="idType == 1 ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
+						<u-icon :color="idType == 1 ? '#FEFA05' : '#B9B9BB'"
+							:name="idType == 1 ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
 					</view>
 				</view>
 			</view>
@@ -48,13 +50,15 @@
 				<view class="item">
 					<view class="lab">{{$t('姓名')}}</view>
 					<view class="input">
-						<u-input fontSize="26rpx" border="none" :placeholder="$t('请输入您的真实姓名')"></u-input>
+						<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" fontSize="26rpx" border="none"
+							:placeholder="$t('请输入您的真实姓名')"></u-input>
 					</view>
 				</view>
 				<view class="item">
 					<view class="lab">{{$t('证件号')}}</view>
 					<view class="input">
-						<u-input fontSize="26rpx" border="none" type="idcard" :placeholder="$t('请输入您的证件号')"></u-input>
+						<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" fontSize="26rpx" border="none"
+							type="idcard" :placeholder="$t('请输入您的证件号')"></u-input>
 					</view>
 				</view>
 			</view>
@@ -76,7 +80,7 @@
 		},
 		methods: {
 			submit() {
-				
+
 			}
 		},
 	}
@@ -125,6 +129,7 @@
 			height: 100rpx;
 			border: 2rpx solid #EBEBEB;
 			border-radius: 8rpx;
+
 			&.active {
 				border-color: #FEFA05;
 			}
@@ -188,5 +193,62 @@
 		font-weight: bold;
 		color: #23282E;
 		font-size: 48rpx;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		page {
+			background: #1A1B1F;
+		}
+
+		.picker-box,
+		.id .item {
+			border-color: #454E57;
+		}
+
+		.info {
+			.input {
+				border-radius: 8rpx;
+				
+border: 2rpx solid #484D53;
+				background: #1A1B1F !important;
+			}
+		}
+
+		.picker-box {
+
+			background: #454E57;
+
+			.left {
+				text {
+					color: #FFFFFF !important;
+				}
+			}
+		}
+
+		.id .item {
+
+			background: #454E57;
+
+			.left {
+				text {
+					color: #FFFFFF !important;
+				}
+			}
+		}
+
+		.country,
+		.info,
+		.id {
+			.title {
+				color: #fff;
+			}
+		}
+
+		.tip {
+
+			background: #0A0E11;
+
+			color: #FFFFFF;
+		}
 	}
 </style>

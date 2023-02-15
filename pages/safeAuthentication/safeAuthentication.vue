@@ -7,7 +7,7 @@
 				codeText:phoneText
 			})}}</view>
 			<view class="input">
-				<u-input v-model="phoneCode" clearable border="none">
+				<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" v-model="phoneCode" clearable border="none">
 					<template slot="suffix">
 						<text @click="getVerificationCode('phone')" v-if="time === 60"
 							class="verificationCode">{{$t("获取验证码")}}</text>
@@ -25,7 +25,7 @@
 				codeText:emailText
 			})}}</view>
 			<view class="input">
-				<u-input v-model="emailCode" clearable border="none">
+				<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" v-model="emailCode" clearable border="none">
 					<template slot="suffix">
 						<text @click="getVerificationCode('email')" v-if="time1 === 60"
 							class="verificationCode">{{$t("获取验证码")}}</text>
@@ -148,6 +148,17 @@
 				color: #8B8F92;
 				font-size: 26rpx;
 			}
+		}
+	}
+	
+	@media (prefers-color-scheme: dark) {
+		.container .btn{
+			background: #374048;
+			color: #929BA2;
+		}
+	
+		.input {
+			background: #29313C !important;
 		}
 	}
 </style>

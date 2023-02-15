@@ -1,11 +1,13 @@
 <template>
 	<view>
-		<u-navbar leftIcon="" placeholder bgColor="#ffffff">
+		<u-navbar leftIcon="" placeholder :bgColor="theme == 'light'?' #ffffff':'#1F282F'">
 			<view class="u-nav-slot" slot="center">
 				<view class="search">
 					<u-search @custom="search" @search="search" :actionStyle="{
-						'width':'auto'
-					}" :actionText="$t('搜索')" v-model="key" height="64rpx" bgColor='#F6F6F6' placeholder="">
+						'width':'auto',
+						'color':theme == 'light' ? '' : '#FEFA05'
+					}" :actionText="$t('搜索')" v-model="key" height="64rpx" :bgColor="theme == 'light'? '#F6F6F6' : '#29313C'"
+						placeholder="">
 					</u-search>
 				</view>
 			</view>
@@ -157,6 +159,17 @@
 		.u-nav-slot {
 			padding: 0 30rpx;
 			width: 100%;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.lab .item {
+			background: #29313C
+		}
+
+		.lab .tit,
+		.lab .lab-list .column .info view:first-child{
+			color: #fff;
 		}
 	}
 </style>

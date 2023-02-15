@@ -88,4 +88,11 @@
 		font-size: 48rpx;
 		padding: 44rpx 30rpx;
 	}
+	
+	@media (prefers-color-scheme: dark) {
+		.title,
+		.nav .item .left{
+			color: #fff;
+		}
+	}
 </style>

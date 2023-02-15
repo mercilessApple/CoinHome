@@ -2,7 +2,7 @@
 	<view>
 		<u-sticky>
 			<view class="sticky">
-				<u-search :show-action="false" height="80rpx" :input-style="{
+				<u-search :color="theme == 'light' ? '' :'#fff'" :bgColor="theme == 'light' ? '' :'#2C303C' " :show-action="false" height="80rpx" :input-style="{
 					'font-size':'24rpx'
 				}" placeholder-color="#BBBBBD" v-model="keyword" placeholder="Search"></u-search>
 			</view>
@@ -95,6 +95,12 @@
 					font-size: 28rpx;
 				}
 			}
+		}
+	}
+	
+	@media (prefers-color-scheme: dark) {
+		.sticky{
+			background-color: #1F282F;
 		}
 	}
 </style>

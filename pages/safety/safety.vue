@@ -90,4 +90,18 @@
 			font-size: 28rpx;
 		}
 	}
+
+	@media (prefers-color-scheme: dark) {
+		.title {
+			background: #171E28;
+		}
+
+		.title .big-tip {
+			color: #FFFFFF;
+		}
+
+		.nav .item .left {
+			color: #FFFFFF;
+		}
+	}
 </style>

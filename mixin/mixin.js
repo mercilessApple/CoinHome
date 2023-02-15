@@ -9,6 +9,9 @@ export default {
 			this.theme = theme
 		})
 	},
+	onShow(){
+
+	},
 	methods: {
 		geTel(tel) {
 			return tel.substring(0, 3) + "****" + tel.substr(tel.length - 4);

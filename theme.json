@@ -3,12 +3,32 @@
 		"backgroundColor":"#ffffff",
 		"navigationBarBackgroundColor":"#ffffff",
 		"navigationBarTextStyle":"black",
-		"accountVerificationNavBG":"#fff"
+		"tabBarTextSelectedColor":"#2B323C",
+		"tabBarBorderStyle":"white",
+		"tabBarBackgroundColor":"#ffffff",
+		"indexSelectIcon":"static/tabbar/index-active.png",
+		"quotationSelectIcon":"static/tabbar/quotation-active.png",
+		"transactionSelectIcon":"static/tabbar/transaction-active.png",
+		"assetsSelectIcon":"static/tabbar/assets-active.png",
+		"authenticationBG":"#fff",
+		"standardAuthenticationBG":"#fff",
+		"tradeBG":"#F6F6F6",
+		"orderDetailBG":"#fff"
 	},
 	"dark": {
+		"orderDetailBG":"#171E28",
+		"tradeBG":"#171E28",
+		"standardAuthenticationBG":"#1A1B1F",
+		"authenticationBG":"#1A1B1F",
 		"backgroundColor":"#1F282F",
-		"navigationBarBackgroundColor":"#202632",
+		"navigationBarBackgroundColor":"#1F282F",
 		"navigationBarTextStyle":"white",
-		"accountVerificationNavBG":"#1F282F"
+		"tabBarTextSelectedColor":"#FEFA05",
+		"tabBarBorderStyle":"black",
+		"tabBarBackgroundColor":"#1F282F",
+		"indexSelectIcon":"static/tabbar/index-dark-active.png",
+		"quotationSelectIcon":"static/tabbar/quotation-dark-active.png",
+		"transactionSelectIcon":"static/tabbar/transaction-dark-active.png",
+		"assetsSelectIcon":"static/tabbar/assets-dark-active.png"
 	}
 }

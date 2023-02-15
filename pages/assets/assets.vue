@@ -40,14 +40,15 @@
 			<view class="info">
 				<view class="left">
 					<u-checkbox-group v-model="checkboxGroup">
-						<u-checkbox labelColor="#929BA2" labelSize="24rpx" activeColor="#FEFA05" shape="circle" key="0"
-							:label="$t('hideAssets',{
+						<u-checkbox iconColor="#000" labelColor="#929BA2" labelSize="24rpx" activeColor="#FEFA05"
+							shape="circle" key="0" :label="$t('hideAssets',{
 								val:0
 							})"></u-checkbox>
 					</u-checkbox-group>
 				</view>
 				<view class="right">
-					<u-search :placeholder="$t('搜索')" :showAction="false"></u-search>
+					<u-search :bgColor="theme == 'light' ? '#f2f2f2' : '#343A46'" :placeholder="$t('搜索')"
+						:showAction="false"></u-search>
 				</view>
 			</view>
 
@@ -263,5 +264,27 @@
 		background-color: #fff;
 		border-radius: 50rpx 50rpx 0px 0px;
 		padding-bottom: 34rpx;
+	}
+
+	@media (prefers-color-scheme: dark) {
+	 page {
+			background: #171E28;
+		}
+
+		.content .upper .info .left .val,
+		.list .title {
+
+			color: #FFFFFF;
+		}
+
+		.content .upper .btn view:last-child {
+			background-color: #343A46;
+			color: #fff;
+		}
+
+		.content,
+		.list {
+			background-color: #1F282F;
+		}
 	}
 </style>

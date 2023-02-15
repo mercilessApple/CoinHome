@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar autoBack placeholder></u-navbar>
+		<!-- <u-navbar autoBack placeholder></u-navbar> -->
 		<view class="title">{{$t('通知')}}</view>
 
 		<!-- <u-tabs :current="current" :inactiveStyle="{
@@ -17,8 +17,8 @@
 		<view class="list">
 			<view class="item" v-for="(item,index) in list" :key="item.id" @click="modalData = item,show = true">
 				<view class="left">
-					<u-image v-if="current === 1" src="@/static/icon13.png" width="60rpx" height="60rpx"></u-image>
-					<u-image v-if="current === 0" src="@/static/icon13.png" width="60rpx" height="60rpx"></u-image>
+					<u-image v-if="current === 1" :src="theme == 'light' ? require('@/static/icon13.png') : require('@/static/icon43.png')" width="60rpx" height="60rpx"></u-image>
+					<u-image v-if="current === 0" :src="theme == 'light' ? require('@/static/icon13.png') : require('@/static/icon43.png')" width="60rpx" height="60rpx"></u-image>
 				</view>
 				<view class="right">
 					<view class="tip">{{item.title}}</view>
@@ -139,6 +139,17 @@
 	::v-deep {
 		.u-tabs__wrapper__nav__item__text {
 			font-size: 32rpx;
+		}
+	}
+	
+	@media (prefers-color-scheme: dark) {
+		.list{
+			.tip{
+				color: #FFFFFF !important;
+			}
+		}
+		.title{
+			color: #fff;
 		}
 	}
 </style>

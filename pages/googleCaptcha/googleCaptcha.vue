@@ -110,4 +110,20 @@
 		font-size: 22rpx;
 		line-height: 35rpx;
 	}
+	
+	@media (prefers-color-scheme: dark) {
+		.tip {
+			background: #171E28;
+		}
+	
+	.item .title text{
+		color: #fff;
+	}
+	.qr-text text{
+		
+background: #374048;
+
+color: #9599A4;
+	}
+	}
 </style>

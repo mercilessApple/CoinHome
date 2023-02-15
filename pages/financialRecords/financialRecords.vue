@@ -56,12 +56,14 @@
 					<u-empty :text="$t('暂无数据')"></u-empty>
 				</block>
 			</view>
-			<u-popup @close="show = false" :show="show" round="20rpx" closeable>
+			<u-popup @close="show = false" :show="show" round="20rpx" closeable
+				:bgColor="theme == 'light' ? '#fff' : '#1F282F'">
 				<view class="coin-popup">
 					<view class="title">{{$t('选择币种')}}</view>
 					<view class="search">
-						<u-search @search="search" :showAction="false" :placeholder="$t('请输入您要搜索的币种名称')" height="72rpx"
-							bgColor="#EBECF0">
+						<u-search :color="theme == 'light' ? '' :'#fff'" @search="search" :showAction="false"
+							:placeholder="$t('请输入您要搜索的币种名称')" height="72rpx"
+							:bgColor="theme == 'light' ? '#EBECF0' :'#2C303C' ">
 						</u-search>
 					</view>
 					<view class="box">
@@ -390,6 +392,46 @@
 				color: #23282E;
 				font-size: 40rpx;
 			}
+		}
+	}
+
+
+	@media (prefers-color-scheme: dark) {
+		page {
+			background-color: #171E28;
+		}
+
+		.content .list .title {
+			color: #fff;
+			border-bottom-color: #343B45;
+		}
+
+		.card .btn-box view:nth-child(2),
+		.card .btn-box view:last-child {
+
+			color: #FFFFFF;
+			background-color: #343A46
+		}
+
+		.card,
+		.content {
+
+			background: #1F282F;
+		}
+
+		.coin-box .left text,
+		.coin-popup .title,
+		.coin-popup .list .item .left text,
+		.coin-popup .list .item .right view:last-child,
+		.content .list .item .left view:first-child,
+		.content .list .item .right,.card .upper .val{
+			color: #fff;
+		}
+
+		.coin-popup .list .item {
+
+			background: #343A46;
+			border-radius: 8rpx;
 		}
 	}
 </style>

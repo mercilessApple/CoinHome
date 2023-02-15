@@ -96,4 +96,16 @@
 		font-size: 48rpx;
 		background: #F6F6F6;
 	}
+
+	@media (prefers-color-scheme: dark) {
+		.title {
+
+			background: #171E28;
+			color: #fff;
+		}
+
+		.nav .item .left {
+			color: #fff;
+		}
+	}
 </style>

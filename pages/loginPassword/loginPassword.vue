@@ -8,7 +8,7 @@
 		<view class="item">
 			<view class="lab">{{$t('验证码')}}</view>
 			<view class="input">
-				<u-input v-model="code" clearable border="none">
+				<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" v-model="code" clearable border="none">
 					<template slot="suffix">
 						<text @click="getVerificationCode" v-if="time === 60"
 							class="verificationCode">{{$t("获取验证码")}}</text>
@@ -118,6 +118,28 @@
 			margin-bottom: 18rpx;
 			color: #8B8F92;
 			font-size: 26rpx;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.tip {
+			background: #171E28;
+		}
+
+		.email {
+			color: #fff;
+		}
+
+		.btn {
+
+			background: #374048;
+
+			color: #929BA2;
+		}
+
+		.item .input {
+
+			background: #29313C;
 		}
 	}
 </style>

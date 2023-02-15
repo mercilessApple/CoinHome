@@ -225,4 +225,32 @@
 			}
 		}
 	}
+
+	@media (prefers-color-scheme: dark) {
+		page {
+			background-color: #1A1B1F !important;
+		}
+
+		.content {
+			.item-title {
+
+				color: #FFFFFF !important;
+			}
+		}
+
+		.tab {
+			view {
+				color: #FFFFFF;
+
+				&.active {
+					color: #23282E;
+				}
+			}
+		}
+
+		.tip {
+			color: #FFFFFF;
+			background: #0A0E11;
+		}
+	}
 </style>

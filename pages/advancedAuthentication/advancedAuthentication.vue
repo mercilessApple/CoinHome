@@ -78,4 +78,17 @@
 			font-size: 32rpx;
 		}
 	}
+	@media (prefers-color-scheme: dark) {
+		page{
+			background-color: #1A1B1F;
+		}
+		.tip .lab{
+			
+color: #FFFFFF;
+		}
+		.tip{
+			
+background: #0A0E11;
+		}
+	}
 </style>

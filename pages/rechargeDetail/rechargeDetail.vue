@@ -1,6 +1,7 @@
 <template>
 	<view class="container">
-		<u-navbar bgColor="#F6F6F6" placeholder title="" @rightClick="$u.route({
+		<u-navbar :leftIconColor="theme == 'light' ? '' : '#fff'" :bgColor="theme == 'light' ? '#F6F6F6':'#171E28' "
+			placeholder title="" @rightClick="$u.route({
 				url:'/pages/financialRecords/financialRecords',
 				params:{
 					coin,
@@ -27,7 +28,7 @@
 				<view class="left">
 					<view>{{$t('主网')}}</view>
 					<view :style="{
-						'color':curNet == '' ? '#888C95' : '#000000' 
+						'color':curNet == '' ? '#888C95' : theme == 'light' ? '#000000' :'#fff'
 					}">{{curNet == '' ? $t('请先选择主网'):curNet.chainName}}</view>
 				</view>
 				<view class="right" @click="showNet = true">
@@ -39,8 +40,9 @@
 				<u-gap height="20rpx"></u-gap>
 				<view class="withdraw address">
 					<view class="tit">{{$t('提币地址')}}</view>
-					<u-input v-model="beneficiaryAddress" fontSize="26rpx" :placeholder="$t('请输入收款地址')" :customStyle="{
-						background: '#F6F6F6',
+					<u-input :color="theme == 'light' ? '' : '#fff'" v-model="beneficiaryAddress" fontSize="26rpx"
+						:placeholder="$t('请输入收款地址')" :customStyle="{
+						background: theme == 'light' ? '#F6F6F6' : '#29313C',
 						height:'90rpx',
 						'padding':'0 30rpx'
 					}" border="none">
@@ -52,9 +54,9 @@
 				</view>
 				<view class="withdraw amount" v-if="curCoin != ''">
 					<view class="tit">{{$t('提币数额')}}</view>
-					<u-input v-model="withdrawalAmount" type="number" fontSize="26rpx" :placeholder="$t('请输入提币数量')"
-						:customStyle="{
-						background: '#F6F6F6',
+					<u-input :color="theme == 'light' ? '' : '#fff'" v-model="withdrawalAmount" type="number"
+						fontSize="26rpx" :placeholder="$t('请输入提币数量')" :customStyle="{
+						background: theme == 'light' ? '#F6F6F6' : '#29313C',
 						height:'90rpx',
 						'padding':'0 30rpx'
 					}" border="none">
@@ -89,12 +91,14 @@
 					</view>
 				</view>
 			</block>
-			<u-popup @close="show = false" :show="show" round="20rpx" closeable>
+			<u-popup :bgColor="theme == 'light' ? '#fff' : '#1F282F'" @close="show = false" :show="show" round="20rpx"
+				closeable>
 				<view class="coin-popup">
 					<view class="title">{{$t('选择币种')}}</view>
 					<view class="search">
-						<u-search @search="search" :showAction="false" :placeholder="$t('请输入您要搜索的币种名称')" height="72rpx"
-							bgColor="#EBECF0">
+						<u-search :color="theme == 'light' ? '' :'#fff'" @search="search" :showAction="false"
+							:placeholder="$t('请输入您要搜索的币种名称')" height="72rpx"
+							:bgColor="theme == 'light' ? '#EBECF0' :'#2C303C' ">
 						</u-search>
 					</view>
 					<view class="box">
@@ -118,7 +122,8 @@
 				</view>
 			</u-popup>
 
-			<u-popup @close="showNet = false" :show="showNet" round="20rpx" closeable>
+			<u-popup @close="showNet = false" :show="showNet" round="20rpx" closeable
+				:bgColor="theme == 'light' ? '#fff' : '#1F282F'">
 				<view class="coin-popup">
 					<view class="title">{{$t('选择网络')}}</view>
 					<view class="warning">
@@ -447,10 +452,11 @@
 		}
 
 		.list {
-			padding: 0 30rpx;
+			// padding: 0 30rpx;
 
 			.item {
-				padding: 0 30rpx;
+				margin: 0 30rpx;
+				padding: 0 20rpx;
 				margin-top: 20rpx;
 				height: 136rpx;
 				display: flex;
@@ -591,5 +597,56 @@
 
 	page {
 		background-color: #F6F6F6;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		page {
+			background-color: #171E28;
+		}
+
+		.coin-box .left text,
+		.coin-popup .title,
+		.coin-popup .list .item .left text,
+		.coin-popup .list .item .right view:last-child,
+		.withdraw .tit,
+		.btn-content .box .btn-tip,
+		.withdraw.amount .unit text:first-child{
+
+			color: #FFFFFF;
+		}
+
+		.btn-content {
+			background-color: #1F282F;
+		}
+
+		.coin-popup .warning {
+			::v-deep {
+				.u-alert--warning--light {
+					background-color: #36342F !important;
+				}
+			}
+		}
+
+		.main-work,
+		.code,
+		.code-info,
+		.tip {
+			background: #343A46;
+		}
+
+		.coin-popup .list .item {
+			border-radius: 8rpx;
+			background: #29313C;
+			padding: 0 20rpx !important;
+		}
+
+		.btn-box {
+
+			background: #29313C;
+		}
+
+		.content {
+			background: #1F282F
+		}
 	}
 </style>

@@ -100,4 +100,16 @@
 
 		padding: 0 30rpx;
 	}
+	
+	@media (prefers-color-scheme: dark) {
+		.card{
+			background-color: #1F282F;
+		}
+		.container .status view{
+			color: #fff;
+		}
+		page{
+			background-color: #171E28;
+		}
+	}
 </style>

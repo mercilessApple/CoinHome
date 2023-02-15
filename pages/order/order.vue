@@ -1,7 +1,9 @@
 <template>
 	<view>
 		<view class="tab u-border-bottom">
-			<u-tabs lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click"></u-tabs>
+			<u-tabs :activeStyle="{
+						'color':theme == 'light' ? '#303133' : '#fff'
+					}"  lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click"></u-tabs>
 		</view>
 		<view class="list">
 			<view class="item u-border-bottom" @click="$u.route({
@@ -255,6 +257,23 @@
 	::v-deep {
 		.u-tabs__wrapper__nav__line {
 			bottom: 0 !important;
+		}
+	}
+
+
+	@media (prefers-color-scheme: dark) {
+
+		.list .item,
+		.tab {
+			&.u-border-bottom {
+				border-color: #343B45 !important;
+			}
+		}
+		
+		 .list .item .left > view:first-child .business,
+		 .list .item .right .right-status.text text
+		{
+			color: #fff;
 		}
 	}
 </style>

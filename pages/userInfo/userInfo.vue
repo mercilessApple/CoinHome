@@ -2,7 +2,7 @@
 	<view>
 		<u-gap height="80rpx"></u-gap>
 		<view class="pic">
-			<u-avatar size="140rpx"></u-avatar>
+			<u-avatar :default-url="require('@/static/icon46.png')" size="140rpx"></u-avatar>
 		</view>
 		<view class="name">
 			<text>{{userInfo.nickName}}</text>
@@ -32,13 +32,15 @@
 				</view>
 			</view>
 		</view>
-		<u-popup :safeAreaInsetBottom="false" round="20rpx" mode="center" :show="show">
+		<u-popup :safeAreaInsetBottom="false" round="20rpx" mode="center" :show="show"
+			:bgColor="theme == 'light' ? '#fff' : '#1F282F'">
 			<view class="popup">
 				<view class="title">{{$t('编辑昵称')}}</view>
 				<view class="tip">{{$t('为您的个人资料设置自定义昵称。')}}</view>
 				<view class="lab">{{$t('昵称')}}</view>
 				<view class="input">
-					<u-input v-model="nickName" fontSize="32rpx" border="none"></u-input>
+					<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" v-model="nickName" fontSize="32rpx"
+						border="none"></u-input>
 				</view>
 				<view class="btn">
 					<view @click="show = false">{{$t('取消')}}</view>
@@ -208,5 +210,24 @@
 	.pic {
 		display: flex;
 		justify-content: center;
+	}
+
+	@media (prefers-color-scheme: dark) {
+
+		.nav .item .left,
+		.popup .title,
+		.name {
+			color: #fff;
+		}
+
+		.popup .input {
+			background: #29313C;
+		}
+
+		.popup .btn view:first-child {
+			background: #4A525D;
+			
+color: #FFFFFF;
+		}
 	}
 </style>

@@ -1,9 +1,10 @@
 <template>
 	<view>
-		<u-navbar placeholder @rightClick="rightClick" bgColor="#f6f6f6">
+		<u-navbar placeholder @rightClick="rightClick" :bgColor="theme == 'light' ? '#f6f6f6' : '#171E28'">
 			<view class="u-nav-slot" slot="left">
 				<view class="nav-coin" @click="show = true">
-					<u-image src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
+					<u-image v-if="theme == 'light'" src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
+					<u-image v-else src="/static/icon44.png" width="48rpx" height="48rpx"></u-image>
 					<text class="name">BTC/USDT</text>
 					<text class="proportion add">+0.25%</text>
 				</view>
@@ -40,12 +41,15 @@
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="number-box">
-						<u-number-box bgColor="#f6f6f6" inputWidth="286rpx" v-model="number"></u-number-box>
+						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
+							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx" v-model="number">
+						</u-number-box>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="count-box">
-						<u-number-box :placeholder="`${$t('数量')}(BTC)`" bgColor="#f6f6f6" inputWidth="286rpx"
-							v-model="count"></u-number-box>
+						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'" :placeholder="`${$t('数量')}(BTC)`"
+							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx" v-model="count">
+						</u-number-box>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 
@@ -55,7 +59,8 @@
 					<u-gap height="16rpx"></u-gap>
 
 					<view class="total-amount">
-						<u-input type="number" inputAlign="center" border="none" :placeholder="`${$t('总额')}(USDT)`">
+						<u-input :color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
+							border="none" :placeholder="`${$t('总额')}(USDT)`">
 						</u-input>
 					</view>
 					<u-gap height="30rpx"></u-gap>
@@ -123,7 +128,9 @@
 
 			<view class="lower">
 				<view class="tab u-border-bottom">
-					<u-tabs lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click">
+					<u-tabs :activeStyle="{
+						'color':theme == 'light' ? '#303133' : '#fff'
+					}" lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click">
 					</u-tabs>
 					<view class="icon" @click="$u.route('/pages/order/order')">
 						<u-image width="40rpx" height="40rpx" src="/static/icon35.png"></u-image>
@@ -229,7 +236,8 @@
 		</view>
 		<view class="mask" v-show="showMoreSelect" @click="showMoreSelect = false"></view>
 
-		<u-popup @close="show = false" :show="show" mode="left" :customStyle="{
+		<u-popup :bgColor="theme == 'light' ? '#fff' : '#1F282F'" @close="show = false" :show="show" mode="left"
+			:customStyle="{
 			'border-radius':'0 60rpx 60rpx 0',
 			'width':'640rpx'
 		}">
@@ -237,11 +245,14 @@
 				<u-status-bar></u-status-bar>
 				<view class="title">{{$t('市场')}}</view>
 				<view class="search">
-					<u-search height="64rpx" placeholder="" :showAction="false" bgColor="#F6F6F6"></u-search>
+					<u-search height="64rpx" placeholder="" :showAction="false"
+						:bgColor="theme == 'light' ? '#F6F6F6' : '#29313C'"></u-search>
 				</view>
 				<view class="popup-tab">
-					<u-tabs activeStyle="color:#000000" inactiveStyle="color:#848B9B" lineHeight="8rpx"
-						lineWidth="48rpx" lineColor="#FEFA05" :list="popupTabs" @click="click"></u-tabs>
+					<u-tabs :activeStyle="{
+						'color':theme == 'light' ? '#000000' : '#fff'
+					}" inactiveStyle="color:#848B9B" lineHeight="8rpx" lineWidth="48rpx" lineColor="#FEFA05" :list="popupTabs"
+						@click="click"></u-tabs>
 				</view>
 				<view class="list-tab">
 					<view>{{$t('名称')}}</view>
@@ -329,9 +340,11 @@
 				padding: 0 30rpx;
 				height: 96rpx;
 				align-items: center;
-				&.active{
+
+				&.active {
 					background-color: #F6F6F6;
 				}
+
 				.right {
 					view {
 						&:first-child {
@@ -345,7 +358,8 @@
 							text-align: right;
 							color: #2DBE87;
 							font-size: 24rpx;
-							&.err{
+
+							&.err {
 								color: #F5475E;
 							}
 						}
@@ -357,6 +371,7 @@
 					font-size: 30rpx;
 					padding-top: 20rpx;
 					align-self: flex-start;
+
 					text {
 						color: #848D96;
 						font-size: 24rpx;
@@ -832,5 +847,87 @@
 			font-size: 36rpx;
 			margin: 0 20rpx;
 		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.nav-coin .name {
+			color: #fff;
+		}
+
+		.content .upper .left .usable .tip,
+		.content .upper .right .price-box>view:last-child .price,
+		.content .lower .list .item .left>view:first-child .business,
+		.content .lower .list .item .right .right-status.text text,
+		.popup .title,
+		.popup .list .item .right view:first-child {
+			color: #fff;
+		}
+
+		.content .lower .list .item,
+		.content .lower .tab {
+			&.u-border-bottom {
+				border-color: #343B45 !important;
+			}
+		}
+
+		.content .upper .left .bar .item,
+		.content .upper .left .select,
+		.content .upper .left .select .down-box,
+		.content .upper .left .number-box,
+		.content .upper .left .count-box {
+			background-color: #29313C;
+		}
+
+		.content .upper .left .total-amount {
+			background: #29313C;
+
+		}
+
+		.popup .popup-tab {
+			border-bottom-color: #343B45;
+		}
+
+		.content .upper .left .block view {
+
+			background: #29313C;
+		}
+
+		.popup .list .item.active {
+			background-color: #29313C;
+		}
+
+		.content .upper .left .number-box,
+		.content .upper .left .count-box {
+			::v-deep {
+
+				.u-number-box__plus--hover,
+				.u-number-box__minus--hover {
+					background-color: #29313C !important;
+				}
+
+				.u-number-box__plus,
+				.u-number-box__minus {
+					background-color: #29313C !important;
+
+					.u-icon__icon {
+						color: #fff !important;
+					}
+				}
+			}
+		}
+
+		.content .upper .left .select {
+			color: #fff;
+		}
+
+		page {
+			background-color: #171E28;
+		}
+
+		.content {
+			background: #1F282F;
+		}
+
+
 	}
 </style>

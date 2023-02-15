@@ -51,7 +51,6 @@
 		}, {
 			"path": "pages/accountVerification/accountVerification",
 			"style": {
-				"navigationBarBackgroundColor": "@accountVerificationNavBG",
 				"navigationBarTitleText": ""
 			}
 
@@ -61,7 +60,7 @@
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom",
-				"backgroundColor": "#F6F6F6"
+				"backgroundColor": "@tradeBG"
 			}
 
 		}, {
@@ -69,7 +68,7 @@
 			"style": {
 				"navigationBarTitleText": "",
 				"navigationStyle": "custom",
-				"backgroundColor": "#F6F6F6",
+				"backgroundColor": "@tradeBG",
 				"enablePullDownRefresh": false
 			}
 
@@ -78,15 +77,15 @@
 			"style": {
 				"navigationBarTitleText": "%assets%",
 				"enablePullDownRefresh": false,
-				"backgroundColor": "#F6F6F6",
-				"navigationBarBackgroundColor": "#F6F6F6"
+				"backgroundColor": "@tradeBG",
+				"navigationBarBackgroundColor": "@tradeBG"
 			}
 
 		}, {
 			"path": "pages/notice/notice",
 			"style": {
 				"navigationBarTitleText": "",
-				"navigationStyle": "custom",
+				// "navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
 
@@ -140,15 +139,15 @@
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
-				"backgroundColor": "#F6F6F6"
+				"backgroundColor": "@tradeBG"
 			}
 
 		}, {
 			"path": "pages/financialRecords/financialRecords",
 			"style": {
 				"navigationBarTitleText": "",
-				"backgroundColor": "#F6F6F6",
-				"navigationBarBackgroundColor": "#F6F6F6",
+				"backgroundColor": "@tradeBG",
+				"navigationBarBackgroundColor": "@tradeBG",
 				"enablePullDownRefresh": false
 			}
 
@@ -156,7 +155,9 @@
 			"path": "pages/dealDetail/dealDetail",
 			"style": {
 				"navigationBarTitleText": "%dealDetail%",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": false,
+				"backgroundColor": "@orderDetailBG",
+				"navigationBarBackgroundColor": "@orderDetailBG"
 			}
 
 		}, {
@@ -234,20 +235,24 @@
 			"path": "pages/orderDetail/orderDetail",
 			"style": {
 				"navigationBarTitleText": "%orderDetail%",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": false,
+				"backgroundColor": "@orderDetailBG",
+				"navigationBarBackgroundColor": "@orderDetailBG"
 			}
 
 		}, {
 			"path": "pages/authentication/authentication",
 			"style": {
 				"navigationBarTitleText": "%authentication%",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": false,
+				"backgroundColor": "@authenticationBG"
 			}
 
 		}, {
 			"path": "pages/standardAuthentication/standardAuthentication",
 			"style": {
 				"navigationBarTitleText": "%standard%",
+				"backgroundColor": "@standardAuthenticationBG",
 				"enablePullDownRefresh": false
 			}
 
@@ -256,7 +261,8 @@
 			"path": "pages/advancedAuthentication/advancedAuthentication",
 			"style": {
 				"navigationBarTitleText": "%advanced%",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": false,
+				"backgroundColor": "@standardAuthenticationBG"
 			}
 
 		}, {
@@ -275,35 +281,45 @@
 			}
 
 		}
-	],
+	    ,{
+            "path" : "pages/webview/webview",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"tabBar": {
-		"color": "#8F919D",
 		"fontSize": "13px",
-		"selectedColor": "#2B323C",
+		"color": "#8F919D",
+		"backgroundColor": "@tabBarBackgroundColor",
+		"selectedColor": "@tabBarTextSelectedColor",
+		"borderStyle": "@tabBarBorderStyle",
 		"spacing": "4rpx",
-		"borderStyle": "white",
 		"list": [{
 				"iconPath": "static/tabbar/index.png",
-				"selectedIconPath": "static/tabbar/index-active.png",
+				"selectedIconPath": "@indexSelectIcon",
 				"text": "%index%",
 				"pagePath": "pages/index/index"
 			},
 			{
 				"iconPath": "static/tabbar/quotation.png",
-				"selectedIconPath": "static/tabbar/quotation-active.png",
+				"selectedIconPath": "@quotationSelectIcon",
 				"text": "%quotation%",
 				"pagePath": "pages/quotation/quotation"
 			},
 
 			{
 				"iconPath": "static/tabbar/transaction.png",
-				"selectedIconPath": "static/tabbar/transaction-active.png",
+				"selectedIconPath": "@transactionSelectIcon",
 				"text": "%transaction%",
 				"pagePath": "pages/transaction/transaction"
 			},
 			{
 				"iconPath": "static/tabbar/assets.png",
-				"selectedIconPath": "static/tabbar/assets-active.png",
+				"selectedIconPath": "@assetsSelectIcon",
 				"text": "%assets%",
 				"pagePath": "pages/assets/assets"
 			}

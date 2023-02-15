@@ -1,8 +1,11 @@
 <template>
 	<view>
-		<u-navbar placeholder title="" @rightClick="rightClick" :autoBack="true">
+		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'"
+			:bgColor="theme == 'light' ? '#fff' : '#1F282F'" placeholder title="" @rightClick="rightClick"
+			:autoBack="true">
 			<view class="navCenterSolt" slot='center'>
-				<u-image src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
+				<u-image v-if="theme == 'light'" src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
+				<u-image v-else src="/static/icon44.png" width="48rpx" height="48rpx"></u-image>
 				<text>BTC/USDT</text>
 			</view>
 			<view slot="right">
@@ -67,10 +70,11 @@
 			</view>
 		</view>
 		<u-gap height="30rpx"></u-gap>
-		<u-gap height="10rpx" bgColor="#F6F6F6"></u-gap>
+		<u-gap height="10rpx" :bgColor="theme == 'light' ? '#F6F6F6' : '#171E28'"></u-gap>
 		<view class="tabs-box u-border-bottom">
-			<u-tabs lineColor="#FEFA05" lineWidth="60rpx" lineHeight="8rpx" activeStyle="color:#1E1F29"
-				inactiveStyle="color:#898D99" :itemStyle="{
+			<u-tabs lineColor="#FEFA05" lineWidth="60rpx" lineHeight="8rpx" :activeStyle="{
+						'color':theme == 'light' ? '#1E1F29' : '#fff'
+					}" inactiveStyle="color:#898D99" :itemStyle="{
 			'height':'80rpx',
 			'font-size':'30rpx'
 		}" :scrollable="false" :list="tabs" @click="tabClick"></u-tabs>
@@ -146,6 +150,7 @@
 				</view>
 				<view class="lab-item">
 					<view>{{$t('介绍')}}</view>
+					<view></view>
 				</view>
 				<view class="desc">
 					比特币（BitCoin）概念最初由中本聪在2008年提出，根据中本聪的思路设计发布的开源软件以及建构其上的P2P网络。比特币是一种P2P形式的数字货币。点对点的传输意味着一个去中心化的支付系统。
@@ -289,19 +294,19 @@
 						id: PERIOD_ID.KLINE_60MINUTE_ID
 					},
 					{
-						text:this.$t('日线'),
+						text: this.$t('日线'),
 						id: PERIOD_ID.KLINE_DAY_ID
 					},
 					{
-						text:this.$t('周线'),
+						text: this.$t('周线'),
 						id: PERIOD_ID.KLINE_WEEK_ID
 					},
 					{
-						text:this.$t('月线'),
+						text: this.$t('月线'),
 						id: PERIOD_ID.KLINE_MONTH_ID
 					},
 					{
-						text:this.$t('年线'),
+						text: this.$t('年线'),
 						id: PERIOD_ID.KLINE_YEAR_ID
 					}
 				],
@@ -321,7 +326,7 @@
 		},
 
 		onLoad() {
-			
+
 		},
 
 		onShow() {
@@ -804,6 +809,32 @@
 			color: #1E1F29;
 			margin-left: 20rpx;
 			font-size: 36rpx;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+
+		.navCenterSolt text,
+		.upper-box .left .unit,
+		.upper-box .right .val,
+		.time-box .box view.active,
+		.time-box .deep.active,
+		.tab-content .tab-box .tab-box-item .item,
+		.tab-content .tab-box .tab-box-item.sell .item text:last-child,
+		.tab-content .tab-box.deal .tab-box-item:last-child .item text:last-child,
+		.tab-content .tab-box.info .lab-item view:last-child,
+		.tab-content .tab-box.info .desc,
+		.tab-content .tab-box.info .logo text
+		{
+			color: #fff;
+		}
+		.fix-bar{
+			background: #29313C;
+		}
+		.tabs-box{
+			&.u-border-bottom {
+				border-color: #343B45 !important;
+			}
 		}
 	}
 </style>

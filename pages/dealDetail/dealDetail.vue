@@ -133,4 +133,24 @@
 			}
 		}
 	}
+
+	@media (prefers-color-scheme: dark) {
+		page {
+
+			background: #171E28;
+		}
+
+		.title,
+		.card .item .val {
+			color: #fff;
+		}
+		.err{
+			
+background: #0F141C;
+		}
+		.card {
+
+			background: #1F282F;
+		}
+	}
 </style>

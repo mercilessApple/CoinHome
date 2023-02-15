@@ -2,9 +2,10 @@
 	<view class="content">
 		<u-navbar leftIcon="">
 			<view slot="left">
-				<u-image @click="toUserCenter"
-					:src="theme == 'light' ? require('@/static/icon4.png') : require('@/static/icon37.png')"
-					width="48rpx" height="48rpx"></u-image>
+				<u-image v-if="theme == 'light'" @click="toUserCenter" src="/static/icon4.png" width="48rpx"
+					height="48rpx"></u-image>
+
+				<u-image v-else @click="toUserCenter" src="/static/icon37.png" width="48rpx" height="48rpx"></u-image>
 			</view>
 
 			<view class="u-nav-slot" slot="right">
@@ -20,7 +21,7 @@
 							:value="badgeNumber"></u-badge>
 					</view>
 				</view>
-				<view class="icon">
+				<view class="icon" @click="$u.route('/pages/webview/webview')">
 					<u-image src="@/static/icon5.png" width="48rpx" height="48rpx"></u-image>
 				</view>
 			</view>
@@ -29,6 +30,8 @@
 			<mescroll-body ref="mescrollRef" @init="mescrollInit" :top="refreshHeight" bottom="0" :down="downOption"
 				@down="downCallback" @up="upCallback">
 				<u-gap height="40rpx"></u-gap>
+				<!-- <image style="width: 100rpx;height: 100rpx;" :src="theme == 'light' ? '/static/icon4.png' : '/static/icon37.png'"></image> -->
+				
 				<u-swiper :loading="banner == ''" keyName="imgUrl" bgColor="transparent" :list="banner" height="260rpx"
 					circular></u-swiper>
 				<view class="notice" v-if="notices != ''">
@@ -39,12 +42,14 @@
 						}
 					})" color="#969AA6" icon="" bgColor="transparent" :text="notices[0].title">
 					</u-notice-bar>
-					<u-image :src="theme == 'light' ? require('@/static/icon7.png') : require('@/static/icon38.png')" width="60rpx" height="48rpx"></u-image>
+					<u-image :src="theme == 'light' ? require('@/static/icon7.png') : require('@/static/icon38.png')"
+						width="60rpx" height="48rpx"></u-image>
 				</view>
 				<view class="tab-bar">
 					<view v-for="(item,index) in tabBarList" :key="index" @click="toUrl(index)">
 						<view class="icon">
-							<u-image :src="item.icon" width="88rpx" height="88rpx"></u-image>
+							<u-image :src="theme == 'light' ? item.icon : item.darkIcon" width="88rpx" height="88rpx">
+							</u-image>
 						</view>
 						<view class="tip">{{item.name}}</view>
 					</view>
@@ -127,39 +132,35 @@
 				downOption: {
 					auto: false, //是否在初始化完毕之后自动执行下拉回调callback; 默认true
 				},
-				tabBarList: [],
+				tabBarList: [{
+						name: this.$t('充币'),
+						icon: require("@/static/icon8.png"),
+						darkIcon: require("@/static/icon39.png")
+					},
+					{
+						name: this.$t('交易'),
+						icon: require("@/static/icon9.png"),
+						darkIcon: require("@/static/icon40.png")
+					},
+					{
+						name: this.$t('转账'),
+						icon: require("@/static/icon10.png"),
+						darkIcon: require("@/static/icon41.png")
+					},
+					{
+						name: this.$t('认证'),
+						icon: require("@/static/icon11.png"),
+						darkIcon: require("@/static/icon42.png")
+					}
+				],
 				refreshHeight: (uni.getSystemInfoSync().statusBarHeight + 44) + "px",
 				list: [],
-			}
-		},
-		watch: {
-			theme(newValue, oldValue) {
-				console.log(newValue);
 			}
 		},
 		onLoad() {
 			this.init('onload')
 			this.timer = null
 			this.startLoad = false
-			
-			this.tabBarList = [{
-						name: this.$t('充币'),
-						icon: require(this.theme == 'light' ? "@/static/icon8.png" : "@/static/icon39.png")
-					},
-					{
-						name: this.$t('交易'),
-						icon: require("@/static/icon9.png")
-					},
-					{
-						name: this.$t('转账'),
-						icon: require("@/static/icon10.png")
-					},
-					{
-						name: this.$t('认证'),
-						icon: require("@/static/icon11.png")
-					}
-				]
-
 		},
 		onHide() {
 			clearInterval(this.timer)
@@ -492,6 +493,33 @@
 				}
 			}
 
+		}
+
+		.list {
+			>view {
+				&:first-child {
+					.val {
+						color: #fff;
+					}
+				}
+
+				&:nth-child(2) {
+					.box {
+						view {
+							&:first-child {
+								color: #FFFFFF;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.tab-bar {
+			.tip {
+
+				color: #FFFFFF;
+			}
 		}
 
 		.subsection {

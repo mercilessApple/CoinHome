@@ -1,26 +1,30 @@
 <template>
 	<view>
-		<u-navbar title="" :autoBack="true" placeholder>
+		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder
+			:bgColor="theme == 'light' ? '#fff' : '#1F282F'">
 			<view class="u-nav-slot" slot="right">
 				<view>
-					<u-image src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
+					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
+					<u-image v-else src="@/static/icon45.png" width="48rpx" height="48rpx"></u-image>
 				</view>
-				<view style="margin-left: 30rpx;">
+
+				<view style="margin-left: 30rpx;" @click="$u.route('/pages/webview/webview')">
 					<u-image src="@/static/icon5.png" width="48rpx" height="48rpx"></u-image>
 				</view>
 			</view>
 		</u-navbar>
 		<view class="user-box">
-			<view class="left">
-				<u-avatar size="96rpx" :iconUrl="userInfo.iconUrl"></u-avatar>
-				<view class="info">
-					<view class="name" @click="$u.route('/pages/userInfo/userInfo')">
+			<view class="left" @click="$u.route('/pages/userInfo/userInfo')">
+				<u-avatar size="96rpx" :default-url="require('@/static/icon46.png')" :iconUrl="userInfo.iconUrl">
+				</u-avatar>
+				<view class="info" >
+					<view class="name">
 						{{userInfo.nickName}}
 						<view>
 							<u-icon color="#9699A0" name="arrow-right"></u-icon>
 						</view>
 					</view>
-					<view class="uid" @click="copy"><text>UID：{{userInfo.uid}}</text>
+					<view class="uid" @click.stop="copy"><text>UID：{{userInfo.uid}}</text>
 						<u-image src="@/static/icon16.png" width="28rpx" height="28rpx">
 						</u-image>
 					</view>
@@ -32,14 +36,14 @@
 					<text>{{$t('已认证')}}</text>
 				</view>
 
-				<view class="yellow" v-if="userInfo.verifiedAudit === 3">
+				<view @click="$u.route('/pages/authentication/authentication')" class="yellow" v-if="userInfo.verifiedAudit === 3">
 					<u-image src="@/static/icon17.png" width="36rpx" height="24rpx"></u-image>
 					<text>{{$t('未认证')}}</text>
 				</view>
 			</view>
 		</view>
 		<view class="tip" v-if="userInfo.verifiedAudit === 3">
-			<u-alert showIcon type="warning" :description="$t('您需要完成身份验证后，方能使用CoinHome服务。')"></u-alert>
+			<u-alert  @click="$u.route('/pages/authentication/authentication')" showIcon type="warning" :description="$t('您需要完成身份验证后，方能使用CoinHome服务。')"></u-alert>
 		</view>
 		<view class="tip" v-if="userInfo.verifiedAudit === 1 || userInfo.verifiedAudit === 4">
 			<view class="box">
@@ -293,7 +297,6 @@
 
 				.uid {
 					display: flex;
-					margin-top: 10rpx;
 					align-items: center;
 					color: #9699A0;
 					font-size: 22rpx;
@@ -307,6 +310,7 @@
 					font-weight: 500;
 					color: #23282E;
 					font-size: 38rpx;
+					padding-bottom: 10rpx;
 					display: flex;
 					align-items: center;
 
@@ -315,6 +319,39 @@
 					}
 				}
 			}
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+
+		::v-deep {
+			.u-alert__content__desc {
+				color: #FE9205;
+			}
+
+			.u-alert--warning--light {
+				background-color: #29313C !important;
+			}
+		}
+
+		.nav {
+			.left {
+				text {
+					color: #FFFFFF !important;
+				}
+			}
+		}
+
+		.user-box {
+			.info {
+				.name {
+					color: #fff !important;
+				}
+			}
+		}
+
+		.btn {
+			background: #4A525D;
 		}
 	}
 </style>
