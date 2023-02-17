@@ -4,6 +4,9 @@ module.exports = (vm) => {
 	uni.$u.http.setConfig((config) => {
 		/* config 为默认全局配置*/
 		config.baseURL = 'http://coinhome-api.godsfin.vip'; /* 根域名 */
+		config.custom = {
+			catch: true
+		}
 		return config
 	})
 
@@ -26,16 +29,18 @@ module.exports = (vm) => {
 		// 自定义参数
 		const custom = response.config?.custom
 		if (data.code !== 1) {
-			if(data.code === 50){
+			if (data.code === 50) {
 				uni.removeStorageSync('token')
 				uni.removeStorageSync('userInfo')
-				uni.navigateTo({
-					url:'/pages/login/login'
-				})
+				// uni.navigateTo({
+				// 	url:'/pages/login/login'
+				// })
 			}
 			// 如果没有显式定义custom的toast参数为false的话，默认对报错进行toast弹出提示
 			if (custom.toast !== false) {
-				uni.$u.toast(data.message)
+				if (data.code != 50) {
+					uni.$u.toast(data.message)
+				}
 			}
 
 			// 如果需要catch返回，则进行reject

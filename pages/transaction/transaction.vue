@@ -5,8 +5,14 @@
 				<view class="nav-coin" @click="show = true">
 					<u-image v-if="theme == 'light'" src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
 					<u-image v-else src="/static/icon44.png" width="48rpx" height="48rpx"></u-image>
-					<text class="name">BTC/USDT</text>
-					<text class="proportion add">+0.25%</text>
+					<text class="name" v-if="marketStatus == 'loading'">{{marketItem.coinMarket[0]}}</text>
+					<text class="name" v-else>{{marketItem.coinMarket[0]}}/{{marketItem.coinMarket[1]}}</text>
+					<text class="proportion" :class="{
+						add:marketItem.rangeAbility >= 0 && marketItem.onDealing === 1,
+						err:marketItem.rangeAbility < 0 && marketItem.onDealing === 1,
+					}">
+						{{marketItem.rangeAbility >=0 ? '+':''}}{{(marketItem.rangeAbility * 100).toFixed(2) + '%'}}
+					</text>
 				</view>
 			</view>
 			<view class="u-nav-slot" slot="right">
@@ -21,12 +27,16 @@
 						<view @click="barIndex = 0" class="item" :class="{
 							active:barIndex == 0
 						}">{{$t('买入')}}
-							<view class="triangle"></view>
+							<view class="triangle" :style="{
+								'border-left-color':barIndex == 1 ? '#F5475E' : '#2EBD87'
+							}"></view>
 						</view>
 						<view @click="barIndex = 1" class="item" :class="{
 							active:barIndex == 1
 						}">{{$t('卖出')}}
-							<view class="triangle"></view>
+							<view class="triangle" :style="{
+								'border-left-color':barIndex == 1 ? '#F5475E' : '#2EBD87'
+							}"></view>
 						</view>
 					</view>
 					<view class="select" @click="showMoreSelect = !showMoreSelect">
@@ -42,25 +52,29 @@
 					<u-gap height="16rpx"></u-gap>
 					<view class="number-box">
 						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
-							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx" v-model="number">
+							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx"
+							v-model="marketItem.lastPrice">
 						</u-number-box>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="count-box">
-						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'" :placeholder="`${$t('数量')}(BTC)`"
+						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
+							:placeholder="`${$t('数量')}(${marketItem.coinMarket[0]})`"
 							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx" v-model="count">
 						</u-number-box>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 
 					<view class="block">
-						<view v-for="(item,index) in block" :key="index">{{item}}</view>
+						<view @click="blockIndex = index" :class="{
+							'active':blockIndex == index
+						}" v-for="(item,index) in block" :key="index">{{item.name}}</view>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 
 					<view class="total-amount">
 						<u-input :color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
-							border="none" :placeholder="`${$t('总额')}(USDT)`">
+							border="none" :placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
 						</u-input>
 					</view>
 					<u-gap height="30rpx"></u-gap>
@@ -68,59 +82,58 @@
 					<view class="usable">
 						<view class="tip">
 							<view>{{$t('可用')}}</view>
-							<view>10000.0154 USDT</view>
+							<view v-if="marketStatus == 'loading'">0</view>
+							<view v-else>
+								{{coinAccountList == '' ? '0' :  getAccount(marketItem.coinMarket[barIndex == 0 ? 1 : 0]).data[0].amount}}
+								{{marketItem.coinMarket[barIndex == 0 ? 1 : 0]}}
+							</view>
 						</view>
 					</view>
 					<u-gap height="30rpx"></u-gap>
-					<view class="btn">{{$t('买入')}}BTC</view>
+					<view v-if="isLogin" class="btn" :style="{
+						'background':barIndex == 1 ? '#F5475E' : '#2EBD87'
+					}">{{ barIndex == 0 ? $t('买入') : $t('卖出')}}{{marketStatus == 'loading' ? '' : marketItem.coinMarket[0]}}</view>
+					<view @click="$u.route('/pages/login/login')" v-else class="btn" :style="{
+						'background':barIndex == 1 ? '#F5475E' : '#2EBD87'
+					}">{{$t('登录')}}</view>
 				</view>
 				<view class="right">
 					<view class="lab-box">
 						<view class="lab">
 							<view>{{$t('价格')}}</view>
-							<text>(USDT)</text>
+							<text v-if="!marketItem.loading">({{marketItem.coinMarket[1]}})</text>
 						</view>
 						<view class="lab">
 							<view>{{$t('数量')}}</view>
-							<text>(BTC)</text>
+							<text v-if="!marketItem.loading">({{marketItem.coinMarket[0]}})</text>
 						</view>
 					</view>
 					<view class="price-box">
 						<view>
-
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
+							<view v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
+								{{item.trustPrice}}
+							</view>
 						</view>
 						<view>
-
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
+							<view v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
+								{{item.cumulativeCommissionQuantity}}
+							</view>
 						</view>
 					</view>
 					<view class="area">
-						<view>35700.88</view>
-						<view>≈ ¥ 35606.32</view>
+						<view>{{marketDeeps.lastPrice || 0}}</view>
+						<view>≈ ¥ {{marketDeeps.lastPriceCny || 0}}</view>
 					</view>
 					<view class="price-box bottom">
 						<view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
-							<view class="price">35700.88</view>
+							<view v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
+								{{item.trustPrice}}
+							</view>
 						</view>
 						<view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
-							<view class="price">0.1452</view>
+							<view v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
+								{{item.cumulativeCommissionQuantity}}
+							</view>
 						</view>
 					</view>
 				</view>
@@ -130,113 +143,72 @@
 				<view class="tab u-border-bottom">
 					<u-tabs :activeStyle="{
 						'color':theme == 'light' ? '#303133' : '#fff'
-					}" lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click">
+					}" lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs">
 					</u-tabs>
-					<view class="icon" @click="$u.route('/pages/order/order')">
+					<view class="icon" @click="$u.route(isLogin ? '/pages/order/order' : '/pages/login/login')">
 						<u-image width="40rpx" height="40rpx" src="/static/icon35.png"></u-image>
 					</view>
 				</view>
-				<block v-if="false">
-					<u-empty icon="/static/icon34.png" :text="$t('无当前委托')"></u-empty>
-					<u-gap height="300rpx"></u-gap>
-				</block>
+
 				<view class="list">
-					<view class="item u-border-bottom" @click="$u.route({
+					<view :class="{
+						'u-border-bottom':index < (userEntrustList.length - 1)
+					}" v-for="(item,index) in userEntrustList" :key="index" class="item" @click="$u.route({
 						url:'/pages/orderDetail/orderDetail'
 					})">
 						<view class="left">
 							<view>
 								<view class="business">
-									<text>{{$t('买入')}}</text> BTC
+									<text :class="{
+										err:item.type == 2
+									}">{{item.type == 2 ? $t('卖出'): $t('买入')}}</text> {{item.coinMarket[0]}}
 								</view>
 								<view>
-									<view>{{$t('价格')}}[USDT]</view>
-									<view>35700.88</view>
+									<view>{{$t('价格')}}[{{item.coinMarket[1]}}]</view>
+									<view>{{item.price}}</view>
 								</view>
 							</view>
 							<view>
-								<view class="date">04:07 01/29</view>
+								<view class="date">{{$moment(item.createTime).format('HH:mm MM/DD')}}</view>
 								<view class="info">
-									<view>{{$t('数量')}}[BTC]</view>
-									<view>0.14</view>
+									<view>{{$t('数量')}}[{{item.coinMarket[1]}}]</view>
+									<view>{{item.remainingNumber}}</view>
 								</view>
 							</view>
 						</view>
 						<view class="right">
-							<view class="right-status btn">{{$t('撤销')}}</view>
+							<view class="right-status btn" v-if="item.orderStatus == 0">{{$t('撤销')}}</view>
+							<block v-else>
+								<view class="right-status text">
+									<text v-if="item.orderStatus == 1">{{$t('完全成交')}}</text>
+									<text v-if="item.orderStatus == 2">{{$t('部分成交')}}</text>
+									<text v-if="item.orderStatus == 3">{{$t('撤销中')}}</text>
+									<text v-if="item.orderStatus == 4">{{$t('撤销成功')}}</text>
+									<u-icon size="20rpx" name="arrow-right"></u-icon>
+								</view>
+							</block>
+
 							<view>
-								<view>{{$t('实际成交')}}[BTC]</view>
-								<view>0</view>
+								<view>{{$t('实际成交')}}[{{item.coinMarket[1]}}]</view>
+								<view>{{item.dealAmount}}</view>
 							</view>
 						</view>
 					</view>
-					<view class="item u-border-bottom">
-						<view class="left">
-							<view>
-								<view class="business">
-									<text class="err">{{$t('卖出')}}</text> BTC
-								</view>
-								<view>
-									<view>{{$t('价格')}}[USDT]</view>
-									<view>35700.88</view>
-								</view>
-							</view>
-							<view>
-								<view class="date">04:07 01/29</view>
-								<view class="info">
-									<view>{{$t('数量')}}[BTC]</view>
-									<view>0.14</view>
-								</view>
-							</view>
-						</view>
-						<view class="right">
-							<view class="right-status text">
-								<text>{{$t('成交')}}</text>
-								<u-icon size="20rpx" name="arrow-right"></u-icon>
-							</view>
-							<view>
-								<view>{{$t('实际成交')}}[BTC]</view>
-								<view>0</view>
-							</view>
-						</view>
-					</view>
-					<view class="item">
-						<view class="left">
-							<view>
-								<view class="business">
-									<text class="err">{{$t('卖出')}}</text> BTC
-								</view>
-								<view>
-									<view>{{$t('价格')}}[USDT]</view>
-									<view>35700.88</view>
-								</view>
-							</view>
-							<view>
-								<view class="date">04:07 01/29</view>
-								<view class="info">
-									<view>{{$t('数量')}}[BTC]</view>
-									<view>0.14</view>
-								</view>
-							</view>
-						</view>
-						<view class="right">
-							<view class="right-status text">
-								<text>{{$t('已撤销')}}</text>
-								<u-icon size="20rpx" name="arrow-right"></u-icon>
-							</view>
-							<view>
-								<view>{{$t('实际成交')}}[BTC]</view>
-								<view>0</view>
-							</view>
-						</view>
-					</view>
+
+					<block v-if="userEntrustList == '' && status == 'nomore'">
+						<u-empty icon="/static/icon34.png" :text="$t('无当前委托')"></u-empty>
+					</block>
+					<block v-if="status == 'loading'">
+						<u-gap height="30rpx"></u-gap>
+						<u-loadmore :status="status" :nomoreText="$t('nomoreText')" :loadingText="$t('loadingText')"
+							:loadmoreText="$t('loadmoreText')" />
+					</block>
 				</view>
 			</view>
-			<!-- <u-gap height="60rpx"></u-gap> -->
 		</view>
 		<view class="mask" v-show="showMoreSelect" @click="showMoreSelect = false"></view>
 
-		<u-popup :bgColor="theme == 'light' ? '#fff' : '#1F282F'" @close="show = false" :show="show" mode="left"
+		<u-popup @open="open" :bgColor="theme == 'light' ? '#fff' : '#1F282F'" @close="close" :show="show" mode="left"
 			:customStyle="{
 			'border-radius':'0 60rpx 60rpx 0',
 			'width':'640rpx'
@@ -245,38 +217,41 @@
 				<u-status-bar></u-status-bar>
 				<view class="title">{{$t('市场')}}</view>
 				<view class="search">
-					<u-search height="64rpx" placeholder="" :showAction="false"
+					<u-search @change="search" v-model="searchKey" :color="theme == 'light' ? '' : '#fff'"
+						height="64rpx" placeholder="" :showAction="false"
 						:bgColor="theme == 'light' ? '#F6F6F6' : '#29313C'"></u-search>
 				</view>
 				<view class="popup-tab">
-					<u-tabs :activeStyle="{
+					<u-tabs :current="marketTabIndex" :activeStyle="{
 						'color':theme == 'light' ? '#000000' : '#fff'
 					}" inactiveStyle="color:#848B9B" lineHeight="8rpx" lineWidth="48rpx" lineColor="#FEFA05" :list="popupTabs"
-						@click="click"></u-tabs>
+						@click="chooseTabMarkets"></u-tabs>
 				</view>
 				<view class="list-tab">
 					<view>{{$t('名称')}}</view>
 					<view>{{$t('最新价格')}}/{{$t('24h涨跌幅')}}</view>
 				</view>
 				<view class="list">
-					<view class="item active">
-						<view class="left">
-							GODE<text>/USDT</text>
+					<scroll-view :style="{
+						'height':marketPopupSliderHeight + 'px'
+					}" scroll-y>
+						<view @click="selectMarket(item,index)" :class="{
+							'active':marketItemIndex == index
+						}" class="item" v-for="(item,index) in marketList" :key="index">
+							<view class="left">
+								{{item.coinMarket[0]}}<text>/{{item.coinMarket[1]}}</text>
+							</view>
+							<view class="right">
+								<view>{{item.lastPriceCny}}</view>
+								<view :class="{
+									'err':item.rangeAbility < 0 && item.onDealing === 1
+								}">{{item.rangeAbility >=0 ? '+':''}}{{(item.rangeAbility * 100).toFixed(2)}}%</view>
+							</view>
 						</view>
-						<view class="right">
-							<view>0.0217</view>
-							<view>+6.12%</view>
-						</view>
-					</view>
-					<view class="item">
-						<view class="left">
-							GODE<text>/USDT</text>
-						</view>
-						<view class="right">
-							<view>0.0217</view>
-							<view class="err">-6.12%</view>
-						</view>
-					</view>
+						<u-loadmore :status="marketStatus" :nomoreText="$t('nomoreText')"
+							:loadingText="$t('loadingText')" :loadmoreText="$t('loadmoreText')" />
+						<u-gap height="30rpx"></u-gap>
+					</scroll-view>
 				</view>
 			</view>
 		</u-popup>
@@ -284,18 +259,53 @@
 </template>
 
 <script>
+	import {
+		getUserEntrustList,
+		getOptionalMarket,
+		getTickerByPartitionMarket,
+		queryAccountInfo,
+		getMarketDeeps
+	} from "@/config/api"
+
 	export default {
 		data() {
 			return {
+				searchKey: '',
+				isLogin: false,
+				marketTabIndex: 2,
+				marketStatus: 'loading',
+				marketItemIndex: 0,
+				marketList: [],
+				status: 'loading',
+				blockIndex: null,
 				popupTabs: [{
 						name: this.$t('自选')
+					},
+					{
+						name: 'GODE'
 					},
 					{
 						name: 'USDT'
 					}
 				],
 				show: false,
-				block: ['25%', '50%', '75%', '100%'],
+				block: [{
+						name: '25%',
+						active: false
+					},
+					{
+						name: '50%',
+						active: false
+					},
+					{
+						name: '75%',
+						active: false
+					},
+					{
+						name: '100%',
+						active: false
+					}
+				],
 				tabs: [{
 					name: this.$t('currentDelegation', {
 						number: 0
@@ -303,19 +313,332 @@
 				}],
 				barIndex: 0,
 				count: 1,
-				number: 35606.32,
-				showMoreSelect: false
+				number: 1,
+				showMoreSelect: false,
+				userEntrustList: [],
+				marketPopupSliderHeight: 0,
+				marketItem: {
+					coinMarket: [this.$t('加载中...'), ''],
+					rangeAbility: null,
+					onDealing: null,
+					lastPrice: 0,
+					loading: true,
+				},
+				coinAccountList: [],
+				marketDeeps: {
+					asks: [{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						}
+					],
+					bids: [{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						}
+					]
+				}
 			};
 		},
-		methods: {
-			click(e) {
+		onHide() {
+			clearInterval(this.marketTimer)
+			clearInterval(this.handicapTimer)
+			// clearInterval(this.entrustTimerTimer)
+			console.log('onHide')
+		},
+		onUnload() {
+			clearInterval(this.marketTimer)
+			clearInterval(this.handicapTimer)
+			// clearInterval(this.entrustTimerTimer)
+			console.log('onUnload')
+		},
+		onLoad() {
 
+		},
+		onShow() {
+			this.isLogin = Boolean(uni.getStorageSync('token'))
+			clearInterval(this.marketTimer)
+			clearInterval(this.handicapTimer)
+			// clearInterval(this.entrustTimerTimer)
+			this.init()
+			
+			let self = this
+			uni.getStorage({
+				key: 'barIndex',
+				success: function (res) {
+					self.barIndex = res.data
+					
+					uni.removeStorage({
+						key:'barIndex'
+					})
+				}
+			});
+		},
+		methods: {
+			/**
+			 * 获取盘口
+			 */
+			getHandicap() {
+				let data = this.oriMarketList
+				if (data == '') return
+
+				getMarketDeeps({
+					coinMarket: data[this.marketItemIndex].oriCoinMarketText,
+					type: 'trade'
+				}).then(marketDeeps => {
+					if (!Boolean(marketDeeps)) {
+						this.marketDeeps = {
+							asks: [{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								}
+							],
+							bids: [{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								},
+								{
+									trustPrice: 0,
+									cumulativeCommissionQuantity: 0
+								}
+							]
+						}
+						return
+					}
+					let {
+						asks,
+						bids
+					} = marketDeeps
+					let newAsks = asks.slice(0, 5),
+						newBids = bids.slice(0, 5)
+					marketDeeps.asks = newAsks
+					marketDeeps.bids = newBids
+					this.marketDeeps = marketDeeps
+				})
+			},
+			init() {
+				this.queryMarkets((e) => {
+					this.oriMarketList = e
+					this.getHandicap()
+					this.handicapTimer = setInterval(this.getHandicap, 1000)
+
+					this.queryUserEntrustList()
+					// this.entrustTimerTimer = setInterval(this.queryUserEntrustList, 1000)
+				})
+
+				this.marketTimer = setInterval(() => {
+					this.queryMarkets()
+				}, 1000)
+
+				if (this.isLogin) {
+					queryAccountInfo({
+						type: 1
+					}).then(e => this.coinAccountList = e.coinAccountList)
+				}
+			},
+			getAccount(coin) {
+				let data = this.coinAccountList.filter(item => item.coinName == coin)
+				return {
+					data
+				}
+			},
+			open() {
+				if (this.marketPopupSliderHeight != 0) return
+				const query = uni.createSelectorQuery().in(this);
+				query.select('.popup .list').boundingClientRect(data => {
+					this.marketPopupSliderHeight = data.height
+				}).exec();
+			},
+
+			/**
+			 * 选择币对
+			 * @param {Object} item
+			 * @param {Object} index
+			 */
+			selectMarket(item, index) {
+				this.marketItemIndex = index
+				this.marketItem = item
+				this.show = false
+				this.oriMarketList = this.marketList
+				this.getHandicap()
+				this.queryMarkets()
+				this.marketTimer = setInterval(() => {
+					this.queryMarkets()
+				}, 1000)
+			},
+
+			/**
+			 * 获取币对
+			 */
+			async queryMarkets(fn = () => {}) {
+				let data
+				if (this.marketTabIndex == 0) data = await getOptionalMarket()
+				else data = await getTickerByPartitionMarket({
+					partition: this.popupTabs[this.marketTabIndex].name
+				})
+
+				this.marketStatus = 'nomore'
+
+				if (data == '') {
+					this.marketList = []
+					return
+				} else {
+					data.forEach(item => {
+						if (item.coinMarket) {
+							item.oriCoinMarketText = item.coinMarket
+							item.coinMarket = item.coinMarket.split('/')
+						}
+					})
+
+					if (this.searchKey == '') {
+						this.marketList = data
+					} else {
+						this.marketList = this.fuzzyQuery(data, this.searchKey)
+					}
+
+					this.marketItem = this.marketList[this.marketItemIndex]
+				}
+
+				fn(this.marketList)
+			},
+			/**
+			 * 查询委托单
+			 * @param {Object} coinMarket
+			 * @param {Object} type
+			 */
+			queryUserEntrustList(coinMarket) {
+				if (!this.isLogin) {
+					this.status = 'nomore'
+					return
+				}
+				getUserEntrustList({
+					coinMarket: this.oriMarketList[this.marketItemIndex].oriCoinMarketText,
+					type: this.barIndex == 0 ? 1 : 2
+				}).then(res => {
+					this.tabs[0].name = this.$t('currentDelegation', {
+						number: res.length
+					})
+					res.forEach(item => {
+						if (item.coinMarket) {
+							item.coinMarket = item.coinMarket.split('/')
+						}
+					})
+					this.status = 'nomore'
+					this.userEntrustList = res
+				}).catch(() => {
+					this.status = 'nomore'
+				})
+			},
+			/**
+			 * 选择交易币种
+			 */
+			chooseTabMarkets({
+				index
+			}) {
+				if (index == this.marketTabIndex) return
+				this.marketStatus = 'loading'
+				this.marketList = []
+				this.marketTabIndex = index
+				clearInterval(this.marketTimer)
+				this.queryMarkets()
+
+			},
+			close() {
+				clearInterval(this.marketTimer)
+				this.show = false
+				this.queryMarkets()
+				this.marketTimer = setInterval(() => {
+					this.queryMarkets()
+				}, 1000)
 			},
 			rightClick() {
-				uni.$u.route('/pages/kLine/kLine')
+				uni.$u.route({
+					url: '/pages/kLine/kLine',
+					params: {
+						coinMarket: this.marketItem.oriCoinMarketText
+					}
+				})
 			},
+			/**
+			 * 模糊匹配
+			 * @param {Object} list
+			 * @param {Object} keyWord
+			 */
+			fuzzyQuery(list, keyWord) {
+				var arr = [];
+				for (var i = 0; i < list.length; i++) {
+					if (list[i].coinMarket[0].indexOf(keyWord) >= 0 || list[i].coinMarket[1].indexOf(keyWord) >= 0) {
+						arr.push(list[i]);
+					}
+				}
+				return arr;
+			},
+
 			selectItem() {
 
+			},
+
+			search(e) {
+				this.queryMarkets()
 			}
 		},
 	}
@@ -332,7 +655,12 @@
 
 
 	.popup {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+
 		.list {
+			flex: 1;
 
 			.item {
 				display: flex;
@@ -439,6 +767,8 @@
 			}
 
 			.list {
+				min-height: 700rpx;
+
 				.item {
 					display: flex;
 					padding: 24rpx 30rpx;
@@ -682,7 +1012,7 @@
 				.btn {
 					line-height: 80rpx;
 					text-align: center;
-					background: #2DBE87;
+					// background: #2DBE87;
 					border-radius: 8rpx;
 					font-weight: 500;
 					font-size: 32rpx;
@@ -717,6 +1047,11 @@
 						color: #929BA2;
 						padding: 8rpx 20rpx;
 						font-size: 24rpx;
+
+						&.active {
+							background: #FEFA05;
+							color: #000
+						}
 					}
 				}
 
@@ -791,6 +1126,12 @@
 						background-color: #f6f6f6;
 						color: #929BA2;
 
+						&:last-child {
+							&.active {
+								background-color: #F5475E;
+							}
+						}
+
 						&.active {
 							background-color: #2EBD87;
 							color: #FFFFFF;
@@ -802,7 +1143,7 @@
 							border-style: solid;
 							border-color: transparent;
 							border-width: 31rpx 0 31rpx 31rpx;
-							border-left-color: #2EBD87;
+							// border-left-color: #2EBD87;
 						}
 
 						&:first-child {
@@ -838,6 +1179,10 @@
 
 			&.add {
 				color: #2EBD87;
+			}
+
+			&.err {
+				color: #F5475E;
 			}
 		}
 

@@ -30,6 +30,13 @@
 </template>
 
 <script>
+	import {
+		sendVerificationCode,
+		checkVerificationCode
+	} from "@/config/api"
+	import {
+		setInterval
+	} from "timers";
 	export default {
 		data() {
 			return {
@@ -41,9 +48,31 @@
 		onLoad() {
 			this.timer = null
 		},
+		onHide() {
+			// if (this.time < 60) clearInterval(this.timer)
+		},
+		onUnload() {
+			if (this.time < 60) clearInterval(this.timer)
+		},
 		methods: {
 			submit() {
-				uni.$u.route('/pages/modifyPassword/modifyPassword')
+				if (!this.code) return
+				uni.showLoading({
+					title: this.$t('加载中...'),
+					mask: true
+				})
+				checkVerificationCode({
+					phoneOrEmailStr: uni.getStorageSync('userInfo').email,
+					code: this.code,
+					smsType: 2
+				}).then(() => {
+					uni.$u.route({
+						url: '/pages/modifyPassword/modifyPassword',
+						params: {
+							code: this.code
+						}
+					})
+				})
 			},
 			counDown() {
 				const self = this
@@ -56,7 +85,20 @@
 			getVerificationCode() {
 				const self = this
 				if (self.time < 60) return
-
+				uni.showLoading({
+					title: this.$t('正在发送...'),
+					mask: true
+				})
+				sendVerificationCode({
+					phoneOrEmailStr: uni.getStorageSync('userInfo').email,
+					smsType: 2
+				}).then(e => {
+					uni.showToast({
+						title: this.$t('发送成功')
+					})
+					this.counDown()
+					this.timer = setInterval(this.counDown, 1000)
+				})
 			},
 		},
 	}

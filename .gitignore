@@ -2,3 +2,4 @@
 unpackage/cache/
 unpackage/debug/
 unpackage/dist/
+node_modules/

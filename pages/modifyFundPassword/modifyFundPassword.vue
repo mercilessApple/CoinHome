@@ -20,6 +20,12 @@
 </template>
 
 <script>
+	import {
+		updateFundsPassword
+	} from "@/config/api"
+	import {
+		hex_md5
+	} from "@/utils/md5.js"
 	export default {
 		data() {
 			return {
@@ -42,7 +48,29 @@
 						title: this.$t('输入的密码不一致，请重新输入'),
 						icon: 'none'
 					})
+					return
 				}
+				const newMd5FundsPassword = hex_md5(this.password).toUpperCase(),
+					confirmMd5FundsPassword = hex_md5(this.againPassword).toUpperCase()
+				uni.showLoading({
+					title: '加载中...',
+					mask: true
+				})
+				updateFundsPassword({
+					newMd5FundsPassword,
+					confirmMd5FundsPassword,
+					type: 1
+				}).then(e => {
+					uni.showToast({
+						title: this.$t('操作成功！')
+					})
+
+					setTimeout(() => {
+						uni.navigateBack({
+							delta: 2
+						})
+					}, 1500)
+				})
 			}
 		},
 	}

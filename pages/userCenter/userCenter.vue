@@ -3,7 +3,7 @@
 		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder
 			:bgColor="theme == 'light' ? '#fff' : '#1F282F'">
 			<view class="u-nav-slot" slot="right">
-				<view>
+				<view @click="changeTheme">
 					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
 					<u-image v-else src="@/static/icon45.png" width="48rpx" height="48rpx"></u-image>
 				</view>
@@ -140,6 +140,12 @@
 			})
 		},
 		methods: {
+			changeTheme(){
+				// #ifdef APP-PLUS
+				plus.nativeUI.setUiStyle(uni.getSystemInfoSync().theme == 'light' ? 'dark':'light');
+				uni.setStorageSync('theme', uni.getSystemInfoSync().theme)
+				// #endif
+			},
 			exit() {
 				signOut().then(() => {
 					uni.removeStorageSync('token')

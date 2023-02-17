@@ -30,6 +30,10 @@
 </template>
 
 <script>
+	import {
+		sendVerificationCode,
+		checkVerificationCode
+	} from "@/config/api"
 	export default {
 		data() {
 			return {
@@ -41,9 +45,25 @@
 		onLoad() {
 			this.timer = null
 		},
+		onUnload() {
+			if (this.time < 60) clearInterval(this.timer)
+		},
 		methods: {
 			submit() {
-				uni.$u.route('/pages/modifyFundPassword/modifyFundPassword')
+				if (!this.code) return
+				uni.showLoading({
+					title: this.$t('加载中...'),
+					mask: true
+				})
+				checkVerificationCode({
+					phoneOrEmailStr: uni.getStorageSync('userInfo').email,
+					code: this.code,
+					smsType: 1
+				}).then(() => {
+					uni.$u.route({
+						url: '/pages/modifyFundPassword/modifyFundPassword'
+					})
+				})
 			},
 			counDown() {
 				const self = this
@@ -56,7 +76,20 @@
 			getVerificationCode() {
 				const self = this
 				if (self.time < 60) return
-
+				uni.showLoading({
+					title: this.$t('正在发送...'),
+					mask: true
+				})
+				sendVerificationCode({
+					phoneOrEmailStr: uni.getStorageSync('userInfo').email,
+					smsType: 1
+				}).then(e => {
+					uni.showToast({
+						title: this.$t('发送成功')
+					})
+					this.counDown()
+					this.timer = setInterval(this.counDown, 1000)
+				})
 			},
 		},
 	}
@@ -120,23 +153,25 @@
 			font-size: 26rpx;
 		}
 	}
-	
+
 	@media (prefers-color-scheme: dark) {
 		.tip {
 			background: #171E28;
 		}
-	
+
 		.item .input {
-	
+
 			background: #29313C;
 		}
-	.email {
-		color: #fff;
-	}
+
+		.email {
+			color: #fff;
+		}
+
 		.btn {
-	
+
 			background: #374048;
-	
+
 			color: #929BA2;
 		}
 	}

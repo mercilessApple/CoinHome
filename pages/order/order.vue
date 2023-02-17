@@ -3,108 +3,105 @@
 		<view class="tab u-border-bottom">
 			<u-tabs :activeStyle="{
 						'color':theme == 'light' ? '#303133' : '#fff'
-					}"  lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click"></u-tabs>
+					}" lineHeight="8rpx" lineWidth="60rpx" lineColor="#FEFA05" :list="tabs" @click="click"></u-tabs>
 		</view>
 		<view class="list">
-			<view class="item u-border-bottom" @click="$u.route({
+			<view :class="{
+				'u-border-bottom':index < (index < (userEntrustList.length - 1).length - 1)
+			}" class="item" v-for="(item,index) in list" :key="index" @click="$u.route({
 				url:'/pages/orderDetail/orderDetail'
 			})">
 				<view class="left">
 					<view>
 						<view class="business">
-							<text>{{$t('买入')}}</text> BTC
+							<text :class="{
+								err:item.type == 2
+							}">{{item.type == 2 ? $t('卖出'): $t('买入')}}</text> {{item.coinMarket[0]}}
 						</view>
-						<view>
-							<view>{{$t('价格')}}[USDT]</view>
-							<view>35700.88</view>
-						</view>
+
+						<block v-if="tabIndex == 0">
+							<view>
+								<view>{{$t('价格')}}[{{item.coinMarket[1]}}]</view>
+								<view>{{item.price}}</view>
+							</view>
+						</block>
+
+						<block v-if="tabIndex == 1">
+							<view class="left-item-box">
+								<view>{{$t('时间')}}</view>
+								<view>{{$moment(item.updateTime).format('HH:mm MM/DD')}}</view>
+							</view>
+
+							<view class="left-item-box">
+								<view>{{$t('成交总额')}}[{{item.coinMarket[1]}}]</view>
+								<view>{{item.totalTurnover}}</view>
+							</view>
+						</block>
 					</view>
 					<view>
-						<view class="date">04:07 01/29</view>
-						<view class="info">
-							<view>{{$t('数量')}}[BTC]</view>
-							<view>0.14</view>
+						<view class="date">{{tabIndex == 0 ? $moment(item.createTime).format('HH:mm MM/DD') : ''}}
 						</view>
+						<block v-if="tabIndex == 0">
+							<view class="info">
+								<view>{{$t('数量')}}[{{item.coinMarket[1]}}]</view>
+								<view>{{item.remainingNumber}}</view>
+							</view>
+						</block>
+
+						<block v-if="tabIndex == 1">
+							<view class="info">
+								<view>{{$t('委托价')}}[{{item.coinMarket[1]}}]</view>
+								<view>{{item.price}}</view>
+							</view>
+							<u-gap height="30rpx"></u-gap>
+							<view class="info">
+								<view>{{$t('成交均价')}}[{{item.coinMarket[1]}}]</view>
+								<view>{{item.averagePrice}}</view>
+							</view>
+						</block>
 					</view>
 				</view>
 				<view class="right">
 					<view class="right-status btn">{{$t('撤销')}}</view>
-					<view>
-						<view>{{$t('实际成交')}}[BTC]</view>
-						<view>0</view>
-					</view>
-				</view>
-			</view>
-			<view class="item u-border-bottom">
-				<view class="left">
-					<view>
-						<view class="business">
-							<text class="err">{{$t('卖出')}}</text> BTC
+					<block v-if="tabIndex == 0">
+						<view class="right-box-item">
+							<view>{{$t('实际成交')}}[{{item.coinMarket[1]}}]</view>
+							<view>{{item.dealAmount}}</view>
 						</view>
-						<view>
-							<view>{{$t('价格')}}[USDT]</view>
-							<view>35700.88</view>
+					</block>
+					<block v-if="tabIndex == 1">
+						<view class="right-box-item">
+							<view>{{$t('委托数量')}}[{{item.coinMarket[1]}}]</view>
+							<view>{{item.turnover}}</view>
 						</view>
-					</view>
-					<view>
-						<view class="date">04:07 01/29</view>
-						<view class="info">
-							<view>{{$t('数量')}}[BTC]</view>
-							<view>0.14</view>
+						<u-gap height="30rpx"></u-gap>
+						<view class="right-box-item">
+							<view>{{$t('实际成交')}}[{{item.coinMarket[1]}}]</view>
+							<view>{{item.volume}}</view>
 						</view>
-					</view>
-				</view>
-				<view class="right">
-					<view class="right-status text">
-						<text>{{$t('成交')}}</text>
-						<u-icon size="20rpx" name="arrow-right"></u-icon>
-					</view>
-					<view>
-						<view>{{$t('实际成交')}}[BTC]</view>
-						<view>0</view>
-					</view>
-				</view>
-			</view>
-			<view class="item u-border-bottom">
-				<view class="left">
-					<view>
-						<view class="business">
-							<text class="err">{{$t('卖出')}}</text> BTC
-						</view>
-						<view>
-							<view>{{$t('价格')}}[USDT]</view>
-							<view>35700.88</view>
-						</view>
-					</view>
-					<view>
-						<view class="date">04:07 01/29</view>
-						<view class="info">
-							<view>{{$t('数量')}}[BTC]</view>
-							<view>0.14</view>
-						</view>
-					</view>
-				</view>
-				<view class="right">
-					<view class="right-status text">
-						<text>{{$t('已撤销')}}</text>
-						<u-icon size="20rpx" name="arrow-right"></u-icon>
-					</view>
-					<view>
-						<view>{{$t('实际成交')}}[BTC]</view>
-						<view>0</view>
-					</view>
+					</block>
 				</view>
 			</view>
 		</view>
+		<u-gap height="30rpx"></u-gap>
+		<u-loadmore :status="status" :nomoreText="$t('nomoreText')" :loadingText="$t('loadingText')"
+			:loadmoreText="$t('loadmoreText')" />
 		<u-gap height="30rpx"></u-gap>
 		<u-safe-bottom></u-safe-bottom>
 	</view>
 </template>
 
 <script>
+	import {
+		getUserEntrustList,
+		getEntrustHistory
+	} from "@/config/api"
 	export default {
 		data() {
 			return {
+				status: 'loading',
+				tabIndex: 0,
+				list: [],
 				tabs: [{
 						name: this.$t('currentDelegation', {
 							number: 0
@@ -116,10 +113,59 @@
 				]
 			};
 		},
-
+		onLoad() {
+			this.pageNum = 1
+			this.pageSize = 10
+			this.getList()
+		},
+		onReachBottom() {
+			if (this.tabIndex == 0) return
+			this.pageNum++
+			this.getList('onReachBottom')
+		},
 		methods: {
-			click(e) {
+			getList(scene) {
+				this.status = 'loading'
+				if (this.tabIndex == 0) {
+					getUserEntrustList().then(e => {
+						this.tabs[0].name = this.$t('currentDelegation', {
+							number: e.length
+						})
+						e.forEach(item => {
+							if (item.coinMarket) {
+								item.coinMarket = item.coinMarket.split('/')
+							}
+						})
+						this.status = 'nomore'
+						this.list = e
+					})
+				} else {
+					getEntrustHistory({
+						pageNum: this.pageNum,
+						pageSize: this.pageSize
+					}).then(e => {
+						if (e.records == '') {
+							this.status = 'nomore'
+							return
+						}
+						e.records.forEach(item => {
+							if (item.coinMarket) {
+								item.coinMarket = item.coinMarket.split('/')
+							}
+						})
+						this.status = 'loadmore'
 
+						this.list = scene == 'onReachBottom' ? this.list.concat(e.records) : e.records
+					})
+				}
+			},
+			click({
+				index
+			}) {
+				this.tabIndex = index
+				this.list = []
+				this.pageNum = 1
+				this.getList()
 			}
 		},
 	}
@@ -136,7 +182,7 @@
 				text-align: right;
 
 				>view {
-					&:last-child {
+					&.right-box-item {
 						view {
 							&:first-child {
 								color: #929BA2;
@@ -233,6 +279,26 @@
 							}
 						}
 
+						.left-item-box {
+							&:last-child {
+								margin-top: 30rpx;
+							}
+
+							view {
+								&:first-child {
+									color: #929BA2;
+									margin-bottom: 16rpx;
+									font-size: 24rpx;
+								}
+
+								&:last-child {
+									font-weight: 500;
+									word-break: break-all;
+									font-size: 32rpx;
+								}
+							}
+						}
+
 						.business {
 							font-weight: 500;
 							color: #333333;
@@ -269,10 +335,9 @@
 				border-color: #343B45 !important;
 			}
 		}
-		
-		 .list .item .left > view:first-child .business,
-		 .list .item .right .right-status.text text
-		{
+
+		.list .item .left>view:first-child .business,
+		.list .item .right .right-status.text text {
 			color: #fff;
 		}
 	}

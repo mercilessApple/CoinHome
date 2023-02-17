@@ -6,7 +6,7 @@
 			<view class="navCenterSolt" slot='center'>
 				<u-image v-if="theme == 'light'" src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
 				<u-image v-else src="/static/icon44.png" width="48rpx" height="48rpx"></u-image>
-				<text>BTC/USDT</text>
+				<text>{{market.symbolKey}}</text>
 			</view>
 			<view slot="right">
 				<u-image src="/static/icon36.png" width="48rpx" height="48rpx"></u-image>
@@ -14,9 +14,12 @@
 		</u-navbar>
 		<view class="upper-box">
 			<view class="left">
-				<view class="amount">22,875.81</view>
+				<view class="amount">{{market.lastPrice}}</view>
 				<view class="unit">
-					≈ ¥154,411.72 <text>-3.18%</text>
+					≈ ¥{{market.lastPriceCny}} <text :class="{
+						add:market.rangeAbility >= 0 ,
+						err:market.rangeAbility < 0 ,
+					}">{{market.rangeAbility >=0 ? '+':''}}{{(market.rangeAbility * 100).toFixed(2) + '%'}}</text>
 				</view>
 			</view>
 			<view class="right">
@@ -85,17 +88,22 @@
 			<view class="tab-box" v-show="tabIndex == 0">
 				<view class="tab-box-item" style="padding-right: 10rpx;">
 					<view class="title">{{$t('买')}}</view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item" v-for="(item,index) in entrustList.bids" :key="index">
+						<text>{{item.amount}}</text><text>{{item.price}}</text>
+					</view>
 				</view>
 				<view class="tab-box-item sell" style="padding-left: 10rpx;">
 					<view class="title">{{$t('卖')}}</view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
+					<view class="item" v-for="(item,index) in entrustList.asks" :key="index">
+						<text>{{item.price}}</text><text>{{item.amount}}</text>
+					</view>
 				</view>
 			</view>
+			<block v-if="tabIndex == 0 && entrustList.bids == ''">
+				<u-gap height="300rpx"></u-gap>
+				<u-empty :text="$t('暂无数据')"></u-empty>
+				<u-gap height="300rpx"></u-gap>
+			</block>
 
 			<view class="tab-box deal" v-show="tabIndex == 1">
 				<view class="tab-box-item">
@@ -103,8 +111,12 @@
 						<text>{{$t('时间')}}</text>
 						<text>{{$t('方向')}}</text>
 					</view>
-					<view class="item"><text>14:14:05</text><text>{{$t('买入')}}</text></view>
-					<view class="item"><text>14:14:05</text><text class="err">{{$t('卖出')}}</text></view>
+					<view class="item" v-for="(item,index) in market.bids" :key="'time'+index">
+						<text>14:14:05</text><text>{{$t('买入')}}</text>
+					</view>
+					<view class="item" v-for="(item,index) in market.asks" :key="'type'+index">
+						<text>14:14:05</text><text class="err">{{$t('卖出')}}</text>
+					</view>
 				</view>
 
 
@@ -113,8 +125,12 @@
 						<text>{{$t('价格')}}</text>
 						<text>{{$t('数量')}}</text>
 					</view>
-					<view class="item"><text>67.193</text><text>310.4</text></view>
-					<view class="item"><text class="err">67.193</text><text>310.4</text></view>
+					<view class="item" v-for="(item,index) in market.bids" :key="'price'+index"><text
+							style="color: #2DBE87;">{{item.trustPrice}}</text><text>{{item.cumulativeCommissionQuantity}}</text>
+					</view>
+					<view class="item" v-for="(item,index) in market.asks" :key="'num'+index"><text
+							class="err">{{item.trustPrice}}</text><text>{{item.cumulativeCommissionQuantity}}</text>
+					</view>
 				</view>
 			</view>
 
@@ -168,8 +184,8 @@
 
 		<view class="fix-bar">
 			<view class="box">
-				<view>{{$t('买入')}}</view>
-				<view>{{$t('卖出')}}</view>
+				<view @click="next(0)">{{$t('买入')}}</view>
+				<view @click="next(1)">{{$t('卖出')}}</view>
 			</view>
 			<u-safe-bottom></u-safe-bottom>
 		</view>
@@ -188,14 +204,16 @@
 	} from '@/uni_modules/jones-hqchart2/js_sdk/umychart.style.wechat.js'
 
 	import {
-		DEPTH_TEST,
-		DEPTH_TEST2
-	} from "./deepTestData.js"
-
-	import {
 		KLineOption,
-		DeepOption
+		DeepOption,
 	} from '@/utils/KLineOption.js'
+	import {
+		getMarketKline,
+		getMarketDeeps,
+		getUserEntrustList,
+		getMarketDepth
+	} from "@/config/api"
+
 
 	//周期枚举
 	var PERIOD_ID = {
@@ -267,47 +285,56 @@
 						text: this.$t('minute', {
 							num: 1
 						}),
-						id: PERIOD_ID.KLINE_MINUTE_ID
+						id: PERIOD_ID.KLINE_MINUTE_ID,
+						key: 'one_minute'
 					},
 					{
 						text: this.$t('minute', {
 							num: 5
 						}),
-						id: PERIOD_ID.KLINE_5MINUTE_ID
+						id: PERIOD_ID.KLINE_5MINUTE_ID,
+						key: 'five_minute'
 					},
 					{
 						text: this.$t('minute', {
 							num: 15
 						}),
-						id: PERIOD_ID.KLINE_15MINUTE_ID
+						id: PERIOD_ID.KLINE_15MINUTE_ID,
+						key: 'fifteen_minute'
 					},
 					{
 						text: this.$t('minute', {
 							num: 30
 						}),
-						id: PERIOD_ID.KLINE_30MINUTE_ID
+						id: PERIOD_ID.KLINE_30MINUTE_ID,
+						key: 'thirty_minute'
 					},
 					{
 						text: this.$t('minute', {
 							num: 60
 						}),
-						id: PERIOD_ID.KLINE_60MINUTE_ID
+						id: PERIOD_ID.KLINE_60MINUTE_ID,
+						key: 'one_hour'
 					},
 					{
 						text: this.$t('日线'),
-						id: PERIOD_ID.KLINE_DAY_ID
+						id: PERIOD_ID.KLINE_DAY_ID,
+						key: 'one_day'
 					},
 					{
 						text: this.$t('周线'),
-						id: PERIOD_ID.KLINE_WEEK_ID
+						id: PERIOD_ID.KLINE_WEEK_ID,
+						key: 'one_week'
 					},
 					{
 						text: this.$t('月线'),
-						id: PERIOD_ID.KLINE_MONTH_ID
+						id: PERIOD_ID.KLINE_MONTH_ID,
+						key: 'one_month'
 					},
 					{
 						text: this.$t('年线'),
-						id: PERIOD_ID.KLINE_YEAR_ID
+						id: PERIOD_ID.KLINE_YEAR_ID,
+						key: 'one_year'
 					}
 				],
 				KLine: {
@@ -320,17 +347,77 @@
 				deepKLine: {
 					Option: DeepOption
 				},
-				PERIOD_ID: PERIOD_ID,
+				market: {
+					symbolKey: this.$t('加载中...'),
+					lastPrice: 0,
+					lastPriceCny: 0,
+					rangeAbility: 0,
+					asks: [{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						}
+					],
+					bids: [{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						},
+						{
+							trustPrice: 0,
+							cumulativeCommissionQuantity: 0
+						}
+					],
+				},
+				// PERIOD_ID: PERIOD_ID,
+				entrustList: {
+					bids: [],
+					asks: []
+				}
 			};
 			return data;
 		},
 
-		onLoad() {
-
+		onLoad(options) {
+			this.coinMarket = options.coinMarket
+			this.init()
+			// this.timer = setInterval(this.init, 1000)
 		},
 
 		onShow() {
-			this.ChangeKLinePeriod(PERIOD_ID.KLINE_DAY_ID, this.timeIndex || 5);
+			clearInterval(this.timer)
+			this.init()
+			this.timer = setInterval(this.init, 1000)
+			if (this.isShowDeep) {
+				return
+			}
+			this.ChangeKLinePeriod(8, 5);
 		},
 
 		onReady() {
@@ -347,6 +434,7 @@
 				d_Line.JSChart.StopAutoUpdate();
 				d_Line.JSChart = null;
 			}
+			clearInterval(this.timer)
 		},
 
 		onUnload() {
@@ -359,8 +447,44 @@
 				d_Line.JSChart.StopAutoUpdate();
 				d_Line.JSChart = null;
 			}
+			clearInterval(this.timer)
 		},
 		methods: {
+			next(type) {
+				uni.setStorage({
+					key:'barIndex',
+					data:type
+				})
+				uni.switchTab({
+					url: '/pages/transaction/transaction'
+				})
+			},
+			init() {
+				getMarketDeeps({
+					coinMarket: this.coinMarket,
+					type: 'detail'
+				}).then(e => {
+					if (!Boolean(e)) return
+					let {
+						asks,
+						bids
+					} = e
+					let newAsks = asks.slice(0, 5),
+						newBids = bids.slice(0, 5)
+					e.asks = newAsks
+					e.bids = newBids
+					this.market = e
+				})
+
+				getUserEntrustList({
+					coinMarket: this.coinMarket
+				}).then(e => {
+					this.entrustList = {
+						asks: e.map(item => item.type == 2),
+						bids: e.map(item => item.type == 1)
+					}
+				})
+			},
 			tabClick({
 				index
 			}) {
@@ -407,20 +531,28 @@
 				}
 			},
 			RequestDepthData(data, callback) {
-				this.TestID = 0;
-				var symbol = data.Request.Data.symbol.toUpperCase();
-
-				this.TestID++;
-				if (this.TestID % 2 == 0) var recvData = DEPTH_TEST;
-				else var recvData = DEPTH_TEST2;
-
-				var hqChartData = {
-					code: 0,
-					asks: recvData.asks, //卖盘
-					bids: recvData.bids, //买盘 
-					datatype: "snapshot" //全量数据  
-				};
-				callback(hqChartData);
+				getMarketDepth({
+					coinMarket: this.coinMarket,
+					type: 'paint'
+				}).then(e => {
+					var hqChartData = {
+						code: 0,
+						asks: e.asks.map(item => {
+							return [
+								item.trustPrice,
+								item.lastNumber
+							]
+						}),
+						bids: e.bids.map(item => {
+							return [
+								item.trustPrice,
+								item.lastNumber
+							]
+						}), //买盘 
+						datatype: "snapshot" //全量数据  
+					};
+					callback(hqChartData);
+				})
 			},
 			rightClick() {
 
@@ -445,13 +577,17 @@
 
 				g_KLine.JSChart = JSCommon.JSChart.Init(element);
 				this.KLine.Option.NetworkFilter = this.NetworkFilter;
-				this.KLine.Option.Symbol = this.Symbol;
+				let coin = this.coinMarket.split('/')
+				this.KLine.Option.Symbol = coin[0] + coin[1] + '.BIT';
 				this.KLine.Option.IsFullDraw = true; //每次手势移动全屏重绘
+
 				g_KLine.JSChart.SetOption(this.KLine.Option);
 			},
 
 			//K线周期切换
 			ChangeKLinePeriod(period, index) {
+				this.timeIndex = index
+				this.isShowDeep = false
 				if (!g_KLine.JSChart) //不存在创建
 				{
 					this.KLine.Option.Period = period;
@@ -459,8 +595,6 @@
 				} else {
 					g_KLine.JSChart.ChangePeriod(period);
 				}
-				this.timeIndex = index
-				this.isShowDeep = false
 			},
 
 			//切换指标 windowIndex=窗口索引 0开始, name=指标名字/ID
@@ -477,8 +611,48 @@
 
 				g_KLine.JSChart.ChangeSymbol(symbol);
 			},
-
+			marketKline(dimension, fn) {
+				getMarketKline({
+					coinMarket: this.coinMarket,
+					dimension
+				}).then(res => {
+					let formatData = res.map(item => {
+						return [
+							Number(this.$moment(item.time).format('YYYYMMDD')),
+							null,
+							Number(item.open),
+							Number(item.high),
+							Number(item.low),
+							Number(item.close),
+							Number(item.amount),
+							Number(item.turnover)
+						]
+					})
+					let coin = this.coinMarket.split('/')
+					let data = {
+						symbol: coin[0] + coin[1] + '.BIT',
+						name: coin[0] + coin[1],
+						data: formatData
+					}
+					fn(data)
+				})
+			},
 			NetworkFilter: function(data, callback) {
+				data.PreventDefault = true
+
+				switch (data.Name) {
+					case 'KLineChartContainer::ReqeustHistoryMinuteData':
+						this.marketKline(this.timeNav[this.timeIndex].key, data => callback({
+							data
+						}))
+
+						break;
+					case 'KLineChartContainer::RequestHistoryData':
+						this.marketKline(this.timeNav[this.timeIndex].key, data => callback({
+							data
+						}))
+						break
+				}
 				console.log('[HQChart:NetworkFilter] data', data.Name);
 			},
 
@@ -652,6 +826,7 @@
 					font-size: 22rpx;
 					display: flex;
 					justify-content: space-between;
+					line-height: 30rpx;
 
 					text {
 						&:last-child {
@@ -787,8 +962,15 @@
 				text {
 					font-weight: 500;
 					margin-left: 16rpx;
-					color: #F5475E;
 					font-size: 28rpx;
+
+					&.add {
+						color: #2DBE87;
+					}
+
+					&.err {
+						color: #F5475E;
+					}
 				}
 			}
 
@@ -824,14 +1006,15 @@
 		.tab-content .tab-box.deal .tab-box-item:last-child .item text:last-child,
 		.tab-content .tab-box.info .lab-item view:last-child,
 		.tab-content .tab-box.info .desc,
-		.tab-content .tab-box.info .logo text
-		{
+		.tab-content .tab-box.info .logo text {
 			color: #fff;
 		}
-		.fix-bar{
+
+		.fix-bar {
 			background: #29313C;
 		}
-		.tabs-box{
+
+		.tabs-box {
 			&.u-border-bottom {
 				border-color: #343B45 !important;
 			}

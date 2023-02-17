@@ -27,7 +27,12 @@
 					},
 					{
 						name: this.$t('主题'),
+						// #ifdef APP-PLUS
+						val: this.$t(uni.getSystemInfoSync().theme == 'light' ? '白天模式' : '黑夜模式'),
+						// #endif
+						// #ifdef H5
 						val: this.$t('自动'),
+						// #endif
 						url: '/pages/theme/theme'
 					},
 					{
@@ -50,6 +55,17 @@
 					}
 				]
 			};
+		},
+		onShow() {
+			// #ifdef APP-PLUS
+			let themeItem = this.nav[1]
+			if (uni.getStorageSync('theme')) {
+				let themeVal = uni.getStorageSync('theme')
+				if (themeVal == 'light') themeItem.val = this.$t('白天模式')
+				if (themeVal == 'dark') themeItem.val = this.$t('黑夜模式')
+				if (themeVal == 'auto') themeItem.val = this.$t('自动')
+			}
+			// #endif
 		},
 		onLoad() {
 

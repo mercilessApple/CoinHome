@@ -49,18 +49,45 @@ export const queryDepositPayCoin = (params: any) => http.post('/api/account/pay/
 export const queryAccountTransfer = (params: any) => http.post('/api/account/query/transfer', params)
 
 // 查询提币币种信息
-export const queryWithdrawCoin= (params: any) => http.post('/api/account/pay/query/withdraw/coin', params)
+export const queryWithdrawCoin = (params: any) => http.post('/api/account/pay/query/withdraw/coin', params)
 
 // 提币
-export const withdraw= (params: any) => http.post('/api/account/pay/withdraw', params)
+export const withdraw = (params: any) => http.post('/api/account/pay/withdraw', params)
 
 // 用户--修改昵称
-export const updateNickName= (params: any) => http.post('/api/user/update/info', params)
+export const updateNickName = (params: any) => http.post('/api/user/update/info', params)
 
 // 退出登录
-export const signOut= (params: any) => http.post('/api/user/sign-out', params)
+export const signOut = (params: any) => http.post('/api/user/sign-out', params)
 
 // 获取随机用户昵称
-export const getNickName= (params: any) => http.post('/api/user/get/nickName', params)
+export const getNickName = (params: any) => http.post('/api/user/get/nickName', params)
 
 export const updatePhone = (params: any) => http.post('/api/user/update/phone-or-email', params)
+
+// 用戶委托单列表查询
+export const getUserEntrustList = (params: any) => http.post('/api/order/user-entrust-list', params)
+
+// 登录发送手机或者邮箱验证码
+export const sendVerificationCode = (params: any) => http.post('/api/user/send/verification-code', params)
+
+// 校验短信或者邮箱验证码
+export const checkVerificationCode = (params: any) => http.post('/api/user/check/verification-code', params)
+
+// 用户修改登录密码（已登录状态)
+export const editUserPassword = (params: any) => http.post('/api/user/edit/password', params)
+
+// 设置修改资金密码
+export const updateFundsPassword = (params: any) => http.post('/api/user/update/funds-password', params)
+
+// 委托单--历史记录
+export const getEntrustHistory= (params: any) => http.post('/api/order/entrust-history-pagination', params)
+
+// 币币/合约--获取盘口
+export const getMarketDeeps= (params: any) => http.post('/api/market/deeps', params)
+
+// 币币/合约--获取k线
+export const getMarketKline= (params: any) => http.post('/api/market/kLine', params)
+
+// 币币/合约--获取深度图
+export const getMarketDepth = (params: any) => http.post('/api/market/depth', params)

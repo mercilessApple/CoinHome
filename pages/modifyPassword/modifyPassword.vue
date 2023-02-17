@@ -28,6 +28,13 @@
 </template>
 
 <script>
+	import {
+		editUserPassword
+	} from "@/config/api"
+
+	import {
+		hex_md5
+	} from "@/utils/md5.js"
 	export default {
 		data() {
 			return {
@@ -35,12 +42,50 @@
 				password: ''
 			};
 		},
-		onLoad() {
-
+		onLoad(options) {
+			this.code = options.code
+			console.log(hex_md5('123456'));
 		},
 		methods: {
 			submit() {
-				uni.$u.route('/pages/modifyPassword/modifyPassword')
+				if (!/^(\w){6,20}$/.test(this.password)) {
+					uni.showToast({
+						title: this.$t("请输入正确的邮箱格式"),
+						icon: "none"
+					})
+					return
+				}
+
+				if (this.againPassword != this.password) {
+					uni.showToast({
+						title: this.$t('输入的密码不一致，请重新输入'),
+						icon: 'none'
+					})
+					return
+				}
+
+				const md5Pwd = hex_md5(this.password).toUpperCase(),
+					md5AgainPwd = hex_md5(this.againPassword).toUpperCase()
+				uni.showLoading({
+					title: '加载中...',
+					mask: true
+				})
+				editUserPassword({
+					newPassword: md5Pwd,
+					newPasswordAgain: md5AgainPwd,
+					code: this.code,
+					phoneOrEmail: 2
+				}).then(e => {
+					uni.showToast({
+						title: this.$t('操作成功！')
+					})
+
+					setTimeout(() => {
+						uni.navigateBack({
+							delta: 2
+						})
+					}, 1500)
+				})
 			},
 		},
 	}

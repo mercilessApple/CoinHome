@@ -20,13 +20,13 @@
 					<u-icon name="arrow-right"></u-icon>
 				</view>
 			</view>
-			<view class="item" @click="$u.route('/pages/googleCaptcha/googleCaptcha')">
+	<!-- 		<view class="item" @click="$u.route('/pages/googleCaptcha/googleCaptcha')">
 				<view class="left">{{$t('googleCaptcha')}}</view>
 				<view class="right">
 					<text>{{$t('去设置')}}</text>
 					<u-icon name="arrow-right"></u-icon>
 				</view>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>

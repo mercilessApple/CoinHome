@@ -1,0 +1,22 @@
+{
+  "name": "coinhome-ios",
+  "version": "1.0.0",
+  "description": "CoinHome-iOS",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mercilessApple/CoinHome.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mercilessApple/CoinHome/issues"
+  },
+  "homepage": "https://github.com/mercilessApple/CoinHome#readme",
+  "dependencies": {
+    "moment": "^2.29.4"
+  }
+}

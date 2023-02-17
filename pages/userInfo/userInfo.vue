@@ -66,7 +66,6 @@
 		},
 		onShow() {
 			this.userInfo = uni.getStorageSync('userInfo')
-			console.log(this.userInfo);
 			this.nickName = this.userInfo.nickName
 		},
 		methods: {
