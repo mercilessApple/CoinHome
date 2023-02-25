@@ -11,7 +11,7 @@
 						add:marketItem.rangeAbility >= 0 && marketItem.onDealing === 1,
 						err:marketItem.rangeAbility < 0 && marketItem.onDealing === 1,
 					}">
-						{{marketItem.rangeAbility >=0 ? '+':''}}{{(marketItem.rangeAbility * 100).toFixed(2) + '%'}}
+						{{marketItem.rangeAbility >=0 ? '+':''}}{{utils.decimal(marketItem.rangeAbility * 100,2) + '%'}}
 					</text>
 				</view>
 			</view>
@@ -51,14 +51,16 @@
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="number-box">
-						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
-							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx"
-							v-model="marketItem.lastPrice">
-						</u-number-box>
+						<block v-if="oriMarketList != ''">
+							<u-number-box :min="0.00001" :color="theme == 'light' ? '#323233' : '#fff'"
+								:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx"
+								v-model="oriMarketList[marketItemIndex].price">
+							</u-number-box>
+						</block>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="count-box">
-						<u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
+						<u-number-box :decimalLength="5" :min="0.00001" :color="theme == 'light' ? '#323233' : '#fff'"
 							:placeholder="`${$t('数量')}(${marketItem.coinMarket[0]})`"
 							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx" v-model="count">
 						</u-number-box>
@@ -66,16 +68,19 @@
 					<u-gap height="16rpx"></u-gap>
 
 					<view class="block">
-						<view @click="blockIndex = index" :class="{
+						<view @click="chooseProportion(item,index)" :class="{
 							'active':blockIndex == index
 						}" v-for="(item,index) in block" :key="index">{{item.name}}</view>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 
 					<view class="total-amount">
-						<u-input :color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
-							border="none" :placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
-						</u-input>
+						<block v-if="oriMarketList != ''">
+							<u-input readonly :value="utils.decimal(count * oriMarketList[marketItemIndex].price,5)"
+								:color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
+								border="none" :placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
+							</u-input>
+						</block>
 					</view>
 					<u-gap height="30rpx"></u-gap>
 
@@ -84,13 +89,13 @@
 							<view>{{$t('可用')}}</view>
 							<view v-if="marketStatus == 'loading'">0</view>
 							<view v-else>
-								{{coinAccountList == '' ? '0' :  getAccount(marketItem.coinMarket[barIndex == 0 ? 1 : 0]).data[0].amount}}
+								{{getAccount().amount}}
 								{{marketItem.coinMarket[barIndex == 0 ? 1 : 0]}}
 							</view>
 						</view>
 					</view>
 					<u-gap height="30rpx"></u-gap>
-					<view v-if="isLogin" class="btn" :style="{
+					<view @click="submit" v-if="isLogin" class="btn" :style="{
 						'background':barIndex == 1 ? '#F5475E' : '#2EBD87'
 					}">{{ barIndex == 0 ? $t('买入') : $t('卖出')}}{{marketStatus == 'loading' ? '' : marketItem.coinMarket[0]}}</view>
 					<view @click="$u.route('/pages/login/login')" v-else class="btn" :style="{
@@ -111,28 +116,28 @@
 					<view class="price-box">
 						<view>
 							<view v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
-								{{item.trustPrice}}
+								{{utils.decimal(item.trustPrice,5)}}
 							</view>
 						</view>
 						<view>
 							<view v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
-								{{item.cumulativeCommissionQuantity}}
+								{{utils.decimal(item.cumulativeCommissionQuantity,5)}}
 							</view>
 						</view>
 					</view>
 					<view class="area">
-						<view>{{marketDeeps.lastPrice || 0}}</view>
-						<view>≈ ¥ {{marketDeeps.lastPriceCny || 0}}</view>
+						<view>{{utils.decimal(marketDeeps.lastPrice,5) || 0}}</view>
+						<view>≈ ¥ {{utils.decimal(marketDeeps.lastPriceCny,5) || 0}}</view>
 					</view>
 					<view class="price-box bottom">
 						<view>
 							<view v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
-								{{item.trustPrice}}
+								{{utils.decimal(item.trustPrice,5)}}
 							</view>
 						</view>
 						<view>
 							<view v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
-								{{item.cumulativeCommissionQuantity}}
+								{{utils.decimal(item.cumulativeCommissionQuantity,5)}}
 							</view>
 						</view>
 					</view>
@@ -153,9 +158,7 @@
 				<view class="list">
 					<view :class="{
 						'u-border-bottom':index < (userEntrustList.length - 1)
-					}" v-for="(item,index) in userEntrustList" :key="index" class="item" @click="$u.route({
-						url:'/pages/orderDetail/orderDetail'
-					})">
+					}" v-for="(item,index) in userEntrustList" :key="index" class="item" @click="toDetail(item)">
 						<view class="left">
 							<view>
 								<view class="business">
@@ -169,19 +172,20 @@
 								</view>
 							</view>
 							<view>
-								<view class="date">{{$moment(item.createTime).format('HH:mm MM/DD')}}</view>
+								<view class="date">{{$moment(item.createTime * 1000).format('HH:mm MM/DD')}}</view>
 								<view class="info">
 									<view>{{$t('数量')}}[{{item.coinMarket[1]}}]</view>
-									<view>{{item.remainingNumber}}</view>
+									<view>{{utils.decimal(item.remainingNumber,5)}}</view>
 								</view>
 							</view>
 						</view>
 						<view class="right">
-							<view class="right-status btn" v-if="item.orderStatus == 0">{{$t('撤销')}}</view>
+							<view class="right-status btn" @click.stop="revoke(item)"
+								v-if="item.orderStatus == 0 || item.orderStatus == 2">{{$t('撤销')}}</view>
 							<block v-else>
 								<view class="right-status text">
 									<text v-if="item.orderStatus == 1">{{$t('完全成交')}}</text>
-									<text v-if="item.orderStatus == 2">{{$t('部分成交')}}</text>
+									<!-- <text v-if="item.orderStatus == 2">{{$t('部分成交')}}</text> -->
 									<text v-if="item.orderStatus == 3">{{$t('撤销中')}}</text>
 									<text v-if="item.orderStatus == 4">{{$t('撤销成功')}}</text>
 									<u-icon size="20rpx" name="arrow-right"></u-icon>
@@ -242,10 +246,10 @@
 								{{item.coinMarket[0]}}<text>/{{item.coinMarket[1]}}</text>
 							</view>
 							<view class="right">
-								<view>{{item.lastPriceCny}}</view>
+								<view>{{item.lastPrice}}</view>
 								<view :class="{
 									'err':item.rangeAbility < 0 && item.onDealing === 1
-								}">{{item.rangeAbility >=0 ? '+':''}}{{(item.rangeAbility * 100).toFixed(2)}}%</view>
+								}">{{item.rangeAbility >=0 ? '+':''}}{{utils.decimal(item.rangeAbility * 100,2)}}%</view>
 							</view>
 						</view>
 						<u-loadmore :status="marketStatus" :nomoreText="$t('nomoreText')"
@@ -264,17 +268,20 @@
 		getOptionalMarket,
 		getTickerByPartitionMarket,
 		queryAccountInfo,
-		getMarketDeeps
+		getMarketDeeps,
+		addUserEntrustOrder,
+		cancelEntrustOrder
 	} from "@/config/api"
-
 	export default {
 		data() {
 			return {
+				oriMarketList: [],
 				searchKey: '',
 				isLogin: false,
 				marketTabIndex: 2,
 				marketStatus: 'loading',
 				marketItemIndex: 0,
+				// marketItemIndex: 2,
 				marketList: [],
 				status: 'loading',
 				blockIndex: null,
@@ -291,18 +298,22 @@
 				show: false,
 				block: [{
 						name: '25%',
+						key: 0.25,
 						active: false
 					},
 					{
 						name: '50%',
+						key: 0.5,
 						active: false
 					},
 					{
 						name: '75%',
+						key: 0.75,
 						active: false
 					},
 					{
 						name: '100%',
+						key: 1,
 						active: false
 					}
 				],
@@ -372,40 +383,150 @@
 			};
 		},
 		onHide() {
-			clearInterval(this.marketTimer)
-			clearInterval(this.handicapTimer)
-			// clearInterval(this.entrustTimerTimer)
-			console.log('onHide')
+			clearInterval(this.timer)
+			let topic = this.oriMarketList[this.marketItemIndex].oriCoinMarketText.toLowerCase().replace(
+				'/', '-')
+			uni.sendSocketMessage({
+				data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+					'-trade"}'
+			})
 		},
 		onUnload() {
-			clearInterval(this.marketTimer)
-			clearInterval(this.handicapTimer)
-			// clearInterval(this.entrustTimerTimer)
-			console.log('onUnload')
+			clearInterval(this.timer)
 		},
 		onLoad() {
+			this.marketItemIndex = 0
+		},
+		watch: {
+			marketItemIndex(newValue, oldValue) {
+				let topic = this.oriMarketList[newValue].oriCoinMarketText.toLowerCase().replace(
+					'/', '-')
 
+				let oldTopic = this.oriMarketList[oldValue].oriCoinMarketText.toLowerCase().replace(
+					'/', '-')
+
+				uni.sendSocketMessage({
+					data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+						'-trade"}'
+				})
+
+				uni.sendSocketMessage({
+					data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + oldTopic +
+						'-trade"}'
+				})
+			}
 		},
 		onShow() {
 			this.isLogin = Boolean(uni.getStorageSync('token'))
-			clearInterval(this.marketTimer)
-			clearInterval(this.handicapTimer)
-			// clearInterval(this.entrustTimerTimer)
-			this.init()
-			
 			let self = this
+			if (this.oriMarketList != '') {
+				this.oriMarketList[this.marketItemIndex].price = this.oriMarketList[this.marketItemIndex].lastPrice
+				this.marketItem = this.oriMarketList[this.marketItemIndex]
+			}
+
 			uni.getStorage({
 				key: 'barIndex',
-				success: function (res) {
-					self.barIndex = res.data
-					
+				success: function(res) {
+					self.barIndex = res.data.index
+					console.log(res);
+					if (self.oriMarketList != '') {
+
+						let index = self.oriMarketList.findIndex(item => item.oriCoinMarketText == res.data
+							.coin)
+						console.log(index);
+						console.log(self.oriMarketList);
+						if (index !== -1) {
+							self.marketItemIndex = index
+						}
+					}
 					uni.removeStorage({
-						key:'barIndex'
+						key: 'barIndex'
 					})
 				}
 			});
+
+			this.$onSocketMessage((data) => {
+				if (data.asks) {
+					let {
+						asks,
+						bids
+					} = data
+					let newAsks = asks.slice(0, 5),
+						newBids = bids.slice(0, 5)
+					this.marketDeeps = {
+						lastPrice: data.lastPrice,
+						lastPriceCny: data.lastPriceCny,
+						asks: newAsks,
+						bids: newBids
+					}
+				}
+
+				this.updateMarketList(this.marketList, data)
+				this.updateMarketList(this.oriMarketList, data)
+			})
+			this.init()
 		},
 		methods: {
+			updateMarketList(list, data) {
+				if (list != '') {
+					const index = list.findIndex(item => item.coinId == data.coinId)
+					if (index == -1) return
+					list[index].lastPrice = data.lastPrice
+					list[index].rangeAbility = data.rangeAbility
+					list[index].lastPriceCny = data.lastPriceCny
+				}
+			},
+			revoke(item) {
+				cancelEntrustOrder({
+					cancelEntrustList: [{
+						entrustNo: item.entrustNo
+					}]
+				}).then(e => {
+					item.orderStatus = 3
+				})
+			},
+			toDetail(item) {
+				if (item.orderStatus == 1 || item.orderStatus == 2) {
+					uni.setStorageSync('orderDetailItem', item)
+					uni.$u.route({
+						url: '/pages/orderDetail/orderDetail',
+						params: {
+							entrustNo: item.entrustNo
+						}
+					})
+				}
+			},
+			submit() {
+				uni.showLoading({
+					mask: true
+				})
+				addUserEntrustOrder({
+					type: this.barIndex == 0 ? 1 : 2,
+					coinMarket: this.oriMarketList[this.marketItemIndex].oriCoinMarketText,
+					amount: this.count,
+					price: this.oriMarketList[this.marketItemIndex].price,
+					orderType: 1
+				}).then(e => {
+					uni.hideLoading()
+				})
+			},
+			chooseProportion(item, index) {
+				if (!uni.getStorageSync('token')) {
+					return
+				}
+				this.blockIndex = index == this.blockIndex ? null : index
+				if (this.blockIndex != null) {
+					this.count = this.utils.decimal((this.getAccount().amount * item.key) / this.oriMarketList[this
+							.marketItemIndex]
+						.price, 5)
+
+				} else {
+					this.count = 1
+				}
+			},
 			/**
 			 * 获取盘口
 			 */
@@ -476,19 +597,22 @@
 				})
 			},
 			init() {
+				clearInterval(this.timer)
 				this.queryMarkets((e) => {
 					this.oriMarketList = e
+					this.marketItem = this.oriMarketList[this.marketItemIndex]
 					this.getHandicap()
-					this.handicapTimer = setInterval(this.getHandicap, 1000)
-
 					this.queryUserEntrustList()
-					// this.entrustTimerTimer = setInterval(this.queryUserEntrustList, 1000)
+
+					let topic = this.oriMarketList[this.marketItemIndex].oriCoinMarketText.toLowerCase().replace(
+						'/', '-')
+					uni.sendSocketMessage({
+						data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+							'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+							'-trade"}'
+					})
 				})
-
-				this.marketTimer = setInterval(() => {
-					this.queryMarkets()
-				}, 1000)
-
+				this.timer = setInterval(this.queryUserEntrustList, 3000)
 				if (this.isLogin) {
 					queryAccountInfo({
 						type: 1
@@ -496,9 +620,14 @@
 				}
 			},
 			getAccount(coin) {
-				let data = this.coinAccountList.filter(item => item.coinName == coin)
-				return {
-					data
+				if (this.coinAccountList == '') {
+					return {
+						amount: 0
+					}
+				} else {
+					let coin = this.marketItem.coinMarket[this.barIndex == 0 ? 1 : 0]
+					let data = this.coinAccountList.filter(item => item.coinName == coin)
+					return data[0]
 				}
 			},
 			open() {
@@ -521,9 +650,6 @@
 				this.oriMarketList = this.marketList
 				this.getHandicap()
 				this.queryMarkets()
-				this.marketTimer = setInterval(() => {
-					this.queryMarkets()
-				}, 1000)
 			},
 
 			/**
@@ -547,18 +673,31 @@
 							item.oriCoinMarketText = item.coinMarket
 							item.coinMarket = item.coinMarket.split('/')
 						}
+						item.price = item.lastPrice
 					})
 
 					if (this.searchKey == '') {
 						this.marketList = data
 					} else {
-						this.marketList = this.fuzzyQuery(data, this.searchKey)
+						// this.marketList = this.fuzzyQuery(data, this.searchKey)
+						this.marketList =  this.utils.fuzzyQuery(data, this.searchKey, 'oriCoinMarketText')
 					}
-
-					this.marketItem = this.marketList[this.marketItemIndex]
 				}
 
 				fn(this.marketList)
+
+				// if (data == '') {
+				// 	this.isCreated = false
+				// 	uni.closeSocket()
+				// } else {
+				// 	if (this.isCreated) return
+				// 	uni.connectSocket({
+				// 		url: this.utils.socketURL,
+				// 		success: () => {
+				// 			this.isCreated = true
+				// 		}
+				// 	});
+				// }
 			},
 			/**
 			 * 查询委托单
@@ -598,17 +737,15 @@
 				this.marketStatus = 'loading'
 				this.marketList = []
 				this.marketTabIndex = index
-				clearInterval(this.marketTimer)
+
 				this.queryMarkets()
 
 			},
 			close() {
-				clearInterval(this.marketTimer)
+
 				this.show = false
 				this.queryMarkets()
-				this.marketTimer = setInterval(() => {
-					this.queryMarkets()
-				}, 1000)
+
 			},
 			rightClick() {
 				uni.$u.route({

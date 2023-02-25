@@ -7,10 +7,8 @@
 		</view>
 		<view class="list">
 			<view :class="{
-				'u-border-bottom':index < (index < (userEntrustList.length - 1).length - 1)
-			}" class="item" v-for="(item,index) in list" :key="index" @click="$u.route({
-				url:'/pages/orderDetail/orderDetail'
-			})">
+				'u-border-bottom':index < (index < (list.length - 1).length - 1)
+			}" class="item" v-for="(item,index) in list" :key="index" @click="toNext(item)">
 				<view class="left">
 					<view>
 						<view class="business">
@@ -29,7 +27,7 @@
 						<block v-if="tabIndex == 1">
 							<view class="left-item-box">
 								<view>{{$t('时间')}}</view>
-								<view>{{$moment(item.updateTime).format('HH:mm MM/DD')}}</view>
+								<view>{{$moment(item.updateTime * 1000).format('HH:mm MM/DD')}}</view>
 							</view>
 
 							<view class="left-item-box">
@@ -39,12 +37,13 @@
 						</block>
 					</view>
 					<view>
-						<view class="date">{{tabIndex == 0 ? $moment(item.createTime).format('HH:mm MM/DD') : ''}}
+						<view class="date">{{tabIndex == 0 ? $moment(item.createTime * 1000).format('HH:mm MM/DD') : ''}}
+							<text style="opacity: 0;">占位</text>
 						</view>
 						<block v-if="tabIndex == 0">
 							<view class="info">
 								<view>{{$t('数量')}}[{{item.coinMarket[1]}}]</view>
-								<view>{{item.remainingNumber}}</view>
+								<view>{{utils.decimal(item.remainingNumber,5)}}</view>
 							</view>
 						</block>
 
@@ -62,11 +61,25 @@
 					</view>
 				</view>
 				<view class="right">
-					<view class="right-status btn">{{$t('撤销')}}</view>
+					<!-- <view class="right-status btn">{{$t('撤销')}}</view> -->
+					<view @click="revoke(item)" class="right-status btn"
+						v-if="tabIndex == 0 && (item.type == 0 || item.type == 2)">
+						{{$t('撤销')}}
+					</view>
+
+					<block v-else>
+						<view class="right-status text">
+							<text v-if="item.type == 1">{{$t('完全成交')}}</text>
+							<text v-if="item.type == 2">{{$t('部分成交')}}</text>
+							<text v-if="item.type == 3">{{$t('撤销中')}}</text>
+							<text v-if="item.type == 4">{{$t('撤销成功')}}</text>
+							<u-icon size="20rpx" name="arrow-right"></u-icon>
+						</view>
+					</block>
 					<block v-if="tabIndex == 0">
 						<view class="right-box-item">
 							<view>{{$t('实际成交')}}[{{item.coinMarket[1]}}]</view>
-							<view>{{item.dealAmount}}</view>
+							<view>{{utils.decimal(item.dealAmount,5)}}</view>
 						</view>
 					</block>
 					<block v-if="tabIndex == 1">
@@ -94,7 +107,8 @@
 <script>
 	import {
 		getUserEntrustList,
-		getEntrustHistory
+		getEntrustHistory,
+		cancelEntrustOrder
 	} from "@/config/api"
 	export default {
 		data() {
@@ -119,11 +133,31 @@
 			this.getList()
 		},
 		onReachBottom() {
-			if (this.tabIndex == 0) return
+			if (this.tabIndex == 0 || this.status == 'nomore') return
 			this.pageNum++
 			this.getList('onReachBottom')
 		},
 		methods: {
+			revoke(item) {
+				cancelEntrustOrder({
+					cancelEntrustList: [{
+						entrustNo: item.entrustNo
+					}]
+				}).then(e => {
+					item.type = 3
+				})
+			},
+			toNext(item) {
+				if (item.type == 1 || item.type == 2) {
+					uni.setStorageSync('orderDetailItem', item)
+					uni.$u.route({
+						url: '/pages/orderDetail/orderDetail',
+						params: {
+							entrustNo: item.entrustNo
+						}
+					})
+				}
+			},
 			getList(scene) {
 				this.status = 'loading'
 				if (this.tabIndex == 0) {
@@ -138,7 +172,7 @@
 						})
 						this.status = 'nomore'
 						this.list = e
-					})
+					}).catch(()=>this.status = 'nomore')
 				} else {
 					getEntrustHistory({
 						pageNum: this.pageNum,
@@ -156,7 +190,7 @@
 						this.status = 'loadmore'
 
 						this.list = scene == 'onReachBottom' ? this.list.concat(e.records) : e.records
-					})
+					}).catch(()=>this.status = 'nomore')
 				}
 			},
 			click({

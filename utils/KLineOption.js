@@ -19,6 +19,7 @@ export const KLineOption = {
 			},
 		],
 	IsAutoUpdate: true, //是自动更新数据
+	// IsAutoUpdate: false, //是自动更新数据
 	AutoUpdateFrequency: 1000,
 	CorssCursorTouchEnd: true,
 	IsShowRightMenu: false, //是否显示右键菜单
@@ -77,7 +78,7 @@ export const DeepOption = {
 	},
 	Symbol: 'BTCBUSD.bit',
 	IsAutoUpdate: true, //是自动更新数据
-	AutoUpdateFrequency: 10000,
+	AutoUpdateFrequency: 1000,
 	//CorssCursorTouchEnd:true,
 	EnableScrollUpDown: true,
 	MaxVolRate: 1.2,

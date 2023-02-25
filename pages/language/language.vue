@@ -25,12 +25,15 @@
 	export default {
 		data() {
 			return {
-				lang: uni.getLocale()
+				lang: uni.getLocale() == 'en' ? 'en' : 'zh'
 			};
+		},
+		onLoad() {
+			
 		},
 		methods: {
 			setLang(lang) {
-				if (uni.getLocale() == lang) return
+				if (this.lang == lang) return
 				uni.showModal({
 					title: this.$t('提示'),
 					content: this.$t('应用此设置将重启App'),
@@ -38,11 +41,6 @@
 						if (res.confirm) {
 							this.$i18n.locale = lang;
 							this.lang = lang
-							uni.$emit("setMescrollGlobalOption", {
-								i18n: {
-									type: lang
-								}
-							})
 							// #ifdef APP-PLUS
 							if (uni.getSystemInfoSync().platform.toLowerCase() === 'android') {
 								uni.setLocale(lang);
@@ -88,10 +86,11 @@
 		font-size: 48rpx;
 		padding: 44rpx 30rpx;
 	}
-	
+
 	@media (prefers-color-scheme: dark) {
+
 		.title,
-		.nav .item .left{
+		.nav .item .left {
 			color: #fff;
 		}
 	}

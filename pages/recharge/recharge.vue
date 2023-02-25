@@ -3,7 +3,7 @@
 		<u-navbar leftIcon="" placeholder :bgColor="theme == 'light'?' #ffffff':'#1F282F'">
 			<view class="u-nav-slot" slot="center">
 				<view class="search">
-					<u-search @custom="search" @search="search" :actionStyle="{
+					<u-search :color="theme == 'light' ? '' :'#fff'" @custom="search" @search="search" :actionStyle="{
 						'width':'auto',
 						'color':theme == 'light' ? '' : '#FEFA05'
 					}" :actionText="$t('搜索')" v-model="key" height="64rpx" :bgColor="theme == 'light'? '#F6F6F6' : '#29313C'"
@@ -28,34 +28,37 @@
 		<u-gap height="10rpx"></u-gap>
 		<view class="lab">
 			<view class="tit">{{$t('币种列表')}}</view>
-
 			<view class="lab-list">
 				<view class="column" v-for="(item,index) in coinList" :key="index" @click="select(item.coinName)">
 					<u-image width="40rpx" height="40rpx" :src="item.iconUrl"></u-image>
 					<view class="info">
 						<view>{{item.coinName}}</view>
-						<view>{{item.list != '' ? item.list[0].chainName : item.coinName}}</view>
+						<view>{{item.chainName}}</view>
 					</view>
 				</view>
 			</view>
-
-			<block v-if="coinList == ''">
-				<u-gap height="300rpx"></u-gap>
-				<u-empty :text="$t('暂无数据')"></u-empty>
-				<u-gap height="300rpx"></u-gap>
-			</block>
 		</view>
+		<u-loading-icon style="margin-top: 300rpx;" mode="circle" :show="loading"></u-loading-icon>
+		<u-safe-bottom></u-safe-bottom>
+		<u-gap height="30rpx"></u-gap>
+		<block v-if="coinList == '' && !loading">
+			<u-gap height="300rpx"></u-gap>
+			<u-empty :text="$t('暂无数据')"></u-empty>
+			<u-gap height="300rpx"></u-gap>
+		</block>
 	</view>
 </template>
 
 <script>
 	import {
 		queryHotCoins,
-		queryDepositPayCoin
+		queryDepositPayCoin,
+		coinSimple
 	} from "@/config/api"
 	export default {
 		data() {
 			return {
+				loading: true,
 				hotCoins: [],
 				key: "",
 				coinList: [],
@@ -64,12 +67,12 @@
 		},
 		onLoad() {
 			queryHotCoins().then(e => this.hotCoins = e)
-
-			queryDepositPayCoin().then(e => {
-				console.log(e);
+			
+			coinSimple().then(e => {
 				this.coinList = e
 				this.oriList = e
-			})
+				this.loading = false
+			}).catch(()=>this.loading = false)
 
 			if (uni.getStorageSync('historyList')) this.historyList = uni.getStorageSync('historyList')
 		},
@@ -79,7 +82,7 @@
 					this.coinList = this.oriList
 					return
 				}
-				let searchList = this.coinList.filter(item => item.coinName == key)
+				let searchList = this.oriList.filter(item => item.coinName == key)
 				this.coinList = searchList
 			},
 			noRepeat11(arr) {
@@ -168,7 +171,7 @@
 		}
 
 		.lab .tit,
-		.lab .lab-list .column .info view:first-child{
+		.lab .lab-list .column .info view:first-child {
 			color: #fff;
 		}
 	}

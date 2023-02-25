@@ -1,6 +1,10 @@
 <template>
 	<view>
-		<web-view src="https://www.baidu.com/"></web-view>
+		<web-view :src="src" :webview-styles="{
+			progress:{
+				color:'#FEFA05'
+			}
+		}"></web-view>
 	</view>
 </template>
 
@@ -8,9 +12,15 @@
 	export default {
 		data() {
 			return {
-
+				src: ''
 			};
-		}
+		},
+		onLoad({
+			url
+		}) {
+			console.log(url);
+			this.src = url
+		},
 	}
 </script>
 

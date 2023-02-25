@@ -6,17 +6,20 @@
 		<view class="content">
 			<view class="country">
 				<view class="title" style="padding-top: 40rpx;">{{$t('证件签发国家/地区')}}</view>
-				<view class="picker-box">
+				<view class="picker-box" @click="choose">
 					<view class="left">
-						<u-image width="48rpx" height="48rpx"></u-image>
-						<text>中国</text>
+						<u-image width="48rpx" height="48rpx"
+							:src="areaItem.key == 0 ? require('@/static/icon48.png') : require('@/static/icon3.png')">
+						</u-image>
+						<text>{{areaItem.name == $t('外国') ? $t('请选择'): areaItem.name}}</text>
 					</view>
 					<view>
 						<u-icon color="#8B8F92" size="20rpx" name="arrow-down-fill"></u-icon>
 					</view>
 				</view>
 			</view>
-			<view class="id">
+
+			<!-- <view class="id" v-if="areaItem.key == 1">
 				<view class="title">{{$t('证件类型')}}</view>
 
 				<view @click="idType = 0" class="item" :class="{
@@ -36,34 +39,80 @@
 				}">
 					<view class="left">
 						<u-image src="/static/icon3.png" width="48rpx" height="48rpx"></u-image>
-						<text>{{$t('护照')}}</text>
+						<text>{{$t('证件')}}</text>
 					</view>
 					<view class="right">
 						<u-icon :color="idType == 1 ? '#FEFA05' : '#B9B9BB'"
 							:name="idType == 1 ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
 					</view>
 				</view>
-			</view>
+			</view> -->
 
 			<view class="info">
-				<view class="title">{{$t('证件信息')}}</view>
-				<view class="item">
-					<view class="lab">{{$t('姓名')}}</view>
-					<view class="input">
-						<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" fontSize="26rpx" border="none"
-							:placeholder="$t('请输入您的真实姓名')"></u-input>
+				<view class="title">{{$t('填写信息')}}</view>
+				<block v-if="areaItem.key == 0">
+					<view class="item">
+						<view class="lab">{{$t('证件号')}}</view>
+						<view class="input">
+							<u-input v-model="val" :color="theme == 'light' ? '#303133' : '#ffffff'" fontSize="26rpx"
+								border="none" type="idcard" :placeholder="$t('请输入您的证件号')"></u-input>
+						</view>
 					</view>
-				</view>
-				<view class="item">
-					<view class="lab">{{$t('证件号')}}</view>
-					<view class="input">
-						<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" fontSize="26rpx" border="none"
-							type="idcard" :placeholder="$t('请输入您的证件号')"></u-input>
+					<view class="item">
+						<view class="lab">{{$t('英文姓')}}</view>
+						<view class="input">
+							<u-input v-model="en_firstName" :color="theme == 'light' ? '#303133' : '#ffffff'"
+								fontSize="26rpx" border="none" :placeholder="$t('请输入您的姓')"></u-input>
+						</view>
 					</view>
-				</view>
+					<view class="item">
+						<view class="lab">{{$t('英文名')}}</view>
+						<view class="input">
+							<u-input v-model="en_lastName" :color="theme == 'light' ? '#303133' : '#ffffff'"
+								fontSize="26rpx" border="none" :placeholder="$t('请输入您的名字')"></u-input>
+						</view>
+					</view>
+					<view class="item">
+						<view class="lab">{{$t('生日')}}</view>
+						<view class="input">
+							<picker @change="bindDateChange" mode="date" :value="birthday">
+								<u-input readonly v-model="birthday" :color="theme == 'light' ? '#303133' : '#ffffff'"
+									fontSize="26rpx" border="none" :placeholder="$t('请输入您的生日')"></u-input>
+							</picker>
+						</view>
+					</view>
+				</block>
+				<block v-if="areaItem.key == 1">
+					<view class="item">
+						<view class="lab">{{$t('英文姓')}}</view>
+						<view class="input">
+							<u-input v-model="en_firstName" :color="theme == 'light' ? '#303133' : '#ffffff'"
+								fontSize="26rpx" border="none" :placeholder="$t('请输入您的姓')"></u-input>
+						</view>
+					</view>
+					<view class="item">
+						<view class="lab">{{$t('英文名')}}</view>
+						<view class="input">
+							<u-input v-model="en_lastName" :color="theme == 'light' ? '#303133' : '#ffffff'"
+								fontSize="26rpx" border="none" :placeholder="$t('请输入您的名字')"></u-input>
+						</view>
+					</view>
+					<view class="item">
+						<view class="lab">{{$t('生日')}}</view>
+						<view class="input">
+							<picker @change="bindDateChange" mode="date" :value="birthday">
+								<u-input readonly v-model="birthday" :color="theme == 'light' ? '#303133' : '#ffffff'"
+									fontSize="26rpx" border="none" :placeholder="$t('请输入您的生日')"></u-input>
+							</picker>
+						</view>
+					</view>
+				</block>
 			</view>
 		</view>
 
+		<!-- <u-picker confirmColor="#FEFA05" @cancel="show = false" :show="show" :columns="columns"></u-picker> -->
+		<u-action-sheet class="u-action-sheet" @select="select" @close="show = false" :cancelText="$t('取消')"
+			safeAreaInsetBottom round="40rpx" :title="$t('证件签发国家/地区')" :actions="columns" :show="show"></u-action-sheet>
 		<view class="btn" @click="submit">
 			{{$t('提交')}}
 		</view>
@@ -72,15 +121,118 @@
 </template>
 
 <script>
+	import {
+		userPrimaryVerified
+	} from "@/config/api"
 	export default {
 		data() {
 			return {
-				idType: 0
+				birthday: '',
+				en_firstName: '',
+				en_lastName: '',
+				columns: [{
+						name: this.$t('中国'),
+						key: 0
+					},
+					{
+						name: this.$t('外国'),
+						key: 1
+					}
+
+				],
+				idType: 0,
+				show: false,
+				name: '',
+				val: '',
+				areaItem: {
+					nationalityName: '',
+					nationality: '',
+					key: 0,
+					name: this.$t('中国')
+				}
 			};
 		},
-		methods: {
-			submit() {
+		onLoad() {
 
+		},
+		methods: {
+			choose() {
+				if (this.areaItem.key == 0) {
+					this.show = true
+				} else {
+					uni.$u.route('/pages/selectCountryCode/selectCountryCode')
+				}
+			},
+			bindDateChange: function(e) {
+				this.birthday = e.detail.value
+			},
+			select(e) {
+				this.areaItem = e
+			},
+			submit() {
+				if (this.areaItem.name == this.$t('外国')) {
+					uni.showToast({
+						title: this.$t('请选择') + this.$t('证件签发国家/地区'),
+						icon: 'none'
+					})
+					return
+				}
+
+				if (this.en_firstName == '') {
+					uni.showToast({
+						title: this.$t('请输入您的姓'),
+						icon: 'none'
+					})
+					return
+				}
+				if (this.en_lastName == '') {
+					uni.showToast({
+						title: this.$t('请输入您的名字'),
+						icon: 'none'
+					})
+					return
+				}
+
+				if (this.birthday == '') {
+					uni.showToast({
+						title: this.$t('请输入您的生日'),
+						icon: 'none'
+					})
+					return
+				}
+
+
+				if (this.val == '' && this.areaItem.key == 0) {
+					uni.showToast({
+						title: this.$t('请输入您的证件号'),
+						icon: 'none'
+					})
+					return
+				}
+				uni.showLoading({
+					title: this.$t('加载中...'),
+					mask: true
+				})
+				userPrimaryVerified({
+					nationality: this.areaItem.nationality,
+					realName: '',
+					
+					// certificateType: this.areaItem.key == 0 ? 1 : this.idType == 0 ? 1 : 2,
+					// certificateName: this.areaItem.key == 0 ? '身份证' : this.idType == 0 ? '身份证' : '证件',
+					nationalityName: this.areaItem.nationalityName,
+
+					cardNo: this.areaItem.key == 0 ? this.val : uni.$u.guid(20),
+					birthday: this.birthday,
+					lastName: this.en_lastName,
+					firstName: this.en_firstName
+				}).then(e => {
+					uni.showToast({
+						title: this.$t('操作成功！')
+					})
+					setTimeout(() => {
+						uni.navigateBack()
+					}, 1500)
+				})
 			}
 		},
 	}
@@ -200,6 +352,36 @@
 			background: #1A1B1F;
 		}
 
+		.u-action-sheet {
+			::v-deep {
+				.u-gap {
+					background-color: #29313C !important;
+				}
+			}
+		}
+
+		::v-deep {
+			.u-popup__content {
+				background-color: #1F282F !important;
+			}
+
+			.u-action-sheet__item-wrap__item__name {
+				color: #fff !important;
+			}
+
+			.u-line {
+				border-bottom-color: #343B45 !important;
+			}
+
+			.u-action-sheet__header__title {
+				color: #8B8F92 !important;
+			}
+
+			.u-action-sheet--hover {
+				background-color: transparent;
+			}
+		}
+
 		.picker-box,
 		.id .item {
 			border-color: #454E57;
@@ -208,8 +390,8 @@
 		.info {
 			.input {
 				border-radius: 8rpx;
-				
-border: 2rpx solid #484D53;
+
+				border: 2rpx solid #484D53;
 				background: #1A1B1F !important;
 			}
 		}

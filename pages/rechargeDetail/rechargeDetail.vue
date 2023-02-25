@@ -146,6 +146,15 @@
 					</view>
 				</view>
 			</u-popup>
+			<u-modal @cancel="showPwd = false" :showConfirmButton="false" @close="showPwd = false"
+				:confirmColor="theme == 'light' ? '#2D270D' : '#fff'" showCancelButton :show="showPwd"
+				:title="$t('资金密码')">
+				<view>
+					<u-code-input focus space="2rpx" @finish="finish" fontSize="70rpx" size="100rpx"
+						borderColor="transparent" v-model="password" mode="box" dot>
+					</u-code-input>
+				</view>
+			</u-modal>
 		</view>
 		<view class="btn-box" v-if=" curNet != '' && scene == ''">
 			<view class="btn" @click="save">{{$t('保存图片')}}</view>
@@ -155,8 +164,9 @@
 		<view class="btn-content" v-if="scene == 'withdraw' && curCoin != ''">
 			<view class="box">
 				<view class="btn-tip">
-					<text>{{$t('手续费')}}：</text>{{tranOutFee}} {{curCoin[0].coinName}}
-					<text style="margin-left: 60rpx;">{{$t('实际到账')}}：</text>{{curCoin[0].amount - tranOutFee}}
+					<text>{{$t('手续费')}}：</text>{{curCoin[0].tranOutFee || 0}} {{curCoin[0].coinName}}
+					<text
+						style="margin-left: 60rpx;">{{$t('实际到账')}}：</text>{{curCoin[0].amount - (curCoin[0].tranOutFee || 0)}}
 					{{curCoin[0].coinName}}
 				</view>
 				<view @click="submit">
@@ -165,6 +175,8 @@
 			</view>
 			<u-safe-bottom></u-safe-bottom>
 		</view>
+
+
 	</view>
 </template>
 
@@ -174,9 +186,14 @@
 		queryWithdrawCoin,
 		withdraw
 	} from "@/config/api"
+	import {
+		hex_md5
+	} from "@/utils/md5.js"
 	export default {
 		data() {
 			return {
+				showPwd: false,
+				password: '',
 				withdrawalAmount: '',
 				curNet: '',
 				beneficiaryAddress: "",
@@ -194,22 +211,49 @@
 		onLoad(options) {
 			this.coin = options.coin
 			this.scene = options.scene || ''
-			queryDepositPayCoin().then(e => {
+			queryWithdrawCoin().then(e => {
 				this.coinList = e
 				this.oriList = e
-				this.curCoin = e.filter(item => item.coinName == options.coin)
-				this.chainList = this.curCoin[0].list
+				if (options.coin) {
+					let find = e.filter(item => item.coinName == options.coin)
+					if (find == '') {
+						this.curCoin = [{
+							coinName: this.$t('选择币种')
+						}]
+						return
+					}
+					this.curCoin = find
+				} else {
+					this.curCoin = e
+				}
+
+				queryDepositPayCoin().then(e => {
+					this.chainList = e.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
+				})
 			})
 		},
-		watch: {
-			curCoin(newValue, oldValue) {
-				queryWithdrawCoin().then(e => {
-					let res = e.filter(item => item.coinName == newValue[0].coinName)
-					this.tranOutFee = res[0].tranOutFee || 0
-				})
-			}
-		},
 		methods: {
+			finish() {
+				uni.showLoading({
+					title: this.$t('加载中...'),
+					mask: true
+				})
+				withdraw({
+					toAddress: this.beneficiaryAddress,
+					amount: this.withdrawalAmount,
+					coinId: this.curCoin[0].coinId,
+					chainName: this.curNet.chainName,
+					fundsPassword: hex_md5(this.password).toUpperCase()
+				}).then(e => {
+					queryWithdrawCoin().then(res => {
+						this.curCoin = res.filter(item => item.coinId == this.curCoin[0].coinId)
+					})
+					uni.showToast({
+						title: this.$t('操作成功！')
+					})
+					this.showPwd = false
+				})
+			},
 			submit() {
 				if (this.curNet == '') {
 					uni.showToast({
@@ -232,23 +276,7 @@
 					})
 					return
 				}
-				uni.showLoading({
-					title: this.$t('加载中...'),
-					mask: true
-				})
-				withdraw({
-					toAddress: this.beneficiaryAddress,
-					amount: this.withdrawalAmount,
-					coinId: this.curCoin[0].coinId,
-					chainName: this.curNet.chainName
-				}).then(e => {
-					queryDepositPayCoin().then(res => {
-						this.curCoin = res.filter(item => item.coinName == this.curCoin[0].coinName)
-					})
-					uni.showToast({
-						title: this.$t('操作成功！')
-					})
-				})
+				this.showPwd = true
 			},
 			scan() {
 				const self = this
@@ -306,7 +334,7 @@
 					this.coinList = this.oriList
 					return
 				}
-				this.coinList = this.coinList.filter(item => item.coinName == key)
+				this.coinList = this.oriList.filter(item => item.coinName == key)
 			},
 			selectNet(item) {
 				this.curNet = item
@@ -322,6 +350,12 @@
 </script>
 
 <style lang="scss">
+	::v-deep {
+		.u-code-input__item {
+			background: #F6F6F6;
+		}
+	}
+
 	.btn-content {
 		background-color: #FFFFFF;
 		padding: 20rpx 30rpx;
@@ -610,7 +644,7 @@
 		.coin-popup .list .item .right view:last-child,
 		.withdraw .tit,
 		.btn-content .box .btn-tip,
-		.withdraw.amount .unit text:first-child{
+		.withdraw.amount .unit text:first-child {
 
 			color: #FFFFFF;
 		}
@@ -647,6 +681,29 @@
 
 		.content {
 			background: #1F282F
+		}
+
+		::v-deep {
+
+			.u-modal__button-group__wrapper--hover {
+				background-color: transparent;
+			}
+
+			.u-line {
+				border-bottom-color: #343B45 !important;
+			}
+
+			.u-code-input__item {
+				background: #29313C;
+			}
+
+			.u-popup__content {
+				background-color: #1F282F;
+			}
+
+			.u-code-input__item__dot {
+				background-color: #fff !important
+			}
 		}
 	}
 </style>

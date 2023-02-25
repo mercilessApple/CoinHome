@@ -3,6 +3,11 @@ import messages from './locale/index'
 import uView from './uni_modules/uview-ui'
 import Mixin from './mixin/mixin.js'
 import moment from "moment";
+import * as utils from "@/utils"
+// #ifdef H5
+import VConsole from 'vconsole';
+const vConsole = new VConsole();
+// #endif
 
 const i18nConfig = {
 	locale: uni.getLocale(),
@@ -26,7 +31,7 @@ const app = new Vue({
 })
 
 Vue.prototype.$moment = moment
-
+Vue.prototype.utils = utils
 app.$mount()
 // 引入请求封装，将app参数传递到配置中
 require('./config/request.js')(app)

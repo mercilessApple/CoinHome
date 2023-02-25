@@ -20,8 +20,8 @@ function GetBlackStyle()
         SelectRectBGColor: "rgba(1,130,212,0.06)", //背景色
         //  SelectRectAlpha: 0.06;                  //透明度
 
-        UpBarColor: "rgb(238,21,21)",
-        DownBarColor: "rgb(25,158,0)",
+		UpBarColor: "#F5475E",
+		DownBarColor: "#2DBE87",
         UnchagneBarColor: "rgb(199,199,199)",
 
         Minute: {
@@ -58,7 +58,8 @@ function GetBlackStyle()
             PositionColor:"rgb(101,104,112)"       //持仓
         },
 
-        FrameBorderPen: "rgba(236,236,236,0.13)",     //边框
+        // FrameBorderPen: "rgba(236,236,236,0.13)",     //边框
+		FrameBorderPen: "rgba(236,236,236,0)",     //边框
         FrameSplitPen: "rgba(236,236,236,0.13)",          //分割线
         FrameSplitTextColor: "rgb(101,104,112)",     //刻度文字颜色
         FrameSplitTextFont: "12px 微软雅黑",        //坐标刻度文字字体
@@ -252,6 +253,34 @@ function GetWhiteStyle()
 {
     var WHITE_STYLE=    //白色风格
     {
+		TooltipPaint:   //Tooltip
+		{
+		    BGColor: 'rgba(250,250,250,0.8)',    //背景色
+		    BorderColor: 'rgb(120,120,120)',     //边框颜色
+		    TitleColor: 'rgb(120,120,120)',       //标题颜色
+		    TitleFont: '13px 微软雅黑'   //字体
+		},
+		//深度图
+		DepthChart:
+		{
+		    BidColor: { Line:"rgb(82,176,123)", Area:"rgba(82,176,123,0.8)"},  //卖
+		    AskColor: { Line:"rgb(207,76,89)", Area:"rgba(207,76,89, 0.8)"},   //买
+		    LineWidth:4
+		},
+		DepthCorss:
+		{
+		    BidColor: { Line:"rgb(82,176,123)" },  //卖
+		    AskColor: { Line:"rgb(207,76,89)" },   //买
+		    LineWidth:2,    //线段宽度
+		    LineDash:[3,3],
+		    Tooltip:
+		    { 
+		        BGColor:'rgba(236,240,245, 0.8)', TextColor:"rgb(130,140,151)",
+		        Border:{ Top:5, Left:20, Bottom:5, Center: 5},
+		        Font:"14px 微软雅黑",
+		        LineHeight:16   //单行高度
+		    }
+		},
         BGColor:'rgb(255,255,255)',
         TooltipBGColor: "rgb(255, 255, 255)", //背景色
         TooltipAlpha: 0.92,                  //透明度
@@ -259,8 +288,10 @@ function GetWhiteStyle()
         SelectRectBGColor:"rgba(1,130,212,0.06)", //背景色
         //   this.SelectRectAlpha=0.06;                  //透明度
 
-        UpBarColor: "rgb(238,21,21)",
-        DownBarColor: "rgb(25,158,0)",
+        // UpBarColor: "rgb(238,21,21)",
+        // DownBarColor: "rgb(25,158,0)",
+		UpBarColor: "#F5475E",
+		DownBarColor: "#2DBE87",
         UnchagneBarColor: "rgb(0,0,0)",
 
         Minute:
@@ -294,7 +325,8 @@ function GetWhiteStyle()
 
         KLine:
         {
-            MaxMin: { Font: '12px 微软雅黑', Color: 'rgb(111,111,111)' },   //K线最大最小值显示
+            // MaxMin: { Font: '12px 微软雅黑', Color: 'rgb(111,111,111)' },   //K线最大最小值显示
+			MaxMin: { Font: '12px 微软雅黑', Color: 'rgb(111,111,111)', RightArrow:"→", LeftArrow:"←", HighYOffset:0, LowYOffset:0 },   //K线最大最小值显示
             Info:  //信息地雷
             {
                 Color: 'rgb(205,149,12)',

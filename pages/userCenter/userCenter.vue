@@ -8,16 +8,16 @@
 					<u-image v-else src="@/static/icon45.png" width="48rpx" height="48rpx"></u-image>
 				</view>
 
-				<view style="margin-left: 30rpx;" @click="$u.route('/pages/webview/webview')">
+				<view style="margin-left: 30rpx;" @click="toServer">
 					<u-image src="@/static/icon5.png" width="48rpx" height="48rpx"></u-image>
 				</view>
 			</view>
 		</u-navbar>
 		<view class="user-box">
-			<view class="left" @click="$u.route('/pages/userInfo/userInfo')">
+			<view class="left" @click="$u.route(isLogin ? '/pages/userInfo/userInfo' : '/pages/login/login')">
 				<u-avatar size="96rpx" :default-url="require('@/static/icon46.png')" :iconUrl="userInfo.iconUrl">
 				</u-avatar>
-				<view class="info" >
+				<view class="info">
 					<view class="name">
 						{{userInfo.nickName}}
 						<view>
@@ -36,14 +36,16 @@
 					<text>{{$t('已认证')}}</text>
 				</view>
 
-				<view @click="$u.route('/pages/authentication/authentication')" class="yellow" v-if="userInfo.verifiedAudit === 3">
+				<view @click="$u.route('/pages/authentication/authentication')" class="yellow"
+					v-if="userInfo.verifiedAudit === 3">
 					<u-image src="@/static/icon17.png" width="36rpx" height="24rpx"></u-image>
 					<text>{{$t('未认证')}}</text>
 				</view>
 			</view>
 		</view>
 		<view class="tip" v-if="userInfo.verifiedAudit === 3">
-			<u-alert  @click="$u.route('/pages/authentication/authentication')" showIcon type="warning" :description="$t('您需要完成身份验证后，方能使用CoinHome服务。')"></u-alert>
+			<u-alert @click="$u.route('/pages/authentication/authentication')" showIcon type="warning"
+				:description="$t('您需要完成身份验证后，方能使用CoinHome服务。')"></u-alert>
 		</view>
 		<view class="tip" v-if="userInfo.verifiedAudit === 1 || userInfo.verifiedAudit === 4">
 			<view class="box">
@@ -53,9 +55,7 @@
 			</view>
 		</view>
 		<view class="nav">
-			<view class="item" v-for="(item,index) in navList" :key="index" @click="$u.route({
-				url:item.url
-			})">
+			<view class="item" v-for="(item,index) in navList" :key="index" @click="toNext(item,index)">
 
 				<view class="left">
 					<u-image width="48rpx" height="48rpx" :src="item.icon"></u-image>
@@ -68,7 +68,7 @@
 			</view>
 		</view>
 
-		<view class="btn" @click="exit">
+		<view class="btn" @click="exit" v-if="isLogin">
 			{{$t('退出')}}
 		</view>
 		<u-gap height="30rpx"></u-gap>
@@ -85,6 +85,7 @@
 	export default {
 		data() {
 			return {
+				isLogin: uni.getStorageSync('token') ? true : false,
 				userInfo: {
 					uid: 0,
 					nickName: this.$t('加载中...')
@@ -112,51 +113,117 @@
 			};
 		},
 		onShow() {
-			userInfo().then(e => {
-				if (e.nickName == '') {
-					e.nickName = uni.getStorageSync('randomNickName')
-					uni.setStorageSync('userInfo', e)
+			// this.isLogin = uni.getStorageSync('token') ? true : false
+			// if (this.isLogin) {
+			// 	userInfo().then(e => {
+			// 		if (e.nickName == '') {
+			// 			e.nickName = uni.getStorageSync('randomNickName')
+			// 			uni.setStorageSync('userInfo', e)
+
+			// 		}
+			// 	})
+			// } else {
+			// 	this.userInfo.nickName = this.$t('请先登录')
+
+			// }
+			this.isLogin = uni.getStorageSync('token') ? true : false
+			if (this.isLogin) {
+				if (uni.getStorageSync('userInfo')) {
+					this.userInfo = uni.getStorageSync('userInfo')
+					return
 				}
-			})
+				userInfo().then(e => {
+					if (e.nickName == '') {
+						getNickName().then(res => {
+							e.nickName = res
+							this.userInfo = e
+							uni.setStorageSync('randomNickName', res)
+							uni.setStorageSync('userInfo', this.userInfo)
+						})
+					} else {
+						this.userInfo = e
+						uni.setStorageSync('userInfo', this.userInfo)
+					}
+				})
+			} else {
+				this.userInfo.nickName = this.$t('请先登录')
+			}
 		},
 		onLoad() {
-			if (uni.getStorageSync('userInfo')) {
-				this.userInfo = uni.getStorageSync('userInfo')
-				return
-			}
-			userInfo().then(e => {
-				if (e.nickName == '') {
-					getNickName().then(res => {
-						e.nickName = res
-						this.userInfo = e
-						this.randomNickName = res
-						uni.setStorageSync('randomNickName', res)
-						uni.setStorageSync('userInfo', this.userInfo)
-					})
-				} else {
-					this.userInfo = e
-					uni.setStorageSync('userInfo', this.userInfo)
-				}
-			})
+			// if (uni.getStorageSync('userInfo')) {
+			// 	this.userInfo = uni.getStorageSync('userInfo')
+			// 	return
+			// }
+			// userInfo().then(e => {
+			// 	if (e.nickName == '') {
+			// 		getNickName().then(res => {
+			// 			e.nickName = res
+			// 			this.userInfo = e
+			// 			this.randomNickName = res
+			// 			uni.setStorageSync('randomNickName', res)
+			// 			uni.setStorageSync('userInfo', this.userInfo)
+			// 		})
+			// 	} else {
+			// 		this.userInfo = e
+			// 		uni.setStorageSync('userInfo', this.userInfo)
+			// 	}
+			// })
 		},
 		methods: {
-			changeTheme(){
+			toServer() {
+				if (!uni.getStorageSync('token')) {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+					return
+				}
+				uni.$u.route({
+					url: '/pages/webview/webview',
+					params: {
+						url: this.utils.serviceURL
+					}
+				})
+			},
+			toNext(item, index) {
+				if (index == 0 || index == 1) {
+					uni.$u.route({
+						url: this.isLogin ? item.url : '/pages/login/login'
+					})
+				} else {
+					if (index == 2) {
+						uni.$u.route({
+							url: '/pages/webview/webview',
+							params: {
+								url: this.utils.helpCenterURL
+							}
+						})
+						return
+					}
+					uni.$u.route(item.url)
+				}
+			},
+			changeTheme() {
 				// #ifdef APP-PLUS
-				plus.nativeUI.setUiStyle(uni.getSystemInfoSync().theme == 'light' ? 'dark':'light');
+				plus.nativeUI.setUiStyle(uni.getSystemInfoSync().theme == 'light' ? 'dark' : 'light');
 				uni.setStorageSync('theme', uni.getSystemInfoSync().theme)
 				// #endif
 			},
 			exit() {
+				uni.showLoading({
+					mask: true
+				})
 				signOut().then(() => {
 					uni.removeStorageSync('token')
 					uni.removeStorageSync('userInfo')
 					uni.showToast({
-						title: '',
 						icon: 'success'
 					})
-					uni.switchTab({
-						url: '/pages/index/index'
-					})
+					this.userInfo = {
+						uid: 0,
+						nickName: this.$t('请先登录')
+					}
+					this.isLogin = false
+					// uni.navigateBack()
 				})
 			},
 			// regEmail(email) {
@@ -173,6 +240,12 @@
 			// 	return new_email
 			// },
 			copy() {
+				if (!this.isLogin) {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+					return
+				}
 				uni.setClipboardData({
 					data: String(this.userInfo.uid)
 				})
@@ -354,6 +427,10 @@
 					color: #fff !important;
 				}
 			}
+		}
+
+		.tip .box {
+			background: #29313C;
 		}
 
 		.btn {

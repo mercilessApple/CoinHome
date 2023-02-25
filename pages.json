@@ -107,6 +107,7 @@
 		}, {
 			"path": "pages/set/set",
 			"style": {
+				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
@@ -122,6 +123,7 @@
 			"path": "pages/theme/theme",
 			"style": {
 				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
 
@@ -283,6 +285,15 @@
 		}
 	    ,{
             "path" : "pages/webview/webview",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/selectCountryCode/selectCountryCode",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",

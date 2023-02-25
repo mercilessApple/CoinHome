@@ -18,10 +18,8 @@
 							≈ ¥{{showVal ? assetsInfo.convertCnySumAccount : '***'}}
 						</view>
 					</view>
-					<view class="right" @click="$u.route({
-						url:'/pages/financialRecords/financialRecords',
-						params:{
-							coin:'USDT', coinId:curCoin[0].coinId }})">
+					<view class="right"
+						@click="toNext('/pages/financialRecords/financialRecords?coinId='+assetsInfo.coinId)">
 						<u-image width="48rpx" height="48rpx" src="@/static/icon25.png"></u-image>
 					</view>
 				</view>
@@ -39,16 +37,20 @@
 			</view>
 			<view class="info">
 				<view class="left">
-					<u-checkbox-group v-model="checkboxGroup">
+					<u-checkbox-group v-model="checkboxGroup" @change="onCheckChange">
 						<u-checkbox iconColor="#000" labelColor="#929BA2" labelSize="24rpx" activeColor="#FEFA05"
 							shape="circle" key="0" :label="$t('hideAssets',{
 								val:0
 							})"></u-checkbox>
 					</u-checkbox-group>
 				</view>
-				<view class="right">
-					<u-search :bgColor="theme == 'light' ? '#f2f2f2' : '#343A46'" :placeholder="$t('搜索')"
-						:showAction="false"></u-search>
+				<view class="right" :style="{
+					'width':open ? '70%':'200rpx'
+				}">
+					<u-search v-model="key" @search="search" :color="theme == 'light' ? '' :'#fff'"
+						@change="onSearchChange" :bgColor="theme == 'light' ? '#f2f2f2' : '#343A46'"
+						:placeholder="$t('搜索')" :showAction="false">
+					</u-search>
 				</view>
 			</view>
 
@@ -60,23 +62,25 @@
 				<view class="box">
 					<view>
 						<view>{{$t('可用余额')}}</view>
-						<view>{{item.amount}}</view>
+						<view>{{utils.decimal(item.amount,5)}}</view>
 					</view>
 					<view>
 						<view>{{$t('冻结余额')}}</view>
-						<view>{{item.frozenAmount}}</view>
+						<view>{{utils.decimal(item.frozenAmount,5)}}</view>
 					</view>
 					<view>
 						<view>{{$t('折合(USDT)')}}</view>
-						<view>{{item.convertUsdtAmount}}</view>
+						<view>{{utils.decimal(item.convertUsdtAmount || 0,5)}}</view>
 					</view>
 				</view>
 			</view>
 
-			<block v-if="list == ''">
+			<u-loading-icon style="margin-top: 200rpx;" :show="loading" mode="circle"></u-loading-icon>
+
+			<block v-if="list == '' && !loading">
 				<u-gap height="300rpx"></u-gap>
-				<u-empty :text="$t('暂无数据')"></u-empty>
-				<u-gap height="300rpx"></u-gap>
+				<u-empty :text="$t(isLogin ?'暂无数据' : '请先登录')"></u-empty>
+				<u-gap height="500rpx"></u-gap>
 			</block>
 		</view>
 	</view>
@@ -84,42 +88,82 @@
 
 <script>
 	import {
-		queryAccountSum,
+		// queryAccountSum,
 		queryAccountInfo,
 		getOptionalMarket,
-		queryDepositPayCoin
+		// queryDepositPayCoin
 	} from "@/config/api"
 	export default {
 		data() {
 			return {
+				loading: true,
+				open: false,
 				showVal: true,
+				key: '',
 				checkboxGroup: [],
 				assetsInfo: {
 					convertCnySumAccount: "0",
-					convertUsdtSumAccount: 0
+					convertUsdtSumAccount: 0,
+					coinId: ''
 				},
 				list: [],
-				curCoin: []
+				curCoin: [],
+				isLogin: !uni.getStorageSync('token') ? false : true
 			};
 		},
-		onLoad() {
-			getOptionalMarket().then(e => {
-				let coinIds = e.map(item => item.type)
-				coinIds.forEach(item => {
-					queryAccountInfo({
-						type: item
-					}).then(e => {
-						this.list.push(e.coinAccountList)
-					})
-				})
-			})
-			queryAccountSum().then(e => this.assetsInfo = e)
-
-			queryDepositPayCoin().then(e => {
-				this.curCoin = e.filter(item => item.coinName == 'USDT')
+		onShow() {
+			if (!uni.getStorageSync('token')) {
+				this.isLogin = false
+				this.loading = false
+				return
+			}
+			this.isLogin = true
+			queryAccountInfo({
+				type: 1
+			}).then(e => {
+				if (e.coinAccountList == null) return
+				this.assetsInfo = {
+					convertCnySumAccount: e.sumAmount || 0,
+					convertUsdtSumAccount: e.sumUsdtAmount || 0,
+					coinId: e.coinId
+				}
+				this.list = e.coinAccountList
+				this.oriList = this.list
+				this.loading = false
+			}).catch(() => {
+				this.loading = false
 			})
 		},
+		onLoad() {
+			// queryAccountSum().then(e => this.assetsInfo = e)
+
+			// queryDepositPayCoin().then(e => {
+			// 	this.curCoin = e.filter(item => item.coinName == 'USDT')
+			// })
+		},
 		methods: {
+			onCheckChange(e) {
+				if (e.indexOf('') == -1) {
+					this.list = this.oriList
+				} else {
+					this.list = this.list.filter(item => Number(item.amount) != 0)
+				}
+			},
+			search(e) {
+				if (e == '') {
+					this.list = this.oriList
+					return
+				}
+				this.list = this.oriList.filter(item => item.coinName == e)
+			},
+			onSearchChange(e) {
+				if (e == '') {
+					this.list = this.oriList
+					this.checkboxGroup = []
+				}
+				if (e == '') this.open = false
+				else this.open = true
+			},
 			toNext(url) {
 				let route
 				if (uni.getStorageSync('token')) route = url
@@ -137,9 +181,17 @@
 	.list {
 		background-color: #fff;
 		padding: 30rpx;
+		padding-bottom: 0;
+		min-height: 1200rpx;
 
 		.item {
 			margin-top: 30rpx;
+			border-bottom: 2rpx solid #EFEFEF;
+			padding-bottom: 30rpx;
+
+			&:last-child {
+				border-bottom: none;
+			}
 
 			.lab {
 				display: flex;
@@ -157,7 +209,7 @@
 				padding-top: 30rpx;
 				display: flex;
 				justify-content: space-between;
-				padding-left: 70rpx;
+				padding-left: 60rpx;
 
 				>view {
 					>view {
@@ -170,6 +222,7 @@
 						&:last-child {
 							font-weight: 500;
 							font-size: 28rpx;
+							margin-top: 10rpx;
 							color: #252525;
 						}
 					}
@@ -185,6 +238,7 @@
 
 			.right {
 				width: 200rpx;
+				transition: width .3s;
 			}
 		}
 
@@ -267,19 +321,25 @@
 	}
 
 	@media (prefers-color-scheme: dark) {
-	 page {
+		page {
 			background: #171E28;
 		}
 
 		.content .upper .info .left .val,
-		.list .title {
+		.list .title,
+		.list .item .lab text,
+		.list .item .box>view>view:last-child,
+		.content .upper .btn view:last-child {
 
 			color: #FFFFFF;
 		}
 
 		.content .upper .btn view:last-child {
 			background-color: #343A46;
-			color: #fff;
+		}
+
+		.list .item {
+			border-bottom-color: #343B45
 		}
 
 		.content,

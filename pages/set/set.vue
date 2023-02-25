@@ -1,11 +1,14 @@
 <template>
 	<view>
+		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'"
+			:bgColor="theme == 'light' ? '#fff' : '#1F282F'" title="" :autoBack="true" placeholder="">
+		</u-navbar>
 		<view class="title">
 			{{$t('设置')}}
 		</view>
 		<u-gap height="40rpx"></u-gap>
 		<view class="nav">
-			<view class="item" v-for="(item,index) in nav" :key="index" @click="item.url ? $u.route(item.url) : false">
+			<view class="item" v-for="(item,index) in nav" :key="index" @click="next(item)">
 				<view class="left">{{item.name}}</view>
 				<view class="right">
 					<text>{{item.val}}</text>
@@ -22,7 +25,7 @@
 			return {
 				nav: [{
 						name: this.$t('语言'),
-						val: uni.getLocale() == 'zh' ? '中文简体' : 'English',
+						val: uni.getLocale() == 'en' ? 'English' : '中文简体',
 						url: '/pages/language/language'
 					},
 					{
@@ -49,10 +52,15 @@
 					},
 					{
 						name: this.$t('关于我们'),
+						val: ''
+					},
+					{
+						name: this.$t('检查更新'),
+						update: true,
 						// #ifdef APP-PLUS
 						val: 'v' + plus.runtime.version,
 						// #endif
-					}
+					},
 				]
 			};
 		},
@@ -68,8 +76,18 @@
 			// #endif
 		},
 		onLoad() {
-
-		}
+			
+		},
+		methods: {
+			next(item) {
+				if (item.update) {
+					this.utils.checkUpdate(this, true)
+				}
+				if (item.url) {
+					uni.$u.route(item.url)
+				}
+			}
+		},
 	}
 </script>
 

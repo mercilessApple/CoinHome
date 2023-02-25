@@ -1,5 +1,7 @@
 <template>
 	<view>
+		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" :bgColor="theme == 'light' ? '#fff' : '#1F282F'" title="" :autoBack="true" placeholder="">
+		</u-navbar>
 		<view class="title">
 			{{$t('主题模式')}}
 		</view>

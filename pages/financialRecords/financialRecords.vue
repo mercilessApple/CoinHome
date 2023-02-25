@@ -2,8 +2,8 @@
 	<view class="container">
 		<view class="coin-box">
 			<view class="left">
-				<u-image width="48rpx" height="48rpx" :src="curCoin == '' ? '' :curCoin[0].iconUrl"></u-image>
-				<text>{{curCoin == '' ? '' :curCoin[0].coinName}}</text>
+				<u-image width="48rpx" height="48rpx" :src="curCoin.iconUrl || ''"></u-image>
+				<text>{{curCoin.coinName || $t('加载中...')}}</text>
 			</view>
 			<view class="right" @click="show = true">
 				<u-image src="@/static/icon26.png" width="48rpx" height="48rpx"></u-image>
@@ -61,8 +61,8 @@
 				<view class="coin-popup">
 					<view class="title">{{$t('选择币种')}}</view>
 					<view class="search">
-						<u-search :color="theme == 'light' ? '' :'#fff'" @search="search" :showAction="false"
-							:placeholder="$t('请输入您要搜索的币种名称')" height="72rpx"
+						<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'" @search="search"
+							:showAction="false" :placeholder="$t('请输入您要搜索的币种名称')" height="72rpx"
 							:bgColor="theme == 'light' ? '#EBECF0' :'#2C303C' ">
 						</u-search>
 					</view>
@@ -92,16 +92,17 @@
 
 <script>
 	import {
-		queryDepositPayCoin,
-		queryAccountTransfer
+		queryAccountTransfer,
+		queryWithdrawCoin
 	} from "@/config/api"
 	export default {
 		data() {
 			return {
 				show: false,
-				curCoin: [],
 				coinList: [],
 				list: [],
+				curCoin: '',
+				key: '',
 				coinInfo: {
 					sumCnhtAmount: 0,
 					sumAmount: 0,
@@ -112,23 +113,29 @@
 			};
 		},
 		onLoad(options) {
-			queryDepositPayCoin().then(e => {
+			this.pageNum = 1
+
+			queryWithdrawCoin().then(e => {
 				this.coinList = e
 				this.oriList = e
-				this.curCoin = e.filter(item => item.coinName == options.coin)
-				this.chainList = this.curCoin[0].list
-			})
-			this.pageNum = 1
-			this.coinId = Number(options.coinId)
-			this.getList(e => {
-				this.coinInfo = {
-					sumCnhtAmount: e.sumCnhtAmount,
-					sumAmount: e.sumAmount,
-					amount: e.amount,
-					frozenAmount: e.frozenAmount,
-					coinName: e.coinName
+
+				if (options.coinId == 'null') {
+					this.curCoin = e[0]
+				} else {
+					this.curCoin = e.filter(item => item.coinId == options.coinId)[0]
 				}
-				this.list = e.pageList.records
+
+				this.coinId = this.curCoin.coinId
+				this.getList(e => {
+					this.coinInfo = {
+						sumCnhtAmount: e.sumCnhtAmount,
+						sumAmount: e.sumAmount,
+						amount: e.amount,
+						frozenAmount: e.frozenAmount,
+						coinName: e.coinName
+					}
+					this.list = e.pageList.records
+				})
 			})
 		},
 		onReachBottom() {
@@ -163,19 +170,18 @@
 					this.coinList = this.oriList
 					return
 				}
-				this.coinList = this.coinList.filter(item => item.coinName == key)
+				this.coinList = this.oriList.filter(item => item.coinName == key)
 			},
 			toDetail(item) {
 				uni.setStorageSync('financialDetail', item)
 				uni.$u.route('/pages/dealDetail/dealDetail')
 			},
 			select(item) {
-				this.curCoin = [item]
-				this.chainList = item.list
 				this.show = false
 				this.pageNum = 1
 				this.loaded = false
 				this.coinId = item.coinId
+				this.curCoin = item
 				this.getList(e => {
 					this.list = e.pageList.records
 				})
@@ -424,7 +430,8 @@
 		.coin-popup .list .item .left text,
 		.coin-popup .list .item .right view:last-child,
 		.content .list .item .left view:first-child,
-		.content .list .item .right,.card .upper .val{
+		.content .list .item .right,
+		.card .upper .val {
 			color: #fff;
 		}
 

@@ -4,8 +4,9 @@
 			<u-navbar leftIcon="" placeholder :bgColor="theme == 'light' ? '#F6F6F6' : '#171E28'">
 				<view class="u-nav-slot" slot="center">
 					<view class="search">
-						<u-search disabled height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'"
-							placeholder="" :showAction="false">
+						<u-search @search="search" v-model="key" :color="theme == 'light' ? '' :'#fff'" @change="onSearchChange"
+							height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'" placeholder=""
+							:showAction="false">
 						</u-search>
 					</view>
 				</view>
@@ -33,12 +34,15 @@
 						<view class="name">{{$t('名称/成交量')}}</view>
 						<view class="column">
 							<view class="val" @click="$u.route({
-								url:'/pages/kLine/kLine'
+								url:'/pages/kLine/kLine',
+								params:{
+									coinMarket:item.coinMarketText
+								}
 							})" v-for="(item,index) in list" :key="index">
 								<view class="val-box">
 									<view class="unit">{{item.coinMarket[0]}}<text>/{{item.coinMarket[1]}}</text></view>
 									<view class="volume">
-										{{$t('成交额')}} {{item.turnover}}亿
+										{{$t('成交额')}} {{item.turnover}}
 									</view>
 								</view>
 							</view>
@@ -48,7 +52,10 @@
 						<view class="name">{{$t('最新价格')}}</view>
 						<view class="column">
 							<view class="val" @click="$u.route({
-								url:'/pages/kLine/kLine'
+								url:'/pages/kLine/kLine',
+								params:{
+									coinMarket:item.coinMarketText
+								}
 							})" v-for="(item,index) in list" :key="index">
 								<view class="box">
 									<view :class="{
@@ -65,13 +72,16 @@
 						<view class="name">{{$t('24h涨跌幅')}}</view>
 						<view class="column">
 							<view class="val" @click="$u.route({
-								url:'/pages/kLine/kLine'
+								url:'/pages/kLine/kLine',
+								params:{
+									coinMarket:item.coinMarketText
+								}
 							})" v-for="(item,index) in list" :key="index">
 								<view class="btn" :class="{
 		 						green:item.rangeAbility >= 0 && item.onDealing === 1,
 		 						red:item.rangeAbility < 0 && item.onDealing === 1,
 		 						gray:item.onDealing !== 1
-		 					}">{{item.rangeAbility >=0 ? '+':''}}{{(item.rangeAbility * 100).toFixed(2)}}%
+		 					}">{{item.rangeAbility >=0 ? '+':''}}{{utils.decimal(item.rangeAbility * 100,2)}}%
 								</view>
 							</view>
 						</view>
@@ -92,7 +102,7 @@
 		mixins: [MescrollMixin], // 使用mixin
 		data() {
 			return {
-				listTabIndex: 0,
+				listTabIndex: 1,
 				listTab: ["GODE", "USDT"],
 				uTabs: [{
 						name: this.$t("自选"),
@@ -108,35 +118,43 @@
 				},
 				list: [],
 				curNow: 1,
+				key: ''
 			};
 		},
 		onLoad() {
-			// setTimeout(()=>{
-			// 	// 动态更新全局配置
-			// 	uni.$emit("setMescrollGlobalOption", {i18n: {type: uni.getLocale()}})
-			// },2000)
-			// this.init('onload')
-			this.timer = null
-			this.startLoad = false
+
 		},
 		onHide() {
-			clearInterval(this.timer)
-			uni.setStorageSync('indexLeave', true)
+
 		},
 		onUnload() {
-			clearInterval(this.timer)
-			uni.setStorageSync('indexLeave', true)
+
 		},
 		onShow() {
-			if (uni.getStorageSync('indexLeave')) {
-				this.getList(e => this.list = e)
-				this.timer = setInterval(() => {
-					this.getList(e => this.list = e)
-				}, 3000)
-				uni.removeStorageSync('indexLeave')
-			}
+			this.$onSocketMessage((data) => {
+				if (this.list != '') {
+					const index = this.list.findIndex(item => item.coinId == data.coinId)
+					if (index == -1) return
+					this.list[index].lastPrice = Number(data.lastPrice)
+					this.list[index].rangeAbility = Number(data.rangeAbility)
+					this.list[index].lastPriceCny = Number(data.lastPriceCny)
+				}
+			})
 		},
 		methods: {
+			onSearchChange(e) {
+				if (e == '') {
+					this.list = this.oriList
+				}
+			},
+			search(key) {
+				if (key == '') {
+					this.list = this.oriList
+					return
+				}
+				let list = JSON.parse(JSON.stringify(this.oriList))
+				this.list = this.utils.fuzzyQuery(list, key, 'coinMarketText')
+			},
 			onListTabChange(index) {
 				this.listTabIndex = index
 				this.list = []
@@ -150,7 +168,6 @@
 				}
 				this.curNow = index
 				this.list = []
-				// this.startLoad = true
 				this.mescroll.resetUpScroll() // 再刷新列表数据
 
 			},
@@ -164,9 +181,11 @@
 
 				res.forEach(item => {
 					if (item.coinMarket) {
+						item.coinMarketText = item.coinMarket
 						item.coinMarket = item.coinMarket.split('/')
 					}
 				})
+				this.oriList = res
 				fn(res)
 			},
 			init() {
@@ -181,21 +200,10 @@
 			},
 			// /*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
-				uni.$u.debounce(() => {
-					clearInterval(this.timer)
-					this.getList(res => {
-						// this.startLoad = false
-						this.list = res
-						this.mescroll.endSuccess(res.length, false)
-						this.timer = setInterval(() => {
-							this.getList(e => this.list = e)
-						}, 3000)
-
-						let routes = getCurrentPages() // 获取当前打开过的页面路由数组
-						let curRoute = routes[routes.length - 1].route // 获取当前页面路由，也就是最后一个打开的页面路由
-						if (curRoute !== 'pages/quotation/quotation') clearInterval(this.timer)
-					}).catch(() => this.startLoad = false)
-				}, 500)
+				this.getList(res => {
+					this.list = res
+					this.mescroll.endSuccess(res.length, false)
+				})
 			}
 		},
 	}

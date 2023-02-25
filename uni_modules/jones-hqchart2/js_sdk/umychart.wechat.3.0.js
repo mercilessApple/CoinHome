@@ -1379,7 +1379,7 @@ function JSChartContainer(uielement)
     this.ChartCorssCursor;                            //十字光标
     this.IsClickShowCorssCursor = false;              //手势点击显示十字光标
     this.ChartSplashPaint = null;                     //等待提示
-    this.LoadDataSplashTitle = '数据加载中';
+    this.LoadDataSplashTitle = 'Loading...';
     this.Canvas = uielement.GetContext("2d");         //画布
     this.UIElement = uielement;
     this.MouseDrag;

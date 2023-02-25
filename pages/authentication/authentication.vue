@@ -2,23 +2,27 @@
 	<view>
 		<view class="tip">
 			{{$t('个人验证')}}
-			<view class="tag" v-if="standardSuccess && tabIndex == 0">
-				<u-image src="@/static/icon18.png" width="34rpx" height="32rpx"></u-image>
-				<text>{{$t('已完成')}}</text>
-			</view>
-
-			<block v-if="tabIndex == 1">
-				<view class="tag" v-if="advancedSuccess">
+			<block v-if="verifiedAudit != null">
+				<view class="tag" v-if="verifiedAudit != 3 && tabIndex == 0">
 					<u-image src="@/static/icon18.png" width="34rpx" height="32rpx"></u-image>
 					<text>{{$t('已完成')}}</text>
 				</view>
 
-				<view class="tag err" v-if="advancedFail">
+				<view class="tag" v-if="verifiedAudit == 4 && tabIndex == 1">
+					<u-image src="@/static/icon18.png" width="34rpx" height="32rpx"></u-image>
+					<text>{{$t('已完成')}}</text>
+				</view>
+
+				<view class="tag err" v-if="verifiedAudit == 2 && tabIndex == 1">
 					<u-image src="@/static/icon14.png" width="34rpx" height="32rpx"></u-image>
 					<text>{{$t('认证失败')}}</text>
 				</view>
-			</block>
 
+				<view class="tag" style="background-color: rgba(254, 250, 5, 0.16);"
+					v-if="verifiedAudit == 0 && tabIndex == 1">
+					<text style="color: #FE9205;">{{$t('待审核')}}</text>
+				</view>
+			</block>
 		</view>
 		<view class="tab">
 			<view @click="tabIndex = 0" :class="{
@@ -35,14 +39,14 @@
 				<view class="item">{{$t('个人信息')}}</view>
 				<view class="item">{{$t('政府发行的身份证')}}</view>
 			</view>
-			<view class="item-box">
+			<view class="item-box" style="display: none;">
 				<view class="item-title">{{$t('功能与限制')}}</view>
 				<view class="item">
 					<view class="left">
-						<block v-if="tabIndex == 0 && standardSuccess">
+						<block v-if="tabIndex == 0 && verifiedAudit != 3">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
-						<block v-if="tabIndex == 1 && advancedSuccess">
+						<block v-if="tabIndex == 1 && verifiedAudit == 4">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
 						<text>
@@ -53,10 +57,10 @@
 				</view>
 				<view class="item">
 					<view class="left">
-						<block v-if="tabIndex == 0 && standardSuccess">
+						<block v-if="tabIndex == 0 && verifiedAudit != 3">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
-						<block v-if="tabIndex == 1 && advancedSuccess">
+						<block v-if="tabIndex == 1 && verifiedAudit == 4">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
 						<text>
@@ -66,18 +70,18 @@
 					<text>300 USDT</text>
 				</view>
 			</view>
-			<view class="item-box" v-if="advancedFail">
+			<view class="item-box" v-if="verifiedAudit == 2 && tabIndex == 1">
 				<view class="item-title">{{$t('失败原因')}}</view>
-				<view class="item" style="color: #F5475E;">*缺失证件反面</view>
+				<view class="item" style="color: #F5475E;">*{{failedReason}}</view>
 			</view>
-			<view class="item-box" v-if="!standardSuccess">
+			<view class="item-box" v-if="(verifiedAudit == 1 || verifiedAudit == 3) && tabIndex == 1">
 				<view class="item-title">{{$t('预计审核时间')}}</view>
 				<view class="item">2{{$t('天')}}</view>
 			</view>
 		</view>
 
 		<block v-if="tabIndex == 0">
-			<view v-if="!standardSuccess" class="btn"
+			<view v-if="verifiedAudit == 3 " class="btn"
 				@click="$u.route('/pages/standardAuthentication/standardAuthentication')">
 				{{$t('开始验证')}}
 			</view>
@@ -85,17 +89,18 @@
 
 		<block v-if="tabIndex == 1">
 			<view class="btn " :class="{
-				disabled:!standardSuccess
+				disabled:verifiedAudit == 3
 			}">
-				<text v-if="!standardSuccess">
+				<text v-if="verifiedAudit == 3">
 					{{$t('不适用')}}
 				</text>
 				<block v-else>
-					<text v-if="!advancedSuccess && !advancedFail"
+					<text v-if="verifiedAudit == 1"
 						@click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
 						{{$t('立即开始')}}
 					</text>
-					<text v-if="advancedFail" @click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
+					<text v-if="verifiedAudit == 2"
+						@click="$u.route('/pages/advancedAuthentication/advancedAuthentication')">
 						{{$t('继续验证')}}
 					</text>
 				</block>
@@ -106,14 +111,25 @@
 </template>
 
 <script>
+	import {
+		userInfo
+	} from "@/config/api"
 	export default {
 		data() {
 			return {
-				advancedSuccess: false,
-				advancedFail: false,
 				tabIndex: 0,
-				standardSuccess: false
+				verifiedAudit: null,
+				failedReason: ''
 			};
+		},
+		onShow() {
+			userInfo().then(e => {
+				const {
+					verifiedAudit
+				} = e
+				this.verifiedAudit = verifiedAudit
+				this.failedReason = e.failedReason
+			})
 		}
 	}
 </script>
@@ -129,7 +145,9 @@
 		text-align: center;
 		border-radius: 8rpx;
 		font-size: 32rpx;
-
+		text{
+			display: block;
+		}
 		&.disabled {
 
 			background: #EEF0F2;

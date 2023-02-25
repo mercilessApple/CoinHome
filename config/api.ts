@@ -81,13 +81,51 @@ export const editUserPassword = (params: any) => http.post('/api/user/edit/passw
 export const updateFundsPassword = (params: any) => http.post('/api/user/update/funds-password', params)
 
 // 委托单--历史记录
-export const getEntrustHistory= (params: any) => http.post('/api/order/entrust-history-pagination', params)
+export const getEntrustHistory = (params: any) => http.post('/api/order/entrust-history-pagination', params)
 
 // 币币/合约--获取盘口
-export const getMarketDeeps= (params: any) => http.post('/api/market/deeps', params)
+export const getMarketDeeps = (params: any) => http.post('/api/market/deeps', params)
 
 // 币币/合约--获取k线
-export const getMarketKline= (params: any) => http.post('/api/market/kLine', params)
+export const getMarketKline = (params: any) => http.post('/api/market/kLine', params)
 
 // 币币/合约--获取深度图
 export const getMarketDepth = (params: any) => http.post('/api/market/depth', params)
+
+export const queryCoinIntroduction = (params: any) => http.post('/api/account/query/coin-introduction', params)
+
+// 客户下单
+export const addUserEntrustOrder = (params: any) => http.post('/api/order/add/user-entrust', params)
+
+// 自选---添加自选
+export const addOptionalMarket = (params: any) => http.post('/api/market/add/optional', params)
+
+// 币币/合约--获取行情【指定交易对】
+export const getTickerMarket = (params: any) => http.post('/api/market/ticker', params)
+
+// 自选---删除自选
+export const deleteOptionalMarket = (params: any) => http.post('/api/market/delete/optional', params)
+
+// 单个委托单--成交明细
+export const getOrderEntrustDetail = (params: any) => http.post('/api/order/entrust-detail-page', params)
+
+// 撤单
+export const cancelEntrustOrder = (params: any) => http.post('/api/order/cancel/entrust', params)
+
+// 查询国家区号和支持的证件类型
+export const queryCountryCode = (params: any) => http.post('/api/user/query/country-code', params)
+
+// 初级身份实名验证
+export const userPrimaryVerified = (params: any) => http.post('/api/user/primary-verified', params)
+
+// 上传文件
+export const uploadFile = (params: any) => http.upload('/api/user/file/upload-file', params)
+
+// 身份实名验证
+export const userVerified = (params: any) => http.post('/api/user/verified', params)
+
+// 检测版本更新
+export const checkVersion = (params: any, config: any) => http.post('/api/user/version', params, config)
+
+// 币种列表信息
+export const coinSimple = (params: any, config: any) => http.post('/api/admin/account/coin/simple', params, config)

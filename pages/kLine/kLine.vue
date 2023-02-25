@@ -9,7 +9,9 @@
 				<text>{{market.symbolKey}}</text>
 			</view>
 			<view slot="right">
-				<u-image src="/static/icon36.png" width="48rpx" height="48rpx"></u-image>
+				<u-image @click="add"
+					:src="require(tickerMarketInfo.collect == 1 ? '@/static/icon47.png' : '@/static/icon36.png')"
+					width="48rpx" height="48rpx"></u-image>
 			</view>
 		</u-navbar>
 		<view class="upper-box">
@@ -19,25 +21,25 @@
 					≈ ¥{{market.lastPriceCny}} <text :class="{
 						add:market.rangeAbility >= 0 ,
 						err:market.rangeAbility < 0 ,
-					}">{{market.rangeAbility >=0 ? '+':''}}{{(market.rangeAbility * 100).toFixed(2) + '%'}}</text>
+					}">{{market.rangeAbility >=0 ? '+':''}}{{utils.decimal(market.rangeAbility * 100,2) + '%'}}</text>
 				</view>
 			</view>
 			<view class="right">
 				<view>
 					<view class="lab">{{$t('24h最高价')}}</view>
-					<view class="val">23,771.80</view>
+					<view class="val">{{tickerMarketInfo.highest}}</view>
 				</view>
 				<view>
-					<view class="lab">{{$t('24h成交量')}}(BTC)</view>
-					<view class="val">23,771.80</view>
+					<view class="lab">{{$t('24h成交量')}}({{coinMarket.split('/')[0]}})</view>
+					<view class="val">{{tickerMarketInfo.amount}}</view>
 				</view>
 				<view>
 					<view class="lab">{{$t('24h最低价')}}</view>
-					<view class="val">23,771.80</view>
+					<view class="val">{{tickerMarketInfo.lowest}}</view>
 				</view>
 				<view>
-					<view class="lab">{{$t('24h成交额')}}(USDT)</view>
-					<view class="val">23,771.80</view>
+					<view class="lab">{{$t('24h成交额')}}({{coinMarket.split('/')[1]}})</view>
+					<view class="val">{{tickerMarketInfo.turnover}}</view>
 				</view>
 			</view>
 		</view>
@@ -138,42 +140,48 @@
 				<u-gap height="20rpx"></u-gap>
 				<view class="logo">
 					<u-image width="48rpx" height="48rpx"></u-image>
-					<text>BTC</text>
+					<text>{{coinIntroduction.coinName}}</text>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('发行时间')}}</view>
-					<view>2008-11-01</view>
+					<view>{{$moment(coinIntroduction.publishTime).format('YYYY-MM-DD')}}</view>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('发行总量')}}</view>
-					<view>21,000,000</view>
+					<view>{{coinIntroduction.totalIssuance}}</view>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('流通总量')}}</view>
-					<view>18,374,575</view>
+					<view>{{coinIntroduction.totalCirculation}}</view>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('发行价格')}}</view>
-					<view>0.0025</view>
+					<view>{{coinIntroduction.issuePrice}}</view>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('白皮书')}}</view>
-					<view>https://bitcoin.org/bitcoin.pdf</view>
+					<view @click="$u.route({
+						url:'/pages/webview/webview',
+						params:{
+							url:coinIntroduction.whitePaper
+						}
+					})">{{coinIntroduction.whitePaper}}</view>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('官网')}}</view>
-					<view><text selectable>https://bitcoin.org</text></view>
+					<view><text @click="$u.route({
+						url:'/pages/webview/webview',
+						params:{
+							url:coinIntroduction.officialWebsite
+						}
+					})">{{coinIntroduction.officialWebsite}}</text></view>
 				</view>
 				<view class="lab-item">
 					<view>{{$t('介绍')}}</view>
 					<view></view>
 				</view>
 				<view class="desc">
-					比特币（BitCoin）概念最初由中本聪在2008年提出，根据中本聪的思路设计发布的开源软件以及建构其上的P2P网络。比特币是一种P2P形式的数字货币。点对点的传输意味着一个去中心化的支付系统。
-					与大多数货币不同，比特币不依靠特定货币机构发行，它依据特定算法，通过大量的计算产生，比特币经济使用整个p2p网络中众多节点构成的分布式数据库来确认并记录所有的交易行为，并使用密码学的设计来确保货币流通各个环节安全性。
-					p2p的去中心化特性与算法本身可以确保无法通过大量制造比特币来人为操控币值。基于密码学的设计可以使比特币只能被真实的拥有者转移或支付。这同样确保了货币所有权与流通交易的匿名性。比特币与其他虚拟货币最大的不同，是其总数量非常有限，具有极强的稀缺性。该货币系统曾在4年内只有不超过1050万个，之后的总数量将被永久限制在2100万个。
-					比特，是一种计算机专业术语，是信息量单位，是由英文BIT音译而来。二进制数的一位所包含的信息就是一比特，如二进制数0100就是4比特。那么，比特这个概念和货币联系到一起，不难看出，比特币非现实货币，而是一种计算机电子虚拟货币，存储在你的电脑上。
-					目前，这种崭新的虚拟货币不受任何政府、任何银行控制。因此，它还未被合法化。
+					{{coinIntroduction.desc}}
 				</view>
 			</view>
 		</view>
@@ -197,7 +205,8 @@
 
 <script>
 	import {
-		JSCommon
+		JSCommon,
+		JSCHART_EVENT_ID
 	} from '@/uni_modules/jones-hqchart2/js_sdk/umychart.wechat.3.0.js'
 	import {
 		JSCommonHQStyle
@@ -211,7 +220,11 @@
 		getMarketKline,
 		getMarketDeeps,
 		getUserEntrustList,
-		getMarketDepth
+		getMarketDepth,
+		queryCoinIntroduction,
+		addOptionalMarket,
+		getTickerMarket,
+		deleteOptionalMarket
 	} from "@/config/api"
 
 
@@ -240,6 +253,14 @@
 	export default {
 		data() {
 			let data = {
+				coinMarket: '',
+				tickerMarketInfo: {
+					highest: 0,
+					amount: 0,
+					lowest: 0,
+					turnover: 0
+				},
+				coinIntroduction: '',
 				tabs: [{
 						name: this.$t('委托订单')
 					},
@@ -253,7 +274,7 @@
 				tabIndex: 0,
 				isShowDeep: false,
 				Symbol: '600000.sh',
-				timeIndex: null,
+				timeIndex: uni.getStorageSync('kLineIndex') || 5,
 				otherNavIndex: null,
 				otherNav: [{
 						text: 'BOLL',
@@ -403,28 +424,91 @@
 			};
 			return data;
 		},
-
 		onLoad(options) {
+			if (uni.getStorageSync('kLineIndex')) {
+				this.timeIndex = Number(uni.getStorageSync('kLineIndex'))
+			} else {
+				this.timeIndex = 5
+			}
 			this.coinMarket = options.coinMarket
-			this.init()
-			// this.timer = setInterval(this.init, 1000)
+			// this.init()
+			let coin = this.coinMarket.split('/')
+			queryCoinIntroduction({
+				coinName: coin[0]
+			}).then(e => {
+				if (uni.getLocale() == 'zh') {
+					e.desc = e.coinIntroduction
+				} else {
+					e.desc = e.coinIntroductionEnglish
+				}
+				this.coinIntroduction = e
+			})
+			this.tickerMarket()
 		},
 
 		onShow() {
-			clearInterval(this.timer)
+			let topic = this.coinMarket.toLowerCase().replace('/', '-')
+			uni.sendSocketMessage({
+				data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+					'-trade"}'
+			})
+
+			this.$onSocketMessage((data) => {
+				if (data.asks && data.symbolKey == this.coinMarket) {
+					let {
+						asks,
+						bids
+					} = data
+					let newAsks = asks.slice(0, 5),
+						newBids = bids.slice(0, 5)
+
+					this.market.asks = newAsks
+					this.market.bids = newBids
+					this.market.lastPrice = data.lastPrice
+					this.market.lastPriceCny = data.lastPriceCny
+					this.market.rangeAbility = data.rangeAbility
+				}
+
+				if (data.coinMarket == this.coinMarket) {
+					this.tickerMarketInfo.highest = data.highest
+					this.tickerMarketInfo.amount = data.amount
+					this.tickerMarketInfo.lowest = data.lowest
+					this.tickerMarketInfo.turnover = data.turnover
+				}
+			})
 			this.init()
-			this.timer = setInterval(this.init, 1000)
 			if (this.isShowDeep) {
+				this.createDeepChart()
 				return
 			}
-			this.ChangeKLinePeriod(8, 5);
+			this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
 		},
+		watch: {
+			theme(newValue, oldValue) {
+				if (g_KLine.JSChart) {
+					g_KLine.JSChart.StopAutoUpdate();
+					g_KLine.JSChart = null;
+				}
 
+				if (d_Line.JSChart) {
+					d_Line.JSChart.StopAutoUpdate();
+					d_Line.JSChart = null;
+				}
+
+				if (this.isShowDeep) {
+					this.createDeepChart()
+					return
+				}
+				this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
+			}
+		},
 		onReady() {
 
 		},
 
 		onHide() {
+			clearInterval(this.timer)
 			if (g_KLine.JSChart) {
 				g_KLine.JSChart.StopAutoUpdate();
 				g_KLine.JSChart = null;
@@ -434,10 +518,22 @@
 				d_Line.JSChart.StopAutoUpdate();
 				d_Line.JSChart = null;
 			}
-			clearInterval(this.timer)
+			let topic = this.coinMarket.toLowerCase().replace('/', '-')
+			uni.sendSocketMessage({
+				data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+					'-trade"}'
+			})
 		},
 
 		onUnload() {
+			clearInterval(this.timer)
+			let topic = this.coinMarket.toLowerCase().replace('/', '-')
+			uni.sendSocketMessage({
+				data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+					'-trade"}'
+			})
 			if (g_KLine.JSChart) {
 				g_KLine.JSChart.StopAutoUpdate();
 				g_KLine.JSChart = null;
@@ -447,24 +543,67 @@
 				d_Line.JSChart.StopAutoUpdate();
 				d_Line.JSChart = null;
 			}
-			clearInterval(this.timer)
+
+
 		},
 		methods: {
+			tickerMarket() {
+				getTickerMarket({
+					coinMarket: this.coinMarket
+				}).then(e => {
+					this.tickerMarketInfo = e
+				})
+			},
+			add() {
+				if (!uni.getStorageSync('token')) {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+					return
+				}
+				if (this.tickerMarketInfo.collect == 1) {
+					deleteOptionalMarket({
+						coinMarket: this.coinMarket
+					}).then(() => {
+						this.tickerMarketInfo.collect = 0
+						uni.showToast({
+							title: this.$t('操作成功！')
+						})
+					})
+				} else {
+					addOptionalMarket({
+						coinMarket: this.coinMarket
+					}).then(() => {
+						this.tickerMarketInfo.collect = 1
+						uni.showToast({
+							title: this.$t('操作成功！')
+						})
+					})
+				}
+			},
 			next(type) {
 				uni.setStorage({
-					key:'barIndex',
-					data:type
+					key: 'barIndex',
+					data: {
+						index: type,
+						coin: this.coinMarket
+					}
 				})
 				uni.switchTab({
 					url: '/pages/transaction/transaction'
 				})
 			},
 			init() {
+				clearInterval(this.timer)
+				this.tickerMarket()
 				getMarketDeeps({
 					coinMarket: this.coinMarket,
 					type: 'detail'
 				}).then(e => {
-					if (!Boolean(e)) return
+					if (!Boolean(e)) {
+						this.market.symbolKey = this.coinMarket
+						return
+					}
 					let {
 						asks,
 						bids
@@ -476,6 +615,11 @@
 					this.market = e
 				})
 
+				this.queryUserEntrustList()
+
+				this.timer = setInterval(this.queryUserEntrustList, 3000)
+			},
+			queryUserEntrustList() {
 				getUserEntrustList({
 					coinMarket: this.coinMarket
 				}).then(e => {
@@ -508,7 +652,7 @@
 				element.Height = this.KLine.Height; //高度宽度需要手动绑定!!
 				element.Width = this.KLine.Width;
 
-				const theme = uni.getSystemInfoSync().theme
+				const theme = this.theme
 				let style
 				if (theme == "light") style = 'WHITE_ID'
 				else style = 'BLACK_ID'
@@ -549,7 +693,8 @@
 								item.lastNumber
 							]
 						}), //买盘 
-						datatype: "snapshot" //全量数据  
+						// datatype: "snapshot" ,//全量数据  
+						datatype: "update" //全量数据
 					};
 					callback(hqChartData);
 				})
@@ -559,7 +704,6 @@
 			},
 			//
 			CreateKLineChart: function() {
-				if (this.KLine.JSChart) return;
 				let element = new JSCommon.JSCanvasElement();
 				// #ifdef APP-PLUS
 				element.IsUniApp = true; //canvas需要指定下 是uniapp的app
@@ -572,6 +716,7 @@
 				let style
 				if (theme == "light") style = 'WHITE_ID'
 				else style = 'BLACK_ID'
+
 				const themeStyle = JSCommonHQStyle.GetStyleConfig(JSCommonHQStyle.STYLE_TYPE_ID[style])
 				JSCommon.JSChart.SetStyle(themeStyle);
 
@@ -580,20 +725,40 @@
 				let coin = this.coinMarket.split('/')
 				this.KLine.Option.Symbol = coin[0] + coin[1] + '.BIT';
 				this.KLine.Option.IsFullDraw = true; //每次手势移动全屏重绘
-
 				g_KLine.JSChart.SetOption(this.KLine.Option);
-			},
 
+				// //注册监听事件         
+				// g_KLine.JSChart.AddEventCallback({
+				// 	event: JSCommon.JSCHART_EVENT_ID.RECV_START_AUTOUPDATE,
+				// 	callback: this.startKlineAutoUpdate
+				// });
+				// g_KLine.JSChart.AddEventCallback({
+				// 	event: JSCommon.JSCHART_EVENT_ID.RECV_STOP_AUTOUPDATE,
+				// 	callback: this.stopKlineAutoUpdate
+				// });
+			},
+			// startKlineAutoUpdate(data) {
+			// 	console.log('[startAutoUpdate] data', data);
+			// 	//根据data.Stock.Period周期，使用websocket下载对应的当天日线或当天分钟数据
+			// 	//数据转换成hqchart接口，使用data.Callback(data) 更新到HQChart中
+
+			// 	console.log(this.KLine.Option.KLine.Period);
+			// },
+			// stopKlineAutoUpdate(data){
+
+			// },
 			//K线周期切换
 			ChangeKLinePeriod(period, index) {
 				this.timeIndex = index
+				uni.setStorageSync('kLineIndex', String(index))
 				this.isShowDeep = false
+				this.KLine.Option.KLine.Period = this.timeNav[this.timeIndex].id
+
 				if (!g_KLine.JSChart) //不存在创建
 				{
-					this.KLine.Option.Period = period;
 					this.CreateKLineChart();
 				} else {
-					g_KLine.JSChart.ChangePeriod(period);
+					g_KLine.JSChart.ChangePeriod(this.KLine.Option.KLine.Period);
 				}
 			},
 
@@ -611,49 +776,108 @@
 
 				g_KLine.JSChart.ChangeSymbol(symbol);
 			},
-			marketKline(dimension, fn) {
+			marketKline(type, dimension, fn) {
 				getMarketKline({
 					coinMarket: this.coinMarket,
 					dimension
 				}).then(res => {
-					let formatData = res.map(item => {
-						return [
-							Number(this.$moment(item.time).format('YYYYMMDD')),
-							null,
-							Number(item.open),
-							Number(item.high),
-							Number(item.low),
-							Number(item.close),
-							Number(item.amount),
-							Number(item.turnover)
-						]
-					})
 					let coin = this.coinMarket.split('/')
+					let formatData = res.map(item => {
+						let klineArray
+						if (type == 'ReqeustHistoryMinuteData') {
+							klineArray = [
+								Number(this.$moment(item.time * 1000).format('YYYYMMDD')), //日期
+								null, //前收盘价
+								Number(item.open), //开盘价
+								Number(item.high), //最高
+								Number(item.low), //最低
+								Number(item.close), //收盘价
+								Number(item.amount), //成交量
+								Number(item.turnover), //成交金额
+								Number(this.$moment(item.time * 1000).format('HHmm')), //日期格式
+							]
+						} else if (type == 'RequestHistoryData') {
+							klineArray = [
+								Number(this.$moment(item.time * 1000).format('YYYYMMDD')), //日期
+								null, //前收盘价
+								Number(item.open), //开盘价
+								Number(item.high), //最高
+								Number(item.low), //最低
+								Number(item.close), //收盘价
+								Number(item.amount), //成交量
+								Number(item.turnover), //成交金额
+							]
+						}
+						return klineArray
+					})
+
 					let data = {
 						symbol: coin[0] + coin[1] + '.BIT',
 						name: coin[0] + coin[1],
+						code: 0,
 						data: formatData
 					}
+
+					if (type == 'RequestRealtimeData') { //	日线最新
+						const RequestRealtimeData = res[res.length - 1]
+						data = {
+							"code": 0,
+							stock: [{
+								"symbol": coin[0] + coin[1] + '.BIT',
+								"name": RequestRealtimeData.coinMarket,
+								"date": Number(this.$moment(RequestRealtimeData.time * 1000).format(
+									'YYYYMMDD')),
+								"yclose": null,
+								"open": Number(RequestRealtimeData.open),
+								"high": Number(RequestRealtimeData.high),
+								"low": Number(RequestRealtimeData.low),
+								"price": Number(RequestRealtimeData.rangeAbilityAmount),
+								"vol": Number(RequestRealtimeData.amount),
+								"amount": Number(RequestRealtimeData.turnover)
+							}]
+						}
+					}
+
+					if (type == 'RequestMinuteRealtimeData') { //	最新分钟线
+						data = {
+							"code": 0,
+							data: []
+						}
+
+						for (let i = 0; i <= 2; i++) //更新最新的3条数据
+						{
+							data.data.push(res[i]);
+						}
+					}
+
 					fn(data)
 				})
 			},
 			NetworkFilter: function(data, callback) {
 				data.PreventDefault = true
-
 				switch (data.Name) {
 					case 'KLineChartContainer::ReqeustHistoryMinuteData':
-						this.marketKline(this.timeNav[this.timeIndex].key, data => callback({
-							data
-						}))
-
+						this.marketKline('ReqeustHistoryMinuteData', this.timeNav[this.timeIndex].key, data =>
+							callback({
+								data
+							}))
 						break;
+					case 'KLineChartContainer::RequestMinuteRealtimeData':
+						this.marketKline('RequestMinuteRealtimeData', this.timeNav[this.timeIndex].key, data =>
+							callback({
+								data
+							}))
+						break
 					case 'KLineChartContainer::RequestHistoryData':
-						this.marketKline(this.timeNav[this.timeIndex].key, data => callback({
+						this.marketKline('RequestHistoryData', this.timeNav[this.timeIndex].key, data => callback({
 							data
 						}))
 						break
+					case 'KLineChartContainer::RequestRealtimeData':
+						this.marketKline('RequestRealtimeData', this.timeNav[this.timeIndex].key, data => callback({
+							data
+						}))
 				}
-				console.log('[HQChart:NetworkFilter] data', data.Name);
 			},
 
 			//KLine事件
@@ -1006,7 +1230,8 @@
 		.tab-content .tab-box.deal .tab-box-item:last-child .item text:last-child,
 		.tab-content .tab-box.info .lab-item view:last-child,
 		.tab-content .tab-box.info .desc,
-		.tab-content .tab-box.info .logo text {
+		.tab-content .tab-box.info .logo text,
+		.other-box view.active {
 			color: #fff;
 		}
 

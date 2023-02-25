@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/mercilessApple/CoinHome#readme",
   "dependencies": {
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "vconsole": "^3.15.0"
   }
 }

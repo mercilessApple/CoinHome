@@ -5,11 +5,13 @@ export default {
 		}
 	},
 	created() {
-		uni.onThemeChange(({theme})=>{
+		uni.onThemeChange(({
+			theme
+		}) => {
 			this.theme = theme
 		})
 	},
-	onShow(){
+	onShow() {
 
 	},
 	methods: {

@@ -2,15 +2,17 @@
 	<view class="content">
 		<u-navbar leftIcon="">
 			<view slot="left">
-				<u-image v-if="theme == 'light'" @click="toUserCenter" src="/static/icon4.png" width="48rpx"
+				<u-image @click="toUserCenter"
+					:src="require(theme == 'light' ? '@/static/icon4.png' : '@/static/icon37.png')" width="48rpx"
 					height="48rpx"></u-image>
-
-				<u-image v-else @click="toUserCenter" src="/static/icon37.png" width="48rpx" height="48rpx"></u-image>
 			</view>
 
 			<view class="u-nav-slot" slot="right">
-				<view class="search">
-					<u-search placeholder="" bgColor="#F4F5F7" disabled :showAction="false"></u-search>
+				<view class="search" :style="{
+					'width':open ? '450rpx':'256rpx'
+				}">
+					<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'" @change="onSearchChange"
+						placeholder="" bgColor="#F4F5F7" @search="search" :showAction="false"></u-search>
 				</view>
 				<view class="icon" @click="$u.route({
 						url:'/pages/notice/notice'
@@ -21,7 +23,7 @@
 							:value="badgeNumber"></u-badge>
 					</view>
 				</view>
-				<view class="icon" @click="$u.route('/pages/webview/webview')">
+				<view class="icon" @click="toServer">
 					<u-image src="@/static/icon5.png" width="48rpx" height="48rpx"></u-image>
 				</view>
 			</view>
@@ -31,7 +33,7 @@
 				@down="downCallback" @up="upCallback">
 				<u-gap height="40rpx"></u-gap>
 				<!-- <image style="width: 100rpx;height: 100rpx;" :src="theme == 'light' ? '/static/icon4.png' : '/static/icon37.png'"></image> -->
-				
+
 				<u-swiper :loading="banner == ''" keyName="imgUrl" bgColor="transparent" :list="banner" height="260rpx"
 					circular></u-swiper>
 				<view class="notice" v-if="notices != ''">
@@ -68,7 +70,10 @@
 						<view class="name">{{$t('名称')}}</view>
 						<view class="column">
 							<view class="val" @click="$u.route({
-								url:'/pages/kLine/kLine'
+								url:'/pages/kLine/kLine',
+								params:{
+									coinMarket:item.coinMarket
+								}
 							})" v-for="(item,index) in list" :key="index">{{item.coinMarket}}
 							</view>
 						</view>
@@ -77,7 +82,10 @@
 						<view class="name">{{$t('最新价格')}}</view>
 						<view class="column">
 							<view class="val" @click="$u.route({
-								url:'/pages/kLine/kLine'
+								url:'/pages/kLine/kLine',
+								params:{
+									coinMarket:item.coinMarket
+								}
 							})" v-for="(item,index) in list" :key="index">
 								<view class="box">
 									<view>{{item.lastPrice}}</view>
@@ -90,13 +98,16 @@
 						<view class="name">{{$t('24h涨跌幅')}}</view>
 						<view class="column">
 							<view class="val" @click="$u.route({
-								url:'/pages/kLine/kLine'
+								url:'/pages/kLine/kLine',
+								params:{
+									coinMarket:item.coinMarket
+								}
 							})" v-for="(item,index) in list" :key="index">
 								<view class="btn" :class="{
 									green:item.rangeAbility >= 0 && item.onDealing === 1,
 									red:item.rangeAbility < 0 && item.onDealing === 1,
 									gray:item.onDealing !== 1
-								}">{{item.rangeAbility >=0 ? '+':''}}{{(item.rangeAbility * 100).toFixed(2)}}%
+								}">{{item.rangeAbility >=0 ? '+':''}}{{utils.decimal(item.rangeAbility * 100,2)}}%
 								</view>
 							</view>
 						</view>
@@ -104,6 +115,25 @@
 				</view>
 			</mescroll-body>
 		</view>
+
+		<u-popup mode="center" round="10rpx" :show="show" @close="show = false">
+			<view class="popup-box">
+				<view class="title">公告</view>
+
+				<view class="tip">CoinHome关于系统升级的公告</view>
+
+				<view class="text-box">
+					<text>亲爱的用户：
+
+						CoinHome App
+						将于2023年2月01日下午6:30（UTC+8）进行系统升级，预计在20分钟内完成。升级期间可能会出现账户登录异常、交易卡顿等情况，待系统维护升级完成后，将恢复正常。
+						感谢您对CoinHome的支持！
+
+						CoinHome团队
+						2023年2月1日</text>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -111,6 +141,7 @@
 	import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
 	import {
 		banners,
+		checkVersion,
 		announcements,
 		getOptionalMarket,
 		getTickerByPartitionMarket
@@ -119,6 +150,8 @@
 		mixins: [MescrollMixin], // 使用mixin
 		data() {
 			return {
+				// show: true,
+				show: false,
 				notices: [],
 				curNow: 1,
 				subsection: [
@@ -128,6 +161,8 @@
 					this.$t("跌幅榜")
 				],
 				banner: [],
+				open: false,
+				key: '',
 				badgeNumber: 1,
 				downOption: {
 					auto: false, //是否在初始化完毕之后自动执行下拉回调callback; 默认true
@@ -158,28 +193,55 @@
 			}
 		},
 		onLoad() {
-			this.init('onload')
-			this.timer = null
-			this.startLoad = false
+			this.init()
+			this.utils.checkUpdate(this)
 		},
 		onHide() {
-			clearInterval(this.timer)
-			uni.setStorageSync('indexLeave', true)
+
 		},
 		onUnload() {
-			clearInterval(this.timer)
-			uni.setStorageSync('indexLeave', true)
+
 		},
 		onShow() {
-			if (uni.getStorageSync('indexLeave')) {
-				this.getList(e => this.list = e)
-				this.timer = setInterval(() => {
-					this.getList(e => this.list = e)
-				}, 3000)
-				uni.removeStorageSync('indexLeave')
-			}
+			this.$onSocketMessage((data) => {
+				if (this.list != '') {
+					const index = this.list.findIndex(item => item.coinId == data.coinId)
+					if (index == -1) return
+					this.list[index].lastPrice = Number(data.lastPrice)
+					this.list[index].rangeAbility = Number(data.rangeAbility)
+					this.list[index].lastPriceCny = Number(data.lastPriceCny)
+				}
+			})
 		},
 		methods: {
+			onSearchChange(e) {
+				if (e == '') {
+					this.open = false
+					this.list = this.oriList
+				} else this.open = true
+			},
+			search(key) {
+				if (key == '') {
+					this.list = this.oriList
+					return
+				}
+				let list = JSON.parse(JSON.stringify(this.oriList))
+				this.list = this.utils.fuzzyQuery(list, key, 'coinMarket')
+			},
+			toServer() {
+				if (!uni.getStorageSync('token')) {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+					return
+				}
+				uni.$u.route({
+					url: '/pages/webview/webview',
+					params: {
+						url: this.utils.serviceURL
+					}
+				})
+			},
 			toUrl(index) {
 				if (index == 0 || index == 3) {
 					if (uni.getStorageSync('token')) {
@@ -201,18 +263,17 @@
 						url: '/pages/transaction/transaction'
 					})
 				}
-			},
-			toUserCenter() {
-				if (uni.getStorageSync('token')) {
-					uni.navigateTo({
-						url: "/pages/userCenter/userCenter",
-						"animationType": "slide-in-left"
-					})
-				} else {
-					uni.navigateTo({
-						url: '/pages/login/login'
+				if (index == 2) {
+					uni.switchTab({
+						url: '/pages/assets/assets'
 					})
 				}
+			},
+			toUserCenter() {
+				uni.navigateTo({
+					url: "/pages/userCenter/userCenter",
+					"animationType": "slide-in-left"
+				})
 			},
 			onSubsectionChange(index) {
 				if (this.curNow === index) {
@@ -220,7 +281,6 @@
 				}
 				this.curNow = index
 				this.list = []
-				// this.startLoad = true
 				this.mescroll.resetUpScroll() // 再刷新列表数据
 			},
 			async getList(fn = () => {}) {
@@ -255,9 +315,10 @@
 					})
 					res = addList
 				}
+				this.oriList = res
 				fn(res)
 			},
-			init(scene) {
+			init() {
 				banners({
 					bannerType: 2
 				}).then(e => this.banner = e == '' ? [{
@@ -271,42 +332,58 @@
 					pageSize: 1,
 					type: 0
 				}).then(e => this.notices = e)
-
-				if (!scene) {
-					this.getList(e => this.list = e)
-				}
 			},
 			/*下拉刷新的回调 */
 			downCallback() {
 				this.init()
+				this.getList(res => {
+					this.list = res
+				})
 				setTimeout(() => {
 					this.mescroll.endSuccess()
 				}, 1000)
 			},
 			// /*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
-				uni.$u.debounce(() => {
-					clearInterval(this.timer)
-					this.getList(res => {
-						// this.startLoad = false
-						this.list = res
-						this.mescroll.endSuccess(res.length, false)
-						this.timer = setInterval(() => {
-							this.getList(e => this.list = e)
-						}, 3000)
-
-						let routes = getCurrentPages() // 获取当前打开过的页面路由数组
-						let curRoute = routes[routes.length - 1].route // 获取当前页面路由，也就是最后一个打开的页面路由
-						if (curRoute !== 'pages/index/index') clearInterval(this.timer)
-					}).catch(() => this.startLoad = false)
-				}, 500)
-
+				this.getList(res => {
+					this.list = res
+					this.mescroll.endSuccess(res.length, false)
+				})
 			}
 		},
 	}
 </script>
 
 <style lang="scss">
+	.popup-box {
+		width: 630rpx;
+		padding: 0 30rpx;
+		padding-bottom: 40rpx;
+
+		.text-box {
+			padding-top: 36rpx;
+
+			text {
+				font-size: 24rpx;
+				color: #969AA6;
+			}
+		}
+
+		.tip {
+			font-weight: 500;
+			color: #0E0E0E;
+			font-size: 28rpx;
+			text-align: center;
+		}
+
+		.title {
+			text-align: center;
+			font-weight: 500;
+			color: #23212C;
+			padding: 35rpx 0;
+		}
+	}
+
 	.list {
 		padding: 0 30rpx;
 		display: flex;
@@ -475,6 +552,7 @@
 
 	.search {
 		width: 256rpx;
+		transition: width .3s;
 		padding-right: 30rpx;
 	}
 

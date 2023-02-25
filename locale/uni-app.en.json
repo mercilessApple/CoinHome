@@ -7,6 +7,8 @@
 		"uni.scanCode.flash.off": "Tap Close",
 		"NSPhotoLibraryUsageDescription": "For users to change the profile picture, upload the picture and scan the QR code",
 		"NSPhotoLibraryAddUsageDescription": "For saving QR code, pictures",
-		"NSCameraUsageDescription": "It is used to shoot the profile picture and scan the QR code"
+		"NSCameraUsageDescription": "It is used to shoot the profile picture and scan the QR code",
+		"permissionExternalStorage":"To save information such as the running status, you need to obtain the permission to read and write the mobile phone storage (the system prompts you to access photos, media content, and files on the device).",
+		"permissionPhoneState":"To ensure normal and safe use of the device, you need to obtain the permission to use the device identifier (some mobile phones prompt you to obtain the mobile phone number). Please allow."
 	}
 }

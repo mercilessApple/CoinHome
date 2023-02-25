@@ -1,4 +1,12 @@
 <script>
+	import Vue from 'vue'
+	import {
+		apiURL,
+		wsURL
+	} from '@/config'
+	import {
+		title
+	} from 'process'
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
@@ -8,12 +16,101 @@
 				plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
 			}
 			// #endif
+			this.isConfirm = false
+		},
+		methods: {
+			Modal(data) {
+				if (this.isConfirm) {
+					return
+				}
+				this.isConfirm = true
+
+				uni.showModal({
+					title: data.maintenance[0].title,
+					content: data.maintenance[0].content.replace(/<[^<>]+>/g, '').replace(/&nbsp;/ig, ''),
+					showCancel: false,
+					confirmText: this.$t('维护中'),
+					confirmColor: '#ccc',
+					success: (res) => {
+						if (res.confirm) {
+							this.isConfirm = false
+							this.Modal(data)
+						}
+					}
+				})
+			},
+			checkNotice() {
+				uni.request({
+					url: apiURL + '/api/user/announcements/windows',
+					method: "POST",
+					data: {
+						type: 1
+					},
+					success: (e) => {
+						if (e.statusCode == 200) {
+							if (e.data.code == 1) {
+								const {
+									data
+								} = e.data
+								if (data.maintenance == '') return
+								uni.setStorageSync('currentDayFlag', data.maintenance[0].currentDayFlag)
+								this.Modal(data)
+							}
+						}
+					}
+				})
+			}
 		},
 		onShow: function() {
 			console.log('App Show')
+
+			uni.connectSocket({
+				url: wsURL,
+			});
+
+			Vue.prototype.$onSocketMessage = (fn) => {
+				uni.onSocketOpen(() => {
+
+					uni.sendSocketMessage({
+						data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+							'","sendMsgSuccess":true,"topic":"alpha-market-ticker"}'
+					})
+
+					// uni.sendSocketMessage({
+					// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+					// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
+					// })
+				});
+				uni.onSocketMessage((message) => {
+					const response = JSON.parse(message.data)
+					const {
+						data
+					} = response
+					if (response.ping) {
+						return
+					}
+					fn(data)
+				});
+			}
+
+			if (uni.getStorageSync('currentDayFlag')) {
+				this.checkNotice()
+				return
+			}
+
+			this.checkNotice()
+		},
+		onUnload() {
+			console.log('unload');
+			uni.onSocketOpen(function() {
+				uni.closeSocket();
+			});
 		},
 		onHide: function() {
-			console.log('App Hide')
+			console.log('hide');
+			uni.onSocketOpen(function() {
+				uni.closeSocket();
+			});
 		}
 	}
 </script>
