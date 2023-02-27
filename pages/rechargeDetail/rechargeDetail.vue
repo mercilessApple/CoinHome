@@ -214,21 +214,23 @@
 			queryWithdrawCoin().then(e => {
 				this.coinList = e
 				this.oriList = e
+		
 				if (options.coin) {
 					let find = e.filter(item => item.coinName == options.coin)
 					if (find == '') {
-						this.curCoin = [{
-							coinName: this.$t('选择币种'),
-							iconUrl:''
-						}]
-						return
+						// this.curCoin = [{
+						// 	coinName: this.$t('选择币种'),
+						// 	iconUrl:''
+						// }]
+						this.curCoin = e
+					}else{
+						this.curCoin = find
 					}
-					this.curCoin = find
 				} else {
 					this.curCoin = e
 				}
-
 				queryDepositPayCoin().then(e => {
+					this.oriChainList = e
 					this.chainList = e.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
 				})
 			})
@@ -335,7 +337,8 @@
 					this.coinList = this.oriList
 					return
 				}
-				this.coinList = this.oriList.filter(item => item.coinName == key)
+				let list = JSON.parse(JSON.stringify(this.oriList))
+				this.coinList = this.utils.fuzzyQuery(list, key, 'coinName')
 			},
 			selectNet(item) {
 				this.curNet = item
@@ -343,7 +346,7 @@
 			},
 			select(item) {
 				this.curCoin = [item]
-				this.chainList = item.list
+				this.chainList = this.oriChainList.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
 				this.show = false
 			}
 		},
