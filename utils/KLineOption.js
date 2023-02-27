@@ -1,6 +1,9 @@
 export const KLineOption = {
 	Type: '历史K线图',
 	Language: uni.getLocale().toUpperCase(),
+	IsCorssOnlyDrawKLine: true,
+	IsClickShowCorssCursor: true, //手势点击出现十字光标
+	EnableScrollUpDown: true, //允许手势上下操作滚动页面
 	Windows: //窗口指标
 		[{
 				Index: "MA",

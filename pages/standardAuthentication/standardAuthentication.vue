@@ -378,7 +378,7 @@
 			}
 
 			.u-action-sheet--hover {
-				background-color: transparent;
+				background-color: transparent !important;
 			}
 		}
 

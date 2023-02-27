@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" :bgColor="theme == 'light' ? '#fff' : '#1F282F'" title="" :autoBack="true" placeholder="">
+		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder="">
 		</u-navbar>
 		<view class="title">
 			{{$t('主题模式')}}
@@ -97,6 +97,10 @@
 		.title,
 		.nav .item .left {
 			color: #fff;
+		}
+		.u-navbar__content,
+		.u-status-bar {
+			background-color: #1F282F !important;
 		}
 	}
 </style>

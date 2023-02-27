@@ -129,3 +129,6 @@ export const checkVersion = (params: any, config: any) => http.post('/api/user/v
 
 // 币种列表信息
 export const coinSimple = (params: any, config: any) => http.post('/api/admin/account/coin/simple', params, config)
+
+// 查询币种基础信息
+export const coinInfo = (params: any, config: any) => http.post('/api/account/query/basis/coin-info', params, config)

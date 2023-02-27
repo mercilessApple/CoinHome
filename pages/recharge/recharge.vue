@@ -82,8 +82,8 @@
 					this.coinList = this.oriList
 					return
 				}
-				let searchList = this.oriList.filter(item => item.coinName == key)
-				this.coinList = searchList
+				let list = JSON.parse(JSON.stringify(this.oriList))
+				this.coinList = this.utils.fuzzyQuery(list, key, 'coinName')
 			},
 			noRepeat11(arr) {
 				var newArr = [];

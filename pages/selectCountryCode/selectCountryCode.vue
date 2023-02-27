@@ -41,8 +41,9 @@
 		},
 		methods: {
 			choose(item) {
-				if (item.nationalityName == 'China') item.key = 0
+				if (item.nationality == 'CHN') item.key = 0
 				else item.key = 1
+				
 				item.name = item.nationalityName
 				// #ifdef APP-PLUS
 				this.beforePage.$vm.areaItem = item

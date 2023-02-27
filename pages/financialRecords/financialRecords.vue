@@ -122,7 +122,12 @@
 				if (options.coinId == 'null') {
 					this.curCoin = e[0]
 				} else {
-					this.curCoin = e.filter(item => item.coinId == options.coinId)[0]
+					let cur = e.filter(item => item.coinId == options.coinId)
+					if(cur == ''){
+						this.curCoin = e[0]
+						return
+					}
+					this.curCoin = cur[0]
 				}
 
 				this.coinId = this.curCoin.coinId

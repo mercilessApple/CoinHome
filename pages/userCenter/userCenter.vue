@@ -1,7 +1,6 @@
 <template>
 	<view>
-		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder
-			:bgColor="theme == 'light' ? '#fff' : '#1F282F'">
+		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
 			<view class="u-nav-slot" slot="right">
 				<view @click="changeTheme">
 					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
@@ -132,6 +131,7 @@
 					this.userInfo = uni.getStorageSync('userInfo')
 					return
 				}
+				this.userInfo.nickName = this.$t('加载中...')
 				userInfo().then(e => {
 					if (e.nickName == '') {
 						getNickName().then(res => {
@@ -410,6 +410,11 @@
 
 			.u-alert--warning--light {
 				background-color: #29313C !important;
+			}
+
+			.u-navbar__content,
+			.u-status-bar {
+				background-color: #1F282F !important;
 			}
 		}
 

@@ -16,28 +16,32 @@
 				plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
 			}
 			// #endif
-			this.isConfirm = false
+
 		},
 		methods: {
-			Modal(data) {
-				if (this.isConfirm) {
+			toNext(data) {
+				let pages = getCurrentPages();
+				if (pages[pages.length - 1].$page.fullPath ==
+					'/pages/noticeDetail/noticeDetail') {
 					return
 				}
-				this.isConfirm = true
-
-				uni.showModal({
-					title: data.maintenance[0].title,
-					content: data.maintenance[0].content.replace(/<[^<>]+>/g, '').replace(/&nbsp;/ig, ''),
-					showCancel: false,
-					confirmText: this.$t('维护中'),
-					confirmColor: '#ccc',
-					success: (res) => {
-						if (res.confirm) {
-							this.isConfirm = false
-							this.Modal(data)
-						}
-					}
+				uni.setStorageSync('noticeDetail', data.maintenance[0])
+				uni.reLaunch({
+					url: '/pages/noticeDetail/noticeDetail'
 				})
+				// uni.showModal({
+				// 	title: data.maintenance[0].title,
+				// 	content: data.maintenance[0].content.replace(/<[^<>]+>/g, '').replace(/&nbsp;/ig, ''),
+				// 	showCancel: false,
+				// 	confirmText: this.$t('维护中'),
+				// 	confirmColor: '#ccc',
+				// 	success: (res) => {
+				// 		if (res.confirm) {
+				// 			this.isConfirm = false
+				// 			this.Modal(data)
+				// 		}
+				// 	}
+				// })
 			},
 			checkNotice() {
 				uni.request({
@@ -52,13 +56,25 @@
 								const {
 									data
 								} = e.data
-								if (data.maintenance == '') return
-								uni.setStorageSync('currentDayFlag', data.maintenance[0].currentDayFlag)
-								this.Modal(data)
+								if (data.maintenance == '') {
+									let pages = getCurrentPages();
+									if (pages[pages.length - 1].$page.fullPath ==
+										'/pages/noticeDetail/noticeDetail') {
+										uni.switchTab({
+											url: '/pages/index/index'
+										})
+									}
+									return
+								}
+								// uni.setStorageSync('currentDayFlag', data.maintenance[0].currentDayFlag)
+								this.toNext(data)
 							}
 						}
 					}
 				})
+			},
+			test() {
+				console.log(1);
 			}
 		},
 		onShow: function() {
@@ -80,6 +96,16 @@
 					// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
 					// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
 					// })
+					
+					clearInterval(this.timer)
+					// 维持心跳活动
+					this.timer = setInterval(() => {
+						uni.sendSocketMessage({
+							data: JSON.stringify({
+								ping: new Date().valueOf()
+							})
+						})
+					}, 50000)
 				});
 				uni.onSocketMessage((message) => {
 					const response = JSON.parse(message.data)
@@ -93,21 +119,21 @@
 				});
 			}
 
-			if (uni.getStorageSync('currentDayFlag')) {
-				this.checkNotice()
-				return
-			}
+			// if (uni.getStorageSync('currentDayFlag')) {
+			// 	this.checkNotice()
+			// 	return
+			// }
 
 			this.checkNotice()
 		},
 		onUnload() {
-			console.log('unload');
+			clearInterval(this.timer)
 			uni.onSocketOpen(function() {
 				uni.closeSocket();
 			});
 		},
 		onHide: function() {
-			console.log('hide');
+			clearInterval(this.timer)
 			uni.onSocketOpen(function() {
 				uni.closeSocket();
 			});

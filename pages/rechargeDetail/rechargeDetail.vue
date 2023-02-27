@@ -15,7 +15,7 @@
 
 		<view class="coin-box">
 			<view class="left">
-				<u-image width="48rpx" height="48rpx" :src="curCoin == '' ? '' :curCoin[0].iconUrl"></u-image>
+				<u-image v-if="curCoin != '' && curCoin[0].iconUrl != ''" width="48rpx" height="48rpx" :src="curCoin[0].iconUrl"></u-image>
 				<text>{{curCoin == '' ? '' :curCoin[0].coinName}}</text>
 			</view>
 			<view class="right" @click="show = true">
@@ -218,7 +218,8 @@
 					let find = e.filter(item => item.coinName == options.coin)
 					if (find == '') {
 						this.curCoin = [{
-							coinName: this.$t('选择币种')
+							coinName: this.$t('选择币种'),
+							iconUrl:''
 						}]
 						return
 					}

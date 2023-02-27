@@ -77,7 +77,7 @@
 		<u-gap height="30rpx"></u-gap>
 		<u-gap height="10rpx" :bgColor="theme == 'light' ? '#F6F6F6' : '#171E28'"></u-gap>
 		<view class="tabs-box u-border-bottom">
-			<u-tabs lineColor="#FEFA05" lineWidth="60rpx" lineHeight="8rpx" :activeStyle="{
+			<u-tabs :current="tabIndex" lineColor="#FEFA05" lineWidth="60rpx" lineHeight="8rpx" :activeStyle="{
 						'color':theme == 'light' ? '#1E1F29' : '#fff'
 					}" inactiveStyle="color:#898D99" :itemStyle="{
 			'height':'80rpx',
@@ -102,8 +102,7 @@
 				</view>
 			</view>
 			<block v-if="tabIndex == 0 && entrustList.bids == ''">
-				<u-gap height="300rpx"></u-gap>
-				<u-empty :text="$t('暂无数据')"></u-empty>
+				<u-empty icon="/static/icon34.png" :text="$t('无当前委托')"></u-empty>
 				<u-gap height="300rpx"></u-gap>
 			</block>
 
@@ -139,7 +138,7 @@
 			<view class="tab-box info" v-show="tabIndex == 2">
 				<u-gap height="20rpx"></u-gap>
 				<view class="logo">
-					<u-image width="48rpx" height="48rpx"></u-image>
+					<u-image :src="iconUrl" width="48rpx" height="48rpx"></u-image>
 					<text>{{coinIntroduction.coinName}}</text>
 				</view>
 				<view class="lab-item">
@@ -224,6 +223,7 @@
 		queryCoinIntroduction,
 		addOptionalMarket,
 		getTickerMarket,
+		coinInfo,
 		deleteOptionalMarket
 	} from "@/config/api"
 
@@ -253,6 +253,7 @@
 	export default {
 		data() {
 			let data = {
+				iconUrl:'',
 				coinMarket: '',
 				tickerMarketInfo: {
 					highest: 0,
@@ -271,7 +272,7 @@
 						name: this.$t('简介信息')
 					}
 				],
-				tabIndex: 0,
+				tabIndex: 1,
 				isShowDeep: false,
 				Symbol: '600000.sh',
 				timeIndex: uni.getStorageSync('kLineIndex') || 5,
@@ -442,8 +443,13 @@
 					e.desc = e.coinIntroductionEnglish
 				}
 				this.coinIntroduction = e
+				coinInfo({
+					coinId:e.coinId
+				}).then(({iconUrl})=>{
+					this.iconUrl = iconUrl
+				})
 			})
-			this.tickerMarket()
+			// this.tickerMarket()
 		},
 
 		onShow() {
@@ -975,6 +981,8 @@
 						&:last-child {
 							font-weight: 500;
 							color: #232531;
+							max-width: 70%;
+							word-break: break-all;
 							font-size: 30rpx;
 						}
 

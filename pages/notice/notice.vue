@@ -15,7 +15,7 @@
 			<u-loading-icon mode="circle" v-if="loading"></u-loading-icon>
 		</block>
 		<view class="list">
-			<view class="item" v-for="(item,index) in list" :key="item.id" @click="modalData = item,show = true">
+			<view class="item" v-for="(item,index) in list" :key="item.id" @click="next(item)">
 				<view class="left">
 					<u-image v-if="current === 1"
 						:src="theme == 'light' ? require('@/static/icon13.png') : require('@/static/icon43.png')"
@@ -66,6 +66,11 @@
 			this.getList()
 		},
 		methods: {
+			next(item){
+				// modalData = item,show = true
+				uni.setStorageSync('noticeDetail',item)
+				uni.$u.route('/pages/noticeDetail/noticeDetail')
+			},
 			onTabsChange({
 				index
 			}) {

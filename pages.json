@@ -301,6 +301,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/noticeDetail/noticeDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "%noticeDetailNavTitle%",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"tabBar": {
 		"fontSize": "13px",
