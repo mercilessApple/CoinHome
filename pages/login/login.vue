@@ -18,7 +18,8 @@
 			<view class="next" @click="uFormModel.phoneOrEmail ? $u.route({
 				url:'/pages/login1/login1',
 				params:{
-					phoneOrEmail:uFormModel.phoneOrEmail
+					phoneOrEmail:uFormModel.phoneOrEmail,
+					scene
 				}
 			}) : $u.toast($t('请输入您的邮箱/手机号码'))">
 				{{$t('下一步')}}
@@ -33,10 +34,14 @@
 	export default {
 		data() {
 			return {
+				scene:'',
 				uFormModel: {
 					phoneOrEmail: ""
 				}
 			};
+		},
+		onLoad(options) {
+			this.scene = options.scene || ''
 		}
 	}
 </script>

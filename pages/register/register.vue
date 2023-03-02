@@ -160,7 +160,7 @@
 		methods: {
 			toLogin() {
 				( < any > uni).navigateTo({
-					url: '/pages/login/login'
+					url: '/pages/login/login?scene=register'
 				})
 			},
 			toRoute(path: string) {

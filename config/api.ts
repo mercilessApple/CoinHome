@@ -132,3 +132,6 @@ export const coinSimple = (params: any, config: any) => http.post('/api/admin/ac
 
 // 查询币种基础信息
 export const coinInfo = (params: any, config: any) => http.post('/api/account/query/basis/coin-info', params, config)
+
+// 币币--获取交易对分区
+export const queryMarketPartition = (params: any, config: any) => http.post('/api/market/partition', params, config)

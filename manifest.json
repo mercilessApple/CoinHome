@@ -30,7 +30,8 @@
         /* 模块配置 */
         "modules" : {
             "Camera" : {},
-            "Barcode" : {}
+            "Barcode" : {},
+            "Share" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -75,7 +76,8 @@
             },
             /* SDK配置 */
             "sdkConfigs" : {
-                "ad" : {}
+                "ad" : {},
+                "share" : {}
             },
             "icons" : {
                 "android" : {

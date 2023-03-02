@@ -16,7 +16,7 @@ export default {
         fontSize: 14,
 		iconSize: 17,
         color: '#606266',
-        loadingIcon: 'spinner',
+        loadingIcon: 'circle',
         loadmoreText: '加载更多',
         loadingText: '正在加载...',
         nomoreText: '没有更多了',

@@ -513,24 +513,24 @@
 
 		},
 
-		onHide() {
-			clearInterval(this.timer)
-			if (g_KLine.JSChart) {
-				g_KLine.JSChart.StopAutoUpdate();
-				g_KLine.JSChart = null;
-			}
+		// onHide() {
+		// 	clearInterval(this.timer)
+		// 	if (g_KLine.JSChart) {
+		// 		g_KLine.JSChart.StopAutoUpdate();
+		// 		g_KLine.JSChart = null;
+		// 	}
 
-			if (d_Line.JSChart) {
-				d_Line.JSChart.StopAutoUpdate();
-				d_Line.JSChart = null;
-			}
-			let topic = this.coinMarket.toLowerCase().replace('/', '-')
-			uni.sendSocketMessage({
-				data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
-					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-					'-trade"}'
-			})
-		},
+		// 	if (d_Line.JSChart) {
+		// 		d_Line.JSChart.StopAutoUpdate();
+		// 		d_Line.JSChart = null;
+		// 	}
+		// 	let topic = this.coinMarket.toLowerCase().replace('/', '-')
+		// 	uni.sendSocketMessage({
+		// 		data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+		// 			'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+		// 			'-trade"}'
+		// 	})
+		// },
 
 		onUnload() {
 			clearInterval(this.timer)

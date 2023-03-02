@@ -13,10 +13,12 @@
 		"authenticationBG":"#fff",
 		"standardAuthenticationBG":"#fff",
 		"tradeBG":"#F6F6F6",
-		"orderDetailBG":"#fff"
+		"orderDetailBG":"#fff",
+		"inviteBG":"#F6F6F6"
 	},
 	"dark": {
 		"orderDetailBG":"#171E28",
+		"inviteBG":"#1E2930",
 		"tradeBG":"#171E28",
 		"standardAuthenticationBG":"#1A1B1F",
 		"authenticationBG":"#1A1B1F",

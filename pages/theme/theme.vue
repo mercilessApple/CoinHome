@@ -98,9 +98,12 @@
 		.nav .item .left {
 			color: #fff;
 		}
-		.u-navbar__content,
-		.u-status-bar {
-			background-color: #1F282F !important;
+		::v-deep{
+			.u-navbar__content,
+			.u-status-bar {
+				background-color: #1F282F !important;
+			}
 		}
+	
 	}
 </style>

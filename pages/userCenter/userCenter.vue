@@ -92,16 +92,25 @@
 				navList: [{
 						name: this.$t('订单管理'),
 						icon: require("@/static/icon19.png"),
-						url: '/pages/order/order'
+						url: '/pages/order/order',
+						hasLogin: true
 					},
 					{
 						name: this.$t('安全'),
 						icon: require("@/static/icon22.png"),
-						url: '/pages/safety/safety'
+						url: '/pages/safety/safety',
+						hasLogin: true
+					},
+					{
+						name: this.$t('任务中心'),
+						url: '/pages/taskCenter/taskCenter',
+						icon: require("@/static/icon58.png")
 					},
 					{
 						name: this.$t('帮助中心'),
-						icon: require("@/static/icon20.png")
+						icon: require("@/static/icon20.png"),
+						params: this.utils.serviceURL,
+						url: '/pages/webview/webview'
 					},
 					{
 						name: this.$t('设置'),
@@ -185,22 +194,38 @@
 				})
 			},
 			toNext(item, index) {
-				if (index == 0 || index == 1) {
-					uni.$u.route({
-						url: this.isLogin ? item.url : '/pages/login/login'
-					})
+				if (item.hasLogin) {
+					if (this.isLogin) uni.$u.route(item.url)
+					else uni.$u.route('/pages/login/login')
 				} else {
-					if (index == 2) {
+					if (item.params) {
 						uni.$u.route({
-							url: '/pages/webview/webview',
+							url: item.url,
 							params: {
-								url: this.utils.helpCenterURL
+								url: item.params
 							}
 						})
-						return
-					}
-					uni.$u.route(item.url)
+					} else uni.$u.route(item.url)
 				}
+
+
+				// return
+				// if (index == 0 || index == 1) {
+				// 	uni.$u.route({
+				// 		url: this.isLogin ? item.url : '/pages/login/login'
+				// 	})
+				// } else {
+				// 	if (index == 2) {
+				// 		uni.$u.route({
+				// 			url: '/pages/webview/webview',
+				// 			params: {
+				// 				url: this.utils.helpCenterURL
+				// 			}
+				// 		})
+				// 		return
+				// 	}
+				// 	uni.$u.route(item.url)
+				// }
 			},
 			changeTheme() {
 				// #ifdef APP-PLUS

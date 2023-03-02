@@ -4,9 +4,9 @@
 			<u-navbar leftIcon="" placeholder :bgColor="theme == 'light' ? '#F6F6F6' : '#171E28'">
 				<view class="u-nav-slot" slot="center">
 					<view class="search">
-						<u-search @search="search" v-model="key" :color="theme == 'light' ? '' :'#fff'" @change="onSearchChange"
-							height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'" placeholder=""
-							:showAction="false">
+						<u-search @search="search" v-model="key" :color="theme == 'light' ? '' :'#fff'"
+							@change="onSearchChange" height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'"
+							placeholder="" :showAction="false">
 						</u-search>
 					</view>
 				</view>
@@ -96,21 +96,20 @@
 	import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
 	import {
 		getOptionalMarket,
-		getTickerByPartitionMarket
+		getTickerByPartitionMarket,
+		queryMarketPartition
 	} from "@/config/api"
 	export default {
 		mixins: [MescrollMixin], // 使用mixin
 		data() {
 			return {
-				listTabIndex: 1,
-				listTab: ["GODE", "USDT"],
+				listTabIndex: 0,
+				listTab: [],
 				uTabs: [{
 						name: this.$t("自选"),
-						disabled: false
 					},
 					{
 						name: this.$t("现货"),
-						disabled: false
 					}
 				],
 				downOption: {
@@ -200,9 +199,12 @@
 			},
 			// /*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
-				this.getList(res => {
-					this.list = res
-					this.mescroll.endSuccess(res.length, false)
+				queryMarketPartition().then(e => {
+					this.listTab = e
+					this.getList(res => {
+						this.list = res
+						this.mescroll.endSuccess(res.length, false)
+					})
 				})
 			}
 		},

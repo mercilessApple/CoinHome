@@ -15,6 +15,13 @@ export default {
 
 	},
 	methods: {
+		/**
+		 * 设置明暗对应参数
+		 */
+		inverseParams(lightText = '', darkText = '') {
+			if (this.theme == 'light') return lightText
+			else return darkText
+		},
 		geTel(tel) {
 			return tel.substring(0, 3) + "****" + tel.substr(tel.length - 4);
 		},

@@ -54,13 +54,13 @@
 						name: this.$t('关于我们'),
 						val: ''
 					},
+					// #ifdef APP-PLUS
 					{
 						name: this.$t('检查更新'),
 						update: true,
-						// #ifdef APP-PLUS
 						val: 'v' + plus.runtime.version,
-						// #endif
 					},
+					// #endif
 				]
 			};
 		},

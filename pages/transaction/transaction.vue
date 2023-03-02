@@ -270,7 +270,8 @@
 		queryAccountInfo,
 		getMarketDeeps,
 		addUserEntrustOrder,
-		cancelEntrustOrder
+		cancelEntrustOrder,
+		queryMarketPartition
 	} from "@/config/api"
 	export default {
 		data() {
@@ -278,7 +279,7 @@
 				oriMarketList: [],
 				searchKey: '',
 				isLogin: false,
-				marketTabIndex: 2,
+				marketTabIndex: 1,
 				marketStatus: 'loading',
 				marketItemIndex: 0,
 				// marketItemIndex: 2,
@@ -288,12 +289,12 @@
 				popupTabs: [{
 						name: this.$t('自选')
 					},
-					{
-						name: 'GODE'
-					},
-					{
-						name: 'USDT'
-					}
+					// {
+					// 	name: 'GODE'
+					// },
+					// {
+					// 	name: 'USDT'
+					// }
 				],
 				show: false,
 				block: [{
@@ -598,20 +599,31 @@
 			},
 			init() {
 				clearInterval(this.timer)
-				this.queryMarkets((e) => {
-					this.oriMarketList = e
-					this.marketItem = this.oriMarketList[this.marketItemIndex]
-					this.getHandicap()
-					this.queryUserEntrustList()
 
-					let topic = this.oriMarketList[this.marketItemIndex].oriCoinMarketText.toLowerCase().replace(
-						'/', '-')
-					uni.sendSocketMessage({
-						data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-							'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-							'-trade"}'
+				queryMarketPartition().then(market => {
+					this.popupTabs.push(...market.map(item => {
+						return {
+							name: item
+						}
+					}))
+					this.queryMarkets((e) => {
+						this.oriMarketList = e
+						this.marketItem = this.oriMarketList[this.marketItemIndex]
+						this.getHandicap()
+						this.queryUserEntrustList()
+
+						let topic = this.oriMarketList[this.marketItemIndex].oriCoinMarketText
+						.toLowerCase().replace(
+							'/', '-')
+						uni.sendSocketMessage({
+							data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+								'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+								'-trade"}'
+						})
 					})
 				})
+
+
 				this.timer = setInterval(this.queryUserEntrustList, 3000)
 				if (this.isLogin) {
 					queryAccountInfo({
@@ -680,7 +692,7 @@
 						this.marketList = data
 					} else {
 						// this.marketList = this.fuzzyQuery(data, this.searchKey)
-						this.marketList =  this.utils.fuzzyQuery(data, this.searchKey, 'oriCoinMarketText')
+						this.marketList = this.utils.fuzzyQuery(data, this.searchKey, 'oriCoinMarketText')
 					}
 				}
 
@@ -744,7 +756,6 @@
 			close() {
 
 				this.show = false
-				this.queryMarkets()
 
 			},
 			rightClick() {

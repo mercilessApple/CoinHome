@@ -31,6 +31,7 @@
 			<block v-if="isShowEmpty">
 				<u-gap height="300rpx"></u-gap>
 				<u-empty @emptyclick="emptyClick" :text="$t('暂无数据')"></u-empty>
+				<u-gap height="300rpx"></u-gap>
 			</block>
 
 			<!-- 上拉加载区域 (下拉刷新时不显示, 支付宝小程序子组件传参给子子组件仍报单项数据流的异常,暂时不通过mescroll-up组件实现)-->

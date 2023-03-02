@@ -48,7 +48,7 @@
 						width="60rpx" height="48rpx"></u-image>
 				</view>
 				<view class="tab-bar">
-					<view v-for="(item,index) in tabBarList" :key="index" @click="toUrl(index)">
+					<view v-for="(item,index) in tabBarList" :key="index" @click="toUrl(item,index)">
 						<view class="icon">
 							<u-image :src="theme == 'light' ? item.icon : item.darkIcon" width="88rpx" height="88rpx">
 							</u-image>
@@ -57,7 +57,10 @@
 					</view>
 				</view>
 				<u-gap height="40rpx"></u-gap>
-
+				<view class="task" @click="$u.route('/pages/taskCenter/taskCenter')">
+					<u-image :src="theme == 'light' ? require('@/static/icon52.png') : require('@/static/icon53.png')"
+						height="136rpx" width="100%"></u-image>
+				</view>
 				<view class="subsection">
 					<view :class="{
 					'active':curNow == index
@@ -115,25 +118,6 @@
 				</view>
 			</mescroll-body>
 		</view>
-
-		<u-popup mode="center" round="10rpx" :show="show" @close="show = false">
-			<view class="popup-box">
-				<view class="title">公告</view>
-
-				<view class="tip">CoinHome关于系统升级的公告</view>
-
-				<view class="text-box">
-					<text>亲爱的用户：
-
-						CoinHome App
-						将于2023年2月01日下午6:30（UTC+8）进行系统升级，预计在20分钟内完成。升级期间可能会出现账户登录异常、交易卡顿等情况，待系统维护升级完成后，将恢复正常。
-						感谢您对CoinHome的支持！
-
-						CoinHome团队
-						2023年2月1日</text>
-				</view>
-			</view>
-		</u-popup>
 	</view>
 </template>
 
@@ -150,8 +134,6 @@
 		mixins: [MescrollMixin], // 使用mixin
 		data() {
 			return {
-				// show: true,
-				show: false,
 				notices: [],
 				curNow: 1,
 				subsection: [
@@ -170,22 +152,41 @@
 				tabBarList: [{
 						name: this.$t('充币'),
 						icon: require("@/static/icon8.png"),
-						darkIcon: require("@/static/icon39.png")
+						darkIcon: require("@/static/icon39.png"),
+						url: '/pages/recharge/recharge',
+						needLog: true
 					},
 					{
 						name: this.$t('交易'),
 						icon: require("@/static/icon9.png"),
-						darkIcon: require("@/static/icon40.png")
+						darkIcon: require("@/static/icon40.png"),
+						url: '/pages/transaction/transaction',
+						isTabBar: true
+					},
+					// {
+					// 	name: this.$t('转账'),
+					// 	icon: require("@/static/icon10.png"),
+					// 	darkIcon: require("@/static/icon41.png")
+					// },
+					{
+						name: this.$t('任务中心'),
+						icon: require("@/static/icon49.png"),
+						darkIcon: require("@/static/icon51.png"),
+						url: '/pages/taskCenter/taskCenter'
 					},
 					{
-						name: this.$t('转账'),
-						icon: require("@/static/icon10.png"),
-						darkIcon: require("@/static/icon41.png")
+						name: this.$t('邀请'),
+						icon: require("@/static/icon50.png"),
+						darkIcon: require("@/static/icon54.png"),
+						url: '/pages/invite/invite',
+						needLog: true
 					},
 					{
-						name: this.$t('认证'),
+						name: this.$t('CERT'),
 						icon: require("@/static/icon11.png"),
-						darkIcon: require("@/static/icon42.png")
+						darkIcon: require("@/static/icon42.png"),
+						url: '/pages/authentication/authentication',
+						needLog: true
 					}
 				],
 				refreshHeight: (uni.getSystemInfoSync().statusBarHeight + 44) + "px",
@@ -242,32 +243,45 @@
 					}
 				})
 			},
-			toUrl(index) {
-				if (index == 0 || index == 3) {
-					if (uni.getStorageSync('token')) {
-						let url
-						if (index == 0) url = '/pages/recharge/recharge'
-						else if (index == 3) url = '/pages/authentication/authentication'
-						uni.navigateTo({
-							url
-						})
-					} else {
-						uni.navigateTo({
-							url: '/pages/login/login'
-						})
-					}
+			toUrl(item, index) {
 
+				if (item.needLog) {
+					const isToken = uni.getStorageSync('token')
+					if (isToken) uni.$u.route(item.url)
+					else uni.$u.route('/pages/login/login')
+				} else {
+					if (item.isTabBar) {
+						uni.switchTab({
+							url: item.url
+						})
+					} else uni.$u.route(item.url)
 				}
-				if (index == 1) {
-					uni.switchTab({
-						url: '/pages/transaction/transaction'
-					})
-				}
-				if (index == 2) {
-					uni.switchTab({
-						url: '/pages/assets/assets'
-					})
-				}
+				// return
+				// if (index == 0 || index == 3) {
+				// 	if (uni.getStorageSync('token')) {
+				// 		let url
+				// 		if (index == 0) url = '/pages/recharge/recharge'
+				// 		else if (index == 3) url = '/pages/authentication/authentication'
+				// 		uni.navigateTo({
+				// 			url
+				// 		})
+				// 	} else {
+				// 		uni.navigateTo({
+				// 			url: '/pages/login/login'
+				// 		})
+				// 	}
+
+				// }
+				// if (index == 1) {
+				// 	uni.switchTab({
+				// 		url: '/pages/transaction/transaction'
+				// 	})
+				// }
+				// if (index == 2) {
+				// 	uni.switchTab({
+				// 		url: '/pages/assets/assets'
+				// 	})
+				// }
 			},
 			toUserCenter() {
 				uni.navigateTo({
@@ -355,33 +369,9 @@
 </script>
 
 <style lang="scss">
-	.popup-box {
-		width: 630rpx;
+	.task {
 		padding: 0 30rpx;
-		padding-bottom: 40rpx;
-
-		.text-box {
-			padding-top: 36rpx;
-
-			text {
-				font-size: 24rpx;
-				color: #969AA6;
-			}
-		}
-
-		.tip {
-			font-weight: 500;
-			color: #0E0E0E;
-			font-size: 28rpx;
-			text-align: center;
-		}
-
-		.title {
-			text-align: center;
-			font-weight: 500;
-			color: #23212C;
-			padding: 35rpx 0;
-		}
+		margin-bottom: 36rpx;
 	}
 
 	.list {

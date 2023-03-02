@@ -50,6 +50,7 @@
 		onLoad(options: any) {
 			const self: any = this
 			this.uFormModel.phoneOrEmail = options.phoneOrEmail
+			self.scene = options.scene
 			if (options.phoneOrEmail.indexOf('@') === -1) self.account = self.geTel(options.phoneOrEmail)
 			else self.account = self.regEmail(options.phoneOrEmail)
 		},
@@ -91,9 +92,15 @@
 						icon: 'success'
 					});
 					setTimeout(() => {
-						uni.navigateBack({
-							delta: 2
-						})
+						if(self.scene == 'register'){
+							uni.switchTab({
+								url:'/pages/index/index'
+							})
+						}else{
+							uni.navigateBack({
+								delta: 2
+							})
+						}
 					}, 1500)
 				})
 			}

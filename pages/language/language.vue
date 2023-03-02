@@ -1,5 +1,8 @@
 <template>
 	<view>
+		<u-navbar :leftIconColor="inverseParams('#303133','#fff')" title="" :autoBack="true" placeholder="">
+		</u-navbar>
+		
 		<view class="title">
 			{{$t('语言')}}
 		</view>
@@ -92,6 +95,12 @@
 		.title,
 		.nav .item .left {
 			color: #fff;
+		}
+		::v-deep{
+			.u-navbar__content,
+			.u-status-bar {
+				background-color: #1F282F !important;
+			}
 		}
 	}
 </style>

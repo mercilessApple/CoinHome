@@ -4,9 +4,6 @@
 		apiURL,
 		wsURL
 	} from '@/config'
-	import {
-		title
-	} from 'process'
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
@@ -16,7 +13,7 @@
 				plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
 			}
 			// #endif
-
+			this.errTeam = 1
 		},
 		methods: {
 			toNext(data) {
@@ -73,58 +70,57 @@
 					}
 				})
 			},
-			test() {
-				console.log(1);
+			createScoket() {
+				uni.connectSocket({
+					url: wsURL,
+				});
+
+				Vue.prototype.$onSocketMessage = (fn) => {
+					uni.onSocketOpen(() => {
+						console.log(1);
+						uni.sendSocketMessage({
+							data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+								'","sendMsgSuccess":true,"topic":"alpha-market-ticker"}'
+						})
+
+						// uni.sendSocketMessage({
+						// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+						// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
+						// })
+
+						clearInterval(this.timer)
+						// 维持心跳活动
+						this.timer = setInterval(() => {
+							uni.sendSocketMessage({
+								data: JSON.stringify({
+									ping: new Date().valueOf()
+								})
+							})
+						}, 50000)
+					});
+					uni.onSocketMessage((message) => {
+						const response = JSON.parse(message.data)
+						const {
+							data
+						} = response
+						if (response.ping) {
+							return
+						}
+						fn(data)
+					});
+				}
+
+				// if (uni.getStorageSync('currentDayFlag')) {
+				// 	this.checkNotice()
+				// 	return
+				// }
+
+				this.checkNotice()
 			}
 		},
 		onShow: function() {
 			console.log('App Show')
-
-			uni.connectSocket({
-				url: wsURL,
-			});
-
-			Vue.prototype.$onSocketMessage = (fn) => {
-				uni.onSocketOpen(() => {
-
-					uni.sendSocketMessage({
-						data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-							'","sendMsgSuccess":true,"topic":"alpha-market-ticker"}'
-					})
-
-					// uni.sendSocketMessage({
-					// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-					// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
-					// })
-					
-					clearInterval(this.timer)
-					// 维持心跳活动
-					this.timer = setInterval(() => {
-						uni.sendSocketMessage({
-							data: JSON.stringify({
-								ping: new Date().valueOf()
-							})
-						})
-					}, 50000)
-				});
-				uni.onSocketMessage((message) => {
-					const response = JSON.parse(message.data)
-					const {
-						data
-					} = response
-					if (response.ping) {
-						return
-					}
-					fn(data)
-				});
-			}
-
-			// if (uni.getStorageSync('currentDayFlag')) {
-			// 	this.checkNotice()
-			// 	return
-			// }
-
-			this.checkNotice()
+			this.createScoket()
 		},
 		onUnload() {
 			clearInterval(this.timer)

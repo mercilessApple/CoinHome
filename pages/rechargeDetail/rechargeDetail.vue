@@ -15,7 +15,8 @@
 
 		<view class="coin-box">
 			<view class="left">
-				<u-image v-if="curCoin != '' && curCoin[0].iconUrl != ''" width="48rpx" height="48rpx" :src="curCoin[0].iconUrl"></u-image>
+				<u-image v-if="curCoin != '' && curCoin[0].iconUrl != ''" width="48rpx" height="48rpx"
+					:src="curCoin[0].iconUrl"></u-image>
 				<text>{{curCoin == '' ? '' :curCoin[0].coinName}}</text>
 			</view>
 			<view class="right" @click="show = true">
@@ -77,6 +78,9 @@
 				<view class="code">
 					<uqrcode :hide="curNet == ''" :value="curNet == '' ? '': curNet.address" :size="upx" ref="uqrcode"
 						canvas-id="qrcode">
+						<template v-slot:loading>
+							<u-loading-icon mode="circle"></u-loading-icon>
+						</template>
 					</uqrcode>
 				</view>
 
@@ -214,7 +218,7 @@
 			queryWithdrawCoin().then(e => {
 				this.coinList = e
 				this.oriList = e
-		
+
 				if (options.coin) {
 					let find = e.filter(item => item.coinName == options.coin)
 					if (find == '') {
@@ -223,7 +227,7 @@
 						// 	iconUrl:''
 						// }]
 						this.curCoin = e
-					}else{
+					} else {
 						this.curCoin = find
 					}
 				} else {
@@ -297,35 +301,35 @@
 				uni.showLoading({
 					title: this.$t('加载中...')
 				})
-				setTimeout(() => {
-					uni.canvasToTempFilePath({
-							canvasId: 'qrcode',
-							success: ({
-								tempFilePath
-							}) => {
-								uni.saveImageToPhotosAlbum({
-									filePath: tempFilePath,
-									success: res => {
-										uni.showToast({
-											title: this.$t('操作成功！')
-										})
-									},
-									fail: err => {
-										uni.showToast({
-											title: JSON.stringify(err)
-										})
-									}
-								});
-							},
-							fail: err => {
-								uni.showToast({
-									title: JSON.stringify(err)
-								})
-							}
+				uni.canvasToTempFilePath({
+						canvasId: 'qrcode',
+						success: ({
+							tempFilePath
+						}) => {
+							uni.saveImageToPhotosAlbum({
+								filePath: tempFilePath,
+								success: res => {
+									uni.showToast({
+										title: this.$t('操作成功！')
+									})
+								},
+								fail: err => {
+									uni.showToast({
+										title: JSON.stringify(err),
+										icon: 'error'
+									})
+								}
+							});
 						},
-						// this // 组件内使用必传当前实例
-					);
-				}, 300);
+						fail: err => {
+							uni.showToast({
+								title: JSON.stringify(err),
+								icon: 'error'
+							})
+						}
+					},
+					// this // 组件内使用必传当前实例
+				);
 			},
 			copy() {
 				uni.setClipboardData({
