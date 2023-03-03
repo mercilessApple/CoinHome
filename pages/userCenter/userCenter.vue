@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
+		<u-navbar bgColor="transparent" :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
 			<view class="u-nav-slot" slot="right">
 				<view @click="changeTheme">
 					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
@@ -67,7 +67,7 @@
 			</view>
 		</view>
 
-		<view class="btn" @click="exit" v-if="isLogin">
+		<view class="btn" @click="exit" v-if="isLogin && userInfo.uid != 0">
 			{{$t('退出')}}
 		</view>
 		<u-gap height="30rpx"></u-gap>
@@ -81,10 +81,11 @@
 		signOut,
 		getNickName
 	} from "@/config/api"
+  import {helpCenterURL} from "@/utils";
 	export default {
 		data() {
 			return {
-				isLogin: uni.getStorageSync('token') ? true : false,
+				isLogin: uni.getStorageSync('token'),
 				userInfo: {
 					uid: 0,
 					nickName: this.$t('加载中...')
@@ -109,7 +110,7 @@
 					{
 						name: this.$t('帮助中心'),
 						icon: require("@/static/icon20.png"),
-						params: this.utils.serviceURL,
+						params: this.utils.helpCenterURL,
 						url: '/pages/webview/webview'
 					},
 					{
@@ -134,7 +135,7 @@
 			// 	this.userInfo.nickName = this.$t('请先登录')
 
 			// }
-			this.isLogin = uni.getStorageSync('token') ? true : false
+			this.isLogin = !!uni.getStorageSync('token')
 			if (this.isLogin) {
 				if (uni.getStorageSync('userInfo')) {
 					this.userInfo = uni.getStorageSync('userInfo')

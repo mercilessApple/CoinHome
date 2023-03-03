@@ -106,7 +106,7 @@
 				<u-gap height="300rpx"></u-gap>
 			</block>
 
-			<view class="tab-box deal" v-show="tabIndex == 1">
+			<view style="min-height: 480rpx" class="tab-box deal" v-show="tabIndex == 1">
 				<view class="tab-box-item">
 					<view class="title">
 						<text>{{$t('时间')}}</text>
@@ -127,10 +127,10 @@
 						<text>{{$t('数量')}}</text>
 					</view>
 					<view class="item" v-for="(item,index) in market.bids" :key="'price'+index"><text
-							style="color: #2DBE87;">{{item.trustPrice}}</text><text>{{item.cumulativeCommissionQuantity}}</text>
+							style="color: #2DBE87;">{{utils.decimal(item.trustPrice,5) }}</text><text>{{utils.decimal(item.cumulativeCommissionQuantity,5)}}</text>
 					</view>
 					<view class="item" v-for="(item,index) in market.asks" :key="'num'+index"><text
-							class="err">{{item.trustPrice}}</text><text>{{item.cumulativeCommissionQuantity}}</text>
+							class="err">{{utils.decimal(item.trustPrice,5)}}</text><text>{{utils.decimal(item.cumulativeCommissionQuantity,5)}}</text>
 					</view>
 				</view>
 			</view>
@@ -454,41 +454,58 @@
 
 		onShow() {
 			let topic = this.coinMarket.toLowerCase().replace('/', '-')
-			uni.sendSocketMessage({
-				data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-					'-trade"}'
-			})
 
-			this.$onSocketMessage((data) => {
-				if (data.asks && data.symbolKey == this.coinMarket) {
-					let {
-						asks,
-						bids
-					} = data
-					let newAsks = asks.slice(0, 5),
-						newBids = bids.slice(0, 5)
+      //#ifdef H5
+      setTimeout(()=>{
+        uni.sendSocketMessage({
+          data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+              '","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+              '-trade"}'
+        })
+      },1000)
+      //#endif
 
-					this.market.asks = newAsks
-					this.market.bids = newBids
-					this.market.lastPrice = data.lastPrice
-					this.market.lastPriceCny = data.lastPriceCny
-					this.market.rangeAbility = data.rangeAbility
-				}
+      //#ifdef APP-PLUS
+      uni.sendSocketMessage({
+        data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+            '","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+            '-trade"}'
+      })
+      //#endif
 
-				if (data.coinMarket == this.coinMarket) {
-					this.tickerMarketInfo.highest = data.highest
-					this.tickerMarketInfo.amount = data.amount
-					this.tickerMarketInfo.lowest = data.lowest
-					this.tickerMarketInfo.turnover = data.turnover
-				}
-			})
+
 			this.init()
 			if (this.isShowDeep) {
 				this.createDeepChart()
 				return
 			}
 			this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
+
+      this.$onSocketMessage((data) => {
+        if(data.asks != undefined){
+          let {
+            asks,
+            bids
+          } = data
+          let newAsks = asks.slice(0, 5),
+              newBids = bids.slice(0, 5)
+
+          this.market.asks = newAsks
+          this.market.bids = newBids
+          this.market.lastPrice = data.lastPrice
+          this.market.lastPriceCny = data.lastPriceCny
+          this.market.rangeAbility = data.rangeAbility
+        }else{
+
+        }
+
+        if (data.coinMarket == this.coinMarket) {
+          this.tickerMarketInfo.highest = data.highest
+          this.tickerMarketInfo.amount = data.amount
+          this.tickerMarketInfo.lowest = data.lowest
+          this.tickerMarketInfo.turnover = data.turnover
+        }
+      })
 		},
 		watch: {
 			theme(newValue, oldValue) {
@@ -960,7 +977,6 @@
 
 		.tab-box {
 			display: flex;
-
 			&.info {
 				display: block;
 				padding-bottom: 20rpx;

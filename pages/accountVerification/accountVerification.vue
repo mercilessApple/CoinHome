@@ -35,7 +35,7 @@
 					</view>
 				</u-form-item>
 				<view class="tip">
-					{{$t("密码仅支持6-20个字母、数字、下划线")}}
+					{{$t("密码至少8位且必有数字+特殊字符+字母")}}
 				</view>
 				<u-form-item :label="$t('确认密码')">
 					<view class="input-box pwd">
@@ -46,7 +46,7 @@
 					</view>
 				</u-form-item>
 				<view class="tip">
-					{{$t("密码仅支持6-20个字母、数字、下划线")}}
+					{{$t("密码至少8位且必有数字+特殊字符+字母")}}
 				</view>
 			</u--form>
 		</view>
@@ -111,9 +111,9 @@
 					return
 				}
 
-				if (!/^(\w){6,20}$/.test(self.newPassword)) {
+				if (!self.utils.pwdREG.test(self.newPassword)) {
 					(uni as any).showToast({
-						title: self.$t('密码仅支持6-20个字母、数字、下划线'),
+						title: self.$t('密码至少8位且必有数字+特殊字符+字母'),
 						icon: "none"
 					});
 					return

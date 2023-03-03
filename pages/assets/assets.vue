@@ -108,16 +108,19 @@
 				},
 				list: [],
 				curCoin: [],
-				isLogin: !uni.getStorageSync('token') ? false : true
+				isLogin: uni.getStorageSync('token')
 			};
 		},
 		onShow() {
 			if (!uni.getStorageSync('token')) {
 				this.isLogin = false
+        this.list = []
+        this.curCoin = []
 				this.loading = false
 				return
 			}
 			this.isLogin = true
+      this.loading = true
 			queryAccountInfo({
 				type: 1
 			}).then(e => {
@@ -150,6 +153,7 @@
 				}
 			},
 			search(e) {
+        if(this.list == '')return;
 				if (e == '') {
 					this.list = this.oriList
 					return
@@ -158,7 +162,7 @@
 			},
 			onSearchChange(e) {
 				if (e == '') {
-					this.list = this.oriList
+					this.list = this.oriList || []
 					this.checkboxGroup = []
 				}
 				if (e == '') this.open = false

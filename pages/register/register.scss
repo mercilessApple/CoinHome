@@ -59,6 +59,9 @@ page{
 		font-size: 12px;
 		line-height: 12px;
 		color: #f56c6c;
+		//#ifdef H5
+		margin-top: 20rpx;
+		//#endif
 	}
 	.input-box{
 		margin-top: 16rpx;

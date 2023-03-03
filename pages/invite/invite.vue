@@ -22,7 +22,7 @@
 				<view class="icon">
 					<u-image src="@/static/icon62.png" width="48rpx" height="48rpx"></u-image>
 				</view>
-				<text class="title" >{{$t('注册并交易')}}</text>
+				<text class="title">{{$t('注册并交易')}}</text>
 			</view>
 			<view class="line">
 				<u-image width="80rpx" height="30rpx" mode="aspectFit" src="@/static/icon64.png"></u-image>
@@ -100,24 +100,34 @@
 </template>
 
 <script>
+	import {
+		invite
+	} from "@/config/api"
 	export default {
 		data() {
 			return {
-				link: 'https://coinhome.pro/',
+				link: '',
 				upx: uni.upx2px(370),
 				showPoster: false,
-				code: 'test',
+				code: '',
 				showQRcode: false,
 				qrCodeUrl: ''
 			};
 		},
 		onLoad() {
-
+			invite().then(e => {
+				const {
+					inviteCode,
+					registrationLink
+				} = e
+				this.link = registrationLink
+				this.code = inviteCode
+			})
 		},
 		methods: {
-			copy(text){
+			copy(text) {
 				uni.setClipboardData({
-					data:text
+					data: text
 				})
 			},
 			share(scene) {
@@ -314,9 +324,11 @@
 
 		.item {
 			margin-bottom: 32rpx;
-			&:last-child{
+
+			&:last-child {
 				margin-bottom: 25rpx;
 			}
+
 			.val {
 				height: 80rpx;
 				padding: 0 30rpx;
@@ -367,8 +379,8 @@
 			text-align: center;
 			display: inline-block;
 
-		font-size: 24rpx;
-	}
+			font-size: 24rpx;
+		}
 	}
 
 	@media (prefers-color-scheme: dark) {

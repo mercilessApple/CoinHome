@@ -33,6 +33,7 @@ module.exports = (vm) => {
 		const custom = response.config?.custom
 		if (data.code !== 1) {
 			if (data.code === 50) {
+				//	账号在其它地方登录时
 				uni.removeStorageSync('token')
 				uni.removeStorageSync('userInfo')
 				// uni.navigateTo({

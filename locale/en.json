@@ -30,7 +30,7 @@
 	"已有账号？": "Existing account？",
 	"去登录": "To Login",
 	"请输入正确的邮箱格式": "Please enter the correct email format",
-	"密码仅支持6-20个字母、数字、下划线": "The password contains only 6 to 20 letters, digits, and underscores",
+	"密码至少8位且必有数字+特殊字符+字母": "The password must be at least 8 characters and must contain digits + special characters + letters",
 	"请阅读并同意CoinHome的服务条款和隐私政策": "Please read and agree to CoinHome's Terms of Service and Privacy Policy",
 	"个人电话号码不正确": "The personal phone number is incorrect",
 	"内容信息有误，请核对后再试": "Please check and try again",
@@ -297,5 +297,8 @@
 	"面对面二维码邀请":"Face-to-face QR code invitation",
 	"邀请码":"Invitation Code",
 	"立即分享":"Share Now",
-	"保存相册":"Save Album"
+	"保存相册":"Save Album",
+	"中文姓": "Chinese surname",
+	"中文名": "Chinese name",
+	"市价委托": "Market"
 }

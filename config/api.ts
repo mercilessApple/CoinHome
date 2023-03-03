@@ -135,3 +135,5 @@ export const coinInfo = (params: any, config: any) => http.post('/api/account/qu
 
 // 币币--获取交易对分区
 export const queryMarketPartition = (params: any, config: any) => http.post('/api/market/partition', params, config)
+
+export const invite = (params: any, config: any) => http.post('/api/admin/user/pay/invite/url', params, config)

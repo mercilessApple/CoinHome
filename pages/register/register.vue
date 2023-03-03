@@ -61,7 +61,7 @@
 
 				</u-form-item>
 				<view class="pwd-tip" v-if="showPwdTip">
-					{{$t("密码仅支持6-20个字母、数字、下划线")}}
+					{{$t("密码至少8位且必有数字+特殊字符+字母")}}
 				</view>
 			</u--form>
 
@@ -169,7 +169,7 @@
 				})
 			},
 			onPwdChange(e: any) {
-				if (/^(\w){6,20}$/.test(e.target.value)) self.showPwdTip = false
+				if (self.utils.pwdREG.test(e.target.value)) self.showPwdTip = false
 				else self.showPwdTip = true
 			},
 			getVerificationCode() {
@@ -229,7 +229,7 @@
 					})
 					return
 				}
-				if (!/^(\w){6,20}$/.test(self.uFormModel.loginPassword)) {
+				if (!self.utils.pwdREG.test(self.uFormModel.loginPassword)) {
 					self.showPwdTip = true
 				}
 				(this as any).$refs.uForm.validate().then((e: any) => {

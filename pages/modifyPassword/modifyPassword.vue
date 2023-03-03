@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="tip">
-			*{{$t('密码仅支持6-20个字母、数字、下划线')}}
+			*{{$t('密码至少8位且必有数字+特殊字符+字母')}}
 		</view>
 		<view class="item">
 			<view class="lab">{{$t('新密码')}}</view>
@@ -44,13 +44,12 @@
 		},
 		onLoad(options) {
 			this.code = options.code
-			console.log(hex_md5('123456'));
 		},
 		methods: {
 			submit() {
-				if (!/^(\w){6,20}$/.test(this.password)) {
+				if (!this.utils.pwdREG.test(this.password)) {
 					uni.showToast({
-						title: this.$t("请输入正确的邮箱格式"),
+						title: this.$t("密码至少8位且必有数字+特殊字符+字母"),
 						icon: "none"
 					})
 					return
