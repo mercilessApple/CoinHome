@@ -85,6 +85,7 @@
 				{{$t('已有账号？')}}<text>{{$t('去登录')}}></text>
 			</view>
 		</view>
+		<u-gap height="30rpx"></u-gap>
 		<u-safe-bottom></u-safe-bottom>
 	</view>
 </template>
@@ -240,6 +241,7 @@
 					});
 					let data = JSON.parse(JSON.stringify(self.uFormModel))
 					data.loginPassword = MD5.instance.hex_md5(self.uFormModel.loginPassword).toUpperCase()
+					data.phoneAreaCode = self.phoneAreaCode
 					if(data.phone == '')delete data.phone
 					registered({
 						registerWay: self.current === 0 ? 2 : 1,

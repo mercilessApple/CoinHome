@@ -22,7 +22,7 @@
 			};
 		},
 		onLoad() {
-			console.log(this.info);
+			
 		}
 	}
 </script>

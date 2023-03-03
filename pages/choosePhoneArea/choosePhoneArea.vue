@@ -2,55 +2,74 @@
 	<view>
 		<u-sticky>
 			<view class="sticky">
-				<u-search :color="theme == 'light' ? '' :'#fff'" :bgColor="theme == 'light' ? '' :'#2C303C' " :show-action="false" height="80rpx" :input-style="{
+				<u-search @change="change" :color="theme == 'light' ? '' :'#fff'"
+					:bgColor="theme == 'light' ? '#f2f2f2' :'#2C303C' " :show-action="false" height="80rpx"
+					:input-style="{
 					'font-size':'24rpx'
 				}" placeholder-color="#BBBBBD" v-model="keyword" placeholder="Search"></u-search>
 			</view>
 		</u-sticky>
 		<view class="list">
-			<block>
-				<u-gap height="300rpx"></u-gap>
-				<u-empty :text="$t('暂无数据')"></u-empty>
-			</block>
-			<!-- 		<view class="item" v-for="(item,index) in 100" @click="choose(item)">
-				<view class="left">
-					<u-image width="48rpx" height="48rpx"></u-image>
-					<text>巴勒斯坦</text>
-				</view>
-				<view class="right">
-					+ 970
-				</view>
-			</view> -->
+			<u-loading-icon mode="circle" style="margin-top: 200rpx;" :show="loading"></u-loading-icon>
+			<view @click="choose(item)" class="item" v-for="(item,index) in list" :key="index">
+				<u-image width="48rpx" height="48rpx" src="@/static/icon3.png"></u-image>
+				<view class="lab">{{item.nationalityName}}</view>
+				<view class="lab">{{item.phoneAreaCode}}</view>
+			</view>
+			<u-gap height="30rpx"></u-gap>
+			<u-safe-bottom></u-safe-bottom>
 		</view>
-		<u-safe-bottom></u-safe-bottom>
 	</view>
 </template>
 
 <script>
 	import {
-		querytheCountryCode
+		queryCountryCode
 	} from "@/config/api"
 	export default {
 		data() {
 			return {
-				keyword: ""
+				keyword: "",
+				list: [],
+				loading: true
 			};
 		},
 		onLoad() {
-			querytheCountryCode().then(res => {
-				console.log(res)
-			})
 			const pages = getCurrentPages(); //当前页
 			const beforePage = pages[pages.length - 2]; //上个页面
 			this.beforePage = beforePage
+			if (uni.getStorageSync('countryCodeList')) {
+				this.list = uni.getStorageSync('countryCodeList')
+				this.oriList = this.list
+				this.loading = false
+				return
+			}
+			queryCountryCode().then(e => {
+				e.unshift({
+					nationality: "CHN",
+					nationalityName: this.$t('中国'),
+					phoneAreaCode: "+86"
+				})
+				this.list = e
+				this.oriList = e
+				this.loading = false
+				uni.setStorageSync('countryCodeList', e)
+			}).catch(() => this.loading = false)
 		},
 		methods: {
+			change(e) {
+				if (e == '') {
+					this.list = this.oriList
+					return
+				}
+				this.list = this.utils.fuzzyQuery(this.oriList, e, 'nationalityName')
+			},
 			choose(e) {
 				// #ifdef APP-PLUS
-				this.beforePage.$vm.phoneAreaCode = ""
+				this.beforePage.$vm.phoneAreaCode = e.phoneAreaCode
 				// #endif
 				// #ifdef H5
-				this.beforePage.phoneAreaCode = ""
+				this.beforePage.phoneAreaCode = e.phoneAreaCode
 				// #endif
 				uni.navigateBack()
 			}
@@ -66,40 +85,19 @@
 
 	.list {
 		.item {
-			display: flex;
-			height: 96rpx;
-
-			&:first-child {
-				margin-top: 0;
-			}
-
-			margin-top: 20rpx;
 			padding: 0 30rpx;
+			display: flex;
 			align-items: center;
-			justify-content: space-between;
+			height: 80rpx;
 
-			.right {
-				font-weight: 500;
-				color: #9599A4;
-				font-size: 28rpx;
-			}
-
-			.left {
-				display: flex;
-				align-items: center;
-
-				text {
-					font-weight: 500;
-					margin-left: 10rpx;
-					color: #23212C;
-					font-size: 28rpx;
-				}
+			.lab {
+				margin-left: 20rpx;
 			}
 		}
 	}
-	
+
 	@media (prefers-color-scheme: dark) {
-		.sticky{
+		.sticky {
 			background-color: #1F282F;
 		}
 	}

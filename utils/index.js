@@ -22,7 +22,7 @@ export const aboutUsURL = 'https://coinhome-1.gitbook.io/coinhome-bang-zhu-zhong
 export const fuzzyQuery = (list, keyWord, val) => {
     var arr = [];
     for (var i = 0; i < list.length; i++) {
-        if (list[i][val].indexOf(keyWord) >= 0) {
+        if (list[i][val].toUpperCase().indexOf(keyWord.toUpperCase()) >= 0) {
             arr.push(list[i]);
         }
     }

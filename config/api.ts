@@ -137,3 +137,6 @@ export const coinInfo = (params: any, config: any) => http.post('/api/account/qu
 export const queryMarketPartition = (params: any, config: any) => http.post('/api/market/partition', params, config)
 
 export const invite = (params: any, config: any) => http.post('/api/admin/user/pay/invite/url', params, config)
+
+// 公告--获取维护公告和弹窗公告
+export const popupNotice = (params: any, config: any) => http.post('/api/user/announcements/windows', params, config)

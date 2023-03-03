@@ -4,7 +4,7 @@
 		<u-gap height="160rpx"></u-gap>
 		<view class="content">
 			<view class="title">
-				CoinHome{{$t('登录')}}
+				CoinHome {{$t('登录')}}
 			</view>
 			<view class="form">
 				<u--form :model="uFormModel" ref="uForm">

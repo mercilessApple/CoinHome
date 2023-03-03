@@ -47,7 +47,7 @@
 				<view class="right" :style="{
 					'width':open ? '70%':'200rpx'
 				}">
-					<u-search v-model="key" @search="search" :color="theme == 'light' ? '' :'#fff'"
+					<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'"
 						@change="onSearchChange" :bgColor="theme == 'light' ? '#f2f2f2' : '#343A46'"
 						:placeholder="$t('搜索')" :showAction="false">
 					</u-search>
@@ -114,13 +114,13 @@
 		onShow() {
 			if (!uni.getStorageSync('token')) {
 				this.isLogin = false
-        this.list = []
-        this.curCoin = []
+				this.list = []
+				this.curCoin = []
 				this.loading = false
 				return
 			}
 			this.isLogin = true
-      this.loading = true
+			this.loading = true
 			queryAccountInfo({
 				type: 1
 			}).then(e => {
@@ -152,14 +152,7 @@
 					this.list = this.list.filter(item => Number(item.amount) != 0)
 				}
 			},
-			search(e) {
-        if(this.list == '')return;
-				if (e == '') {
-					this.list = this.oriList
-					return
-				}
-				this.list = this.oriList.filter(item => item.coinName == e)
-			},
+		
 			onSearchChange(e) {
 				if (e == '') {
 					this.list = this.oriList || []
@@ -167,6 +160,7 @@
 				}
 				if (e == '') this.open = false
 				else this.open = true
+				this.list = this.utils.fuzzyQuery(this.oriList, e, 'coinName')
 			},
 			toNext(url) {
 				let route

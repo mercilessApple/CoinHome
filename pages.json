@@ -331,7 +331,8 @@
 				"backgroundColor": "@inviteBG"
             }
             
-        }
+        } ,{            "path" : "pages/popup/popup",            "style" :            {				"navigationStyle": "custom",				"backgroundColor": "transparent",				"app-plus": {					"animationType": "fade-in",					"background": "transparent",					"popGesture": "none"				}            }                    }
+       
     ],
 	"tabBar": {
 		"fontSize": "13px",
