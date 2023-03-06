@@ -320,6 +320,10 @@
 		.u-alert--warning--light {
 			background-color: #F3F4F6;
 		}
+    .u-navbar__content,
+    .u-status-bar {
+      background-color: #FFFFFF !important;
+    }
 	}
 
 	.tip {

@@ -455,24 +455,13 @@
 		onShow() {
 			let topic = this.coinMarket.toLowerCase().replace('/', '-')
 
-      //#ifdef H5
-      setTimeout(()=>{
+     setTimeout(()=>{
         uni.sendSocketMessage({
           data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
               '","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
               '-trade"}'
         })
       },1000)
-      //#endif
-
-      //#ifdef APP-PLUS
-      uni.sendSocketMessage({
-        data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-            '","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-            '-trade"}'
-      })
-      //#endif
-
 
 			this.init()
 			if (this.isShowDeep) {

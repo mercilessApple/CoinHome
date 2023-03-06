@@ -19,10 +19,9 @@
 			</view>
 			<view class="item">
 				<view class="left">{{$t('手机号码')}}</view>
-				<!-- @click="$u.route('/pages/bindPhoneNumber/bindPhoneNumber')" -->
-				<view class="right" >
+				<view class="right" @click="$u.route('/pages/bindPhoneNumber/bindPhoneNumber')">
 					<text>{{userInfo.phone || $t('未绑定')}}</text>
-					<!-- <u-icon name="arrow-right"></u-icon> -->
+					 <u-icon name="arrow-right"></u-icon>
 				</view>
 			</view>
 			<view class="item">

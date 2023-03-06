@@ -140,3 +140,10 @@ export const invite = (params: any, config: any) => http.post('/api/admin/user/p
 
 // 公告--获取维护公告和弹窗公告
 export const popupNotice = (params: any, config: any) => http.post('/api/user/announcements/windows', params, config)
+
+// 谷歌--获取新的谷歌秘钥
+export const getNewOne = (params: any, config: any) => http.post('/api/user/google/getNewOne', params, config)
+
+// 谷歌--绑定/开启/关闭/解绑
+export const googleUpdate = (params: any, config: any) => http.post('/api/user/google/update', params, config)
+

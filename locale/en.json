@@ -300,5 +300,13 @@
 	"保存相册":"Save Album",
 	"中文姓": "Chinese surname",
 	"中文名": "Chinese name",
-	"市价委托": "Market"
+	"市价委托": "Market",
+	"开启": "Open",
+	"解绑": "Unbinding",
+	"关闭": "Close",
+	"关闭谷歌验证码": "Turn off Google Captcha",
+	"确定": "Confirm",
+	"解除绑定": "Remove Binding",
+	"关闭后将不可使用，若想重新使用需要重新开启。": "If you want to use it again, you need to enable it again.",
+	"解除绑定以后将不可使用，若想再次使用当前功能需重新绑定。": "If you want to use the current function again, you need to bind it again."
 }

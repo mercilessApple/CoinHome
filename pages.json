@@ -333,6 +333,15 @@
             
         } ,{            "path" : "pages/popup/popup",            "style" :            {				"navigationStyle": "custom",				"backgroundColor": "transparent",				"app-plus": {					"animationType": "fade-in",					"background": "transparent",					"popGesture": "none"				}            }                    }
        
+        ,{
+            "path" : "pages/googleCaptchaState/googleCaptchaState",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"tabBar": {
 		"fontSize": "13px",

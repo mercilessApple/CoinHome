@@ -148,7 +148,9 @@
 			background-color: transparent;
 		}
 	}
-
+input{
+  caret-color: #FEFA05;
+}
 	@media (prefers-color-scheme: dark) {
 		page {
 			background-color: #1F282F;

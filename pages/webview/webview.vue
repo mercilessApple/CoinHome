@@ -18,7 +18,6 @@
 		onLoad({
 			url
 		}) {
-			console.log(url);
 			this.src = url
 		},
 	}

@@ -1,8 +1,10 @@
 <template>
 	<view>
 		<view class="tip">
-			{{$t(`*输入谷歌验证器中6位验证码，如验证码丢失，请联系
-客服。`)}}
+			{{
+        $t(`*输入谷歌验证器中6位验证码，如验证码丢失，请联系
+客服。`)
+      }}
 		</view>
 
 		<view class="box">
@@ -14,15 +16,58 @@
 </template>
 
 <script>
+	import {
+		googleUpdate
+	} from "@/config/api"
+
 	export default {
 		data() {
 			return {
 				code: ''
 			};
 		},
+		onLoad(options) {
+			this.type = options.type
+		},
 		methods: {
-			finish(e) {
+			// GOOGLE_NO_BINDING 解绑     GOOGLE_BINDING 绑定     GOOGLE_CLOSE 关闭验证     GOOGLE_OPEN 开启验证
+			finish(value) {
+				uni.showLoading({
+					mask: true
+				})
+				googleUpdate({
+					type: this.type,
+					googleCode: value
+				}).then((res) => {
 
+					if (this.type == 'GOOGLE_BINDING') { //	绑定时再调用下开启验证
+						googleUpdate({
+							type: 'GOOGLE_OPEN',
+							googleCode: value
+						}).then(() => {
+							uni.showToast({
+								icon: 'success'
+							})
+
+							setTimeout(() => {
+								uni.navigateBack({
+									delta: 2
+								})
+							}, 1500)
+						})
+						return
+					}
+
+					uni.showToast({
+						icon: 'success'
+					})
+
+					setTimeout(() => {
+						uni.navigateBack({
+							delta: 2
+						})
+					}, 1500)
+				})
 			}
 		}
 	}
@@ -48,19 +93,20 @@
 		font-size: 22rpx;
 		line-height: 35rpx;
 	}
-	
+
 	@media (prefers-color-scheme: dark) {
-			.tip {
-				background: #171E28;
-			}
-		
+		.tip {
+			background: #171E28;
+		}
+
 		::v-deep {
 			.u-code-input__item {
 				background: #29313C;
 			}
-			.u-code-input__item__dot{
+
+			.u-code-input__item__dot {
 				background-color: #fff !important
 			}
 		}
-		}
+	}
 </style>

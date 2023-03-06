@@ -51,19 +51,45 @@
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="number-box">
-						<block v-if="oriMarketList != ''">
-							<u-number-box :min="0.00001" :color="theme == 'light' ? '#323233' : '#fff'"
+						<!-- <block v-if="oriMarketList != ''"> -->
+							<!-- <u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
 								:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx"
 								v-model="oriMarketList[marketItemIndex].price">
-							</u-number-box>
-						</block>
+							</u-number-box> -->
+
+
+							<view @click="onPriceChange('minus')" class="icon">
+								<u-icon color="rgb(96, 98, 102)"
+									bold name="minus"></u-icon>
+							</view>
+							<block v-if="oriMarketList != ''">
+							<u-input :color="inverseParams('#000' , '#fff')" v-model="oriMarketList[marketItemIndex].price" inputAlign="center" border="none"
+								type="digit">
+							</u-input>
+							</block>
+							<block v-else>
+								<view style="flex: 1;"></view>
+							</block>
+							<view @click="onPriceChange('plus')" class="icon">
+								<u-icon bold name="plus"></u-icon>
+							</view>
+						<!-- </block> -->
 					</view>
 					<u-gap height="16rpx"></u-gap>
 					<view class="count-box">
-						<u-number-box :decimalLength="5" :min="0.00001" :color="theme == 'light' ? '#323233' : '#fff'"
+						<!-- <u-number-box inputType="digit" :color="inverseParams('#323233' ,'#fff')"
 							:placeholder="`${$t('数量')}(${marketItem.coinMarket[0]})`"
-							:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx" v-model="count">
-						</u-number-box>
+							:bgColor="inverseParams('#f6f6f6','#29313C')" inputWidth="286rpx" v-model="count">
+						</u-number-box> -->
+						<view @click="onCountChange('minus')" class="icon">
+							<u-icon color="rgb(96, 98, 102)" bold name="minus"></u-icon>
+						</view>
+						<u-input :color="inverseParams('#000' , '#fff')" @blur="onCountBlur" v-model="count" inputAlign="center" border="none" type="digit"
+							:placeholder="`${$t('数量')}${marketStatus == 'loading' ? '' : marketItem.coinMarket[0]}`">
+						</u-input>
+						<view @click="onCountChange('plus')" class="icon">
+							<u-icon bold name="plus"></u-icon>
+						</view>
 					</view>
 					<u-gap height="16rpx"></u-gap>
 
@@ -77,7 +103,7 @@
 
 					<view class="total-amount">
 						<block v-if="oriMarketList != ''">
-							<u-input readonly :value="utils.decimal(count * oriMarketList[marketItemIndex].price,5)"
+							<u-input readonly :value="utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision) == 0 ? '' : utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision)"
 								:color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
 								border="none" :placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
 							</u-input>
@@ -119,29 +145,29 @@
 					</view>
 					<view class="price-box">
 						<view>
-							<view v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
-								{{ utils.decimal(item.trustPrice, 5) }}
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
+								{{ utils.decimal(item.trustPrice, 4) }}
 							</view>
 						</view>
 						<view>
-							<view v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
-								{{ utils.decimal(item.cumulativeCommissionQuantity, 5) }}
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
+								{{ utils.decimal(item.cumulativeCommissionQuantity, 4) }}
 							</view>
 						</view>
 					</view>
 					<view class="area">
-						<view>{{ utils.decimal(marketDeeps.lastPrice, 5) || 0 }}</view>
-						<view>≈ ¥ {{ utils.decimal(marketDeeps.lastPriceCny, 5) || 0 }}</view>
+						<view>{{ utils.decimal(marketDeeps.lastPrice, 4) || 0 }}</view>
+						<view>≈ ¥ {{ utils.decimal(marketDeeps.lastPriceCny, 4) || 0 }}</view>
 					</view>
 					<view class="price-box bottom">
 						<view>
-							<view v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
-								{{ utils.decimal(item.trustPrice, 5) }}
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
+								{{ utils.decimal(item.trustPrice, 4) }}
 							</view>
 						</view>
 						<view>
-							<view v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
-								{{ utils.decimal(item.cumulativeCommissionQuantity, 5) }}
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
+								{{ utils.decimal(item.cumulativeCommissionQuantity, 4) }}
 							</view>
 						</view>
 					</view>
@@ -335,7 +361,7 @@
 					})
 				}],
 				barIndex: 0,
-				count: 1,
+				count: "",
 				number: 1,
 				showMoreSelect: false,
 				userEntrustList: [],
@@ -448,7 +474,6 @@
 				key: 'barIndex',
 				success: function(res) {
 					self.barIndex = res.data.index
-					console.log(res)
 					if (self.oriMarketList != '') {
 
 						let index = self.oriMarketList.findIndex(item => item.oriCoinMarketText == res.data
@@ -543,6 +568,45 @@
 			})
 		},
 		methods: {
+			onPriceChange(scene) {
+				this.onNumberChange('oriMarketList[marketItemIndex].price', scene, 'price')
+			},
+			onCountChange(scene) {
+				this.onNumberChange('count', scene)
+			},
+			onCountBlur(e) {
+				if (e.split(".")[1]) {
+					let leng = e.split(".")[1].length
+					if (leng > this.oriMarketList[this.marketItemIndex].amountPrecision) {
+						this.count = this.utils.decimal(Number(e), this.oriMarketList[this.marketItemIndex]
+							.amountPrecision)
+					}
+				}
+
+			},
+			onNumberChange(num, scene, type) {
+				let count = type == 'price' ? String(this['oriMarketList'][this.marketItemIndex].price).split('.') : String(this[num]).split('.')
+					
+				if (scene == 'minus') {
+					count[0] -= 1
+					if (count[0] < 0 ) {
+						if (type == 'price') this['oriMarketList'][this.marketItemIndex].price = 0
+						else this[num] = ''
+						return
+					}
+					if(count.length == 1 && count[0] ==0){
+						if (type == 'price') this['oriMarketList'][this.marketItemIndex].price = 0
+						else this[num] = ''
+						return
+					}
+				} else {
+					count[0] ++
+				}
+				count = count.join(count.length == 2 ? '.':'')
+				
+				if (type == 'price') this['oriMarketList'][this.marketItemIndex].price = count
+				else this[num] = count
+			},
 			updateMarketList(list, data) {
 				if (list != '' && data.coinId != undefined) {
 					const index = list.findIndex(item => item.coinId == data.coinId)
@@ -671,7 +735,6 @@
 			},
 			init(coin = false) {
 				clearInterval(this.timer)
-
 				queryMarketPartition().then(market => {
 					let popupTabs = market.map(item => {
 						return {
@@ -695,12 +758,15 @@
 							.toLowerCase().replace(
 								'/', '-')
 						if (!coin) {
-							uni.sendSocketMessage({
-								data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-									'","sendMsgSuccess":true,"topic":"alpha-market-depth-' +
-									topic +
-									'-trade"}'
-							})
+							setTimeout(()=>{
+								uni.sendSocketMessage({
+									data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+										'","sendMsgSuccess":true,"topic":"alpha-market-depth-' +
+										topic +
+										'-trade"}'
+								})
+							},1000)
+							
 						}
 
 					})
@@ -873,11 +939,13 @@
 			.u-tabs__wrapper__nav__line {
 				bottom: 0 !important;
 			}
-			.u-navbar{
-			.u-navbar__content,
-			.u-status-bar {
-				background-color: #f6f6f6 !important;
-			}
+
+			.u-navbar {
+
+				.u-navbar__content,
+				.u-status-bar {
+					background-color: #f6f6f6 !important;
+				}
 			}
 		}
 	}
@@ -895,6 +963,7 @@
 
 		.list {
 			flex: 1;
+
 			.item {
 				display: flex;
 				justify-content: space-between;
@@ -1295,13 +1364,24 @@
 					overflow: hidden;
 					align-items: center;
 
-					::v-deep {
-
-						.u-number-box__plus--hover,
-						.u-number-box__minus--hover {
-							background-color: #f6f6f6 !important;
-						}
+					.icon {
+						padding: 0 20rpx;
+						height: 80rpx;
+						display: flex;
+						align-items: center;
 					}
+
+					::v-deep {
+						.u-input {}
+					}
+
+					// ::v-deep {
+
+					// 	.u-number-box__plus--hover,
+					// 	.u-number-box__minus--hover {
+					// 		background-color: #f6f6f6 !important;
+					// 	}
+					// }
 				}
 
 				.select {
@@ -1512,7 +1592,8 @@
 						background-color: #171E28 !important;
 					}
 				}
-				.u-popup{
+
+				.u-popup {
 					.u-status-bar {
 						opacity: 0 !important;
 					}
