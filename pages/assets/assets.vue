@@ -146,6 +146,7 @@
 		},
 		methods: {
 			onCheckChange(e) {
+				if(!uni.getStorageSync('token'))return
 				if (e.indexOf('') == -1) {
 					this.list = this.oriList
 				} else {
@@ -154,12 +155,13 @@
 			},
 		
 			onSearchChange(e) {
+				if (e == '') this.open = false
+				else this.open = true
+				if(!uni.getStorageSync('token'))return
 				if (e == '') {
 					this.list = this.oriList || []
 					this.checkboxGroup = []
 				}
-				if (e == '') this.open = false
-				else this.open = true
 				this.list = this.utils.fuzzyQuery(this.oriList, e, 'coinName')
 			},
 			toNext(url) {

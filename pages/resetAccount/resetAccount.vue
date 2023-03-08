@@ -62,13 +62,13 @@
 
 			.u-form-item__body__left__content__label {
 				color: #8B8F92 !important;
-				font-size: 26rpx;
+				font-size: 26rpx !important;
 			}
 
 			.u-form-item__body {
-				padding-top: 0;
-				padding-bottom: 0;
-				margin-top: 50rpx;
+				padding-top: 0 !important;
+				padding-bottom: 0 !important;
+				margin-top: 50rpx !important;
 				flex-direction: column !important
 			}
 		}

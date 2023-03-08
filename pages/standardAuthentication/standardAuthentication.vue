@@ -124,6 +124,7 @@
         @cancel="showBirthday = false"
         :title="$t('生日')"
         :maxDate="maxDate"
+		:minDate="minDate"
         :confirmColor="inverseParams('#000' , '#FEFA05')"
     ></u-datetime-picker>
 
@@ -147,6 +148,7 @@ export default {
     return {
       date: Number(new Date()),
       maxDate: (new Date()).valueOf(),
+	  minDate:(new Date("1970/01/01")).valueOf(),
       showBirthday: false,
       birthday: '',
       en_firstName: '',
@@ -174,7 +176,7 @@ export default {
     };
   },
   onLoad() {
-
+	
   },
   methods: {
     choose() {

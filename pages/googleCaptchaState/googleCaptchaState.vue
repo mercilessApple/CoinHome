@@ -5,23 +5,23 @@
     </view>
     <u-gap height="40rpx"></u-gap>
     <view class="nav">
-      <view class="item" @click="visible = true;current = null">
+      <view class="item" @click="unbind">
         <view class="left">{{ $t('解绑') }}</view>
-        <view class="right">
+        <view class="right" v-show="googleCaptchaState != 0">
           <u-icon name="arrow-right" size="24rpx" :color="inverseParams('','#fff')"></u-icon>
         </view>
       </view>
 
-      <view class="item" @click="showPopup(0)">
+      <view class="item" @click="googleCaptchaState != 2 ? showPopup(0): false">
         <view class="left">{{ $t('关闭') }}</view>
-        <view class="right">
+        <view class="right" v-show="googleCaptchaState != 2">
           <u-icon name="arrow-right" size="24rpx" :color="inverseParams('','#fff')"></u-icon>
         </view>
       </view>
 
-      <view class="item" @click="open">
+      <view class="item" @click="googleCaptchaState != 1 ? open() : false">
         <view class="left">{{ $t('开启') }}</view>
-        <view class="right">
+        <view class="right" v-show="googleCaptchaState != 1">
           <u-icon name="arrow-right" size="24rpx" :color="inverseParams('','#fff')"></u-icon>
         </view>
       </view>
@@ -52,10 +52,21 @@ export default {
     return {
       visible: false,
       current: null,
-      scene: ""
+      scene: "",
+      googleCaptchaState: uni.getStorageSync('userInfo').googleVerifyStatus
     };
   },
+  onLoad(){
+
+  },
   methods: {
+    unbind(){
+      if(this.googleCaptchaState != 0){
+        this.visible = true
+        this.current = null
+      }
+
+    },
     confirm() {
       this.next(this.current == 0 ? 'GOOGLE_CLOSE' : 'GOOGLE_NO_BINDING')
       this.visible = false
@@ -131,9 +142,6 @@ export default {
     height: 96rpx;
     padding: 0 30rpx;
     display: flex;
-    /* #ifdef APP-PLUS */
-    padding-right: 0;
-    /* #endif */
     justify-content: space-between;
     align-items: center;
     margin-top: 20rpx;

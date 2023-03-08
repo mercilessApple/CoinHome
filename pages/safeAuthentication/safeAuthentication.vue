@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
-		<u-gap height="60rpx"></u-gap>
-		<view class="item">
+		<u-gap height="30rpx"></u-gap>
+		<view class="item" v-if="scene == 'phone'">
 			<!-- <view class="lab">{{$t('将发送验证码到您的130****2217')}}</view> -->
 			<view class="lab">{{$t('sendCodeText',{
 				codeText:phoneText
@@ -19,33 +19,41 @@
 			</view>
 		</view>
 
-		<view class="item" style="margin-top: 60rpx;">
+		<view class="item" v-if="scene == 'email'" style="margin-bottom: 30rpx;">
 			<!-- <view class="lab">{{$t('将发送验证码到您的7568****@qq.com')}}</view> -->
-			<view class="lab">{{$t('sendCodeText',{
-				codeText:emailText
-			})}}</view>
+			<view class="lab">{{$t('个人电子邮箱')}}</view>
+			<view class="input">
+				<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" v-model="email" clearable border="none">
+
+				</u-input>
+			</view>
+		</view>
+		
+		<view class="item" v-if="scene == 'email'">
+			<!-- <view class="lab">{{$t('将发送验证码到您的7568****@qq.com')}}</view> -->
+			<view class="lab">{{$t('将发送验证码到您的个人电子邮箱')}}</view>
 			<view class="input">
 				<u-input :color="theme == 'light' ? '#303133' : '#ffffff'" v-model="emailCode" clearable border="none">
 					<template slot="suffix">
-						<text @click="getVerificationCode('email')" v-if="time1 === 60"
+						<text @click="getVerificationCode('email')" v-if="time === 60"
 							class="verificationCode">{{$t("获取验证码")}}</text>
 						<text v-else class="verificationCode">{{$t("countDown",{
-							time:time1
+							time:time
 						})}}</text>
 					</template>
 				</u-input>
 			</view>
 		</view>
 		<view class="btn" @click="submit" :class="{
-			active:emailCode != '' && phoneCode != ''
+			active:emailCode != '' || phoneCode != ''
 		}">{{$t('确认')}}</view>
 	</view>
 </template>
 
 <script>
 	import {
-		updatePhone,
-		verificationCode
+		phoneOrEmailCode,
+		updatePhone
 	} from "@/config/api"
 	export default {
 		data() {
@@ -53,16 +61,21 @@
 				emailCode: '',
 				phoneCode: '',
 				time: 60,
-				time1: 60,
-				emailText: '',
-				phoneText: ''
+				phoneText: '',
+				scene: '',
+				email: ''
 			};
 		},
 		onLoad(options) {
 			this.timer = null
-			this.timer1 = null
-			this.emailText = this.regEmail(uni.getStorageSync('userInfo').email)
-			this.phoneText = this.geTel(options.phone)
+			if (options.phone) {
+				this.phone = options.phone
+				this.phoneText = this.geTel(options.phone)
+				this.scene = 'phone'
+			} else {
+				this.scene = 'email'
+			}
+			if (options.phoneAreaCode) this.phoneAreaCode = decodeURIComponent(options.phoneAreaCode)
 		},
 		methods: {
 			// geTel(tel) {
@@ -91,15 +104,44 @@
 			},
 			getVerificationCode(scene) {
 				const self = this
-				if(scene == 'phone'){
-					if (self.time < 60) return
-					
-				}else{
-					if (self.time1 < 60) return
-				}
-				
+				if (self.time < 60) return
+				uni.showLoading({
+					mask: true
+				})
+				phoneOrEmailCode({
+					phoneOrEmail: this.scene == 'phone' ? this.phone : this.email,
+					phoneAreaCode: this.scene == 'phone' ? this.phoneAreaCode : null,
+					smsType: 4,
+					type: this.scene == 'phone' ? 2 : 1
+				}).then(e => {
+					uni.showToast({
+						title: this.$t('发送成功')
+					})
+					this.counDown()
+					this.timer = setInterval(this.counDown, 1000)
+				})
 			},
 			submit() {
+				uni.showLoading({
+					mask: true
+				})
+				updatePhone({
+					"phoneOrEmail": this.scene == 'phone' ? 1 : 2,
+					"phoneAreaCode": this.scene == 'phone' ? this.phoneAreaCode : null,
+					"code": this.scene == 'phone' ? this.phoneCode : this.emailCode,
+					"phone": this.scene == 'phone' ? this.phone : null,
+					"email": this.scene == 'phone' ? null : this.email
+				}).then(() => {
+					uni.showToast({
+						icon: 'success'
+					})
+					setTimeout(() => {
+						uni.navigateBack({
+							delta: this.scene == 'phone' ? 2 : 1
+						})
+					}, 1500)
+
+				})
 
 			}
 		},
@@ -150,13 +192,13 @@
 			}
 		}
 	}
-	
+
 	@media (prefers-color-scheme: dark) {
-		.container .btn{
+		.container .btn {
 			background: #374048;
 			color: #929BA2;
 		}
-	
+
 		.input {
 			background: #29313C !important;
 		}

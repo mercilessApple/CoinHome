@@ -308,5 +308,15 @@
 	"确定": "Confirm",
 	"解除绑定": "Remove Binding",
 	"关闭后将不可使用，若想重新使用需要重新开启。": "If you want to use it again, you need to enable it again.",
-	"解除绑定以后将不可使用，若想再次使用当前功能需重新绑定。": "If you want to use the current function again, you need to bind it again."
+	"解除绑定以后将不可使用，若想再次使用当前功能需重新绑定。": "If you want to use the current function again, you need to bind it again.",
+	"将发送验证码到您的个人电子邮箱":"A verification code will be sent to your personal email address",
+	"GRC20通道":"GRC20 Thoroughfare",
+	"其他通道及币种":"Other channels and currencies",
+	"24小时限额":"24-hour limit",
+	"请填写谷歌验证码":"Please fill in the Google Captcha",
+	"请输入6位验证码":"Please enter a 6-digit verification code",
+	"价值50RMB等额的数字货币盲盒: BTC / ETH / USDT / GODE/ BAYE等。":"Digital currency blind box with an equivalent value of 50RMB: BTC/ETH/USDT/GODE/ BAYE, etc.",
+	"余额不足，请确认账户资产后重新下单":"The balance is insufficient, please confirm the account assets and re-order",
+	"请输入数量":"Please enter quantity",
+	"请输入价格":"Please enter the price"
 }

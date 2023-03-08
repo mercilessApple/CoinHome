@@ -21,6 +21,21 @@
 			</u--form>
 		</view>
 
+    <u-popup :bgColor="inverseParams('#fff','#1F282F')" @close="show = false" closeable :show="show" round="20rpx" mode="center">
+      <view class="popup">
+        <view class="popup-title">{{$t('googleCaptcha')}}</view>
+        <view class="item">
+          <view class="lab">{{$t('请填写谷歌验证码')}}</view>
+          <view class="input-box">
+          <u-input border="none" fontSize="32rpx" v-model="googleCode" clearable :placeholder="$t('请输入6位验证码')"></u-input>
+          </view>
+
+        </view>
+
+        <view class="btn" @click="next">{{$t('确认')}}</view>
+      </view>
+    </u-popup>
+
 		<view class="next" @click="next">
 			{{$t('下一步')}}
 		</view>
@@ -34,11 +49,15 @@
 		MD5
 	} from '@/utils/md5';
 	import {
-		userLogin
+		userLogin,
+		userInfo,
+		getNickName
 	} from '@/config/api'
 	export default {
 		data(): any {
 			return {
+        googleCode:"",
+        show:false,
 				account: '',
 				isShowPwd: false,
 				email: "",
@@ -79,6 +98,9 @@
 				}
 				let data = JSON.parse(JSON.stringify(self.uFormModel))
 				data.loginPassword = MD5.instance.hex_md5(self.uFormModel.loginPassword).toUpperCase()
+        if(self.show){
+          data.googleCode = self.googleCode
+        }
 				uni.showLoading({
 					title: self.$t('正在登录...'),
 					mask: true
@@ -91,6 +113,18 @@
 						title: self.$t('登录成功！'),
 						icon: 'success'
 					});
+					
+					userInfo({}).then((e:any) => {
+						if (e.nickName == '') {
+							getNickName({}).then((res :any) => {
+								e.nickName = res
+								uni.setStorageSync('userInfo', e)
+							})
+						} else {
+							uni.setStorageSync('userInfo', e)
+						}
+					})
+					
 					setTimeout(() => {
 						if(self.scene == 'register'){
 							uni.switchTab({
@@ -102,13 +136,59 @@
 							})
 						}
 					}, 1500)
-				})
+				}).catch((err:any)=>{
+          if(err.code === 15047){
+            //  需要传谷歌验证码
+            self.show = true
+          }
+        })
 			}
 		},
 	}
 </script>
 
 <style lang="scss">
+.popup{
+  padding: 0 30rpx;
+  width: 630rpx;
+  padding-bottom: 48rpx;
+  .btn{
+    line-height: 80rpx;
+    background: #FEFA05;
+    border-radius: 8rpx;
+    margin-top: 80rpx;
+    font-weight: 500;
+    text-align: center;
+    color: #2D270D;font-size: 32rpx;
+  }
+  .item{
+    .input-box{
+      height: 90rpx;
+      background: #F6F6F6;
+      padding:0 30rpx;
+      border-radius: 8rpx;
+      display: flex;
+      align-items: center;
+    }
+    .lab{
+      font-weight: 400;
+      color: #8B8F92;
+      font-size: 26rpx;
+      margin-bottom: 16rpx;
+    }
+    ::v-deep{
+
+    }
+  }
+  .popup-title{
+    text-align: center;
+    margin-bottom: 84rpx;
+    padding-top: 36rpx;
+    font-weight: 500;
+    color: #23212C;
+    font-size: 40rpx;
+  }
+}
 	page {
 		padding: 0 50rpx;
 
@@ -120,13 +200,13 @@
 
 			.u-form-item__body__left__content__label {
 				color: #8B8F92 !important;
-				font-size: 26rpx;
+				font-size: 26rpx !important;
 			}
 
 			.u-form-item__body {
-				padding-top: 0;
-				padding-bottom: 0;
-				margin-top: 50rpx;
+				padding-top: 0 !important;
+				padding-bottom: 0 !important;
+				margin-top: 50rpx !important;
 				flex-direction: column !important
 			}
 		}
@@ -206,9 +286,12 @@
 				}
 			}
 		}
+    .popup .item .input-box{
 
+      background: #29313C;
+    }
 		.tip-title,
-		.account {
+		.account,.popup .popup-title{
 			color: #fff;
 		}
 	}

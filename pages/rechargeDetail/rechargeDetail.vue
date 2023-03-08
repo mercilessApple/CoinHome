@@ -17,7 +17,7 @@
 			<view class="left">
 				<u-image v-if="curCoin != '' && curCoin[0].iconUrl != ''" width="48rpx" height="48rpx"
 					:src="curCoin[0].iconUrl"></u-image>
-				<text>{{curCoin == '' ? '' :curCoin[0].coinName}}</text>
+				<text>{{curCoin == '' ? 'Loading...' : curCoin[0].coinName}}</text>
 			</view>
 			<view class="right" @click="show = true">
 				<u-image src="@/static/icon26.png" width="48rpx" height="48rpx"></u-image>
@@ -215,29 +215,45 @@
 		onLoad(options) {
 			this.coin = options.coin
 			this.scene = options.scene || ''
-			queryWithdrawCoin().then(e => {
-				this.coinList = e
-				this.oriList = e
-
-				if (options.coin) {
-					let find = e.filter(item => item.coinName == options.coin)
-					if (find == '') {
-						// this.curCoin = [{
-						// 	coinName: this.$t('选择币种'),
-						// 	iconUrl:''
-						// }]
-						this.curCoin = e
+			
+			if(options.scene == 'withdraw'){
+				queryWithdrawCoin().then(e => {
+					this.coinList = e
+					this.oriList = e
+				
+					if (options.coin) {
+						let find = e.filter(item => item.coinName == options.coin)
+						if (find == '') {
+							this.curCoin = e
+						} else {
+							this.curCoin = find
+						}
 					} else {
-						this.curCoin = find
+						this.curCoin = e
 					}
-				} else {
-					this.curCoin = e
-				}
-				queryDepositPayCoin().then(e => {
-					this.oriChainList = e
-					this.chainList = e.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
+					this.chainList = e[0].chainNamelist
 				})
-			})
+			}else{
+				queryDepositPayCoin().then(e => {
+					this.coinList = e
+					this.oriList = e
+					
+					if (options.coin) {
+						let find = e.filter(item => item.coinName == options.coin)
+						if (find == '') {
+							// this.curCoin = [{
+							// 	coinName: this.$t('选择币种'),
+							// 	iconUrl:''
+							// }]
+							this.curCoin = e
+						} else {
+							this.curCoin = find
+						}
+					} else {
+						this.curCoin = e
+					}
+				})
+			}
 		},
 		methods: {
 			finish() {
@@ -350,7 +366,19 @@
 			},
 			select(item) {
 				this.curCoin = [item]
-				this.chainList = this.oriChainList.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
+				// this.chainList = this.oriChainList.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
+				if(this.scene == 'withdraw'){
+					this.chainList = item.chainNamelist
+				}else{
+					this.chainList = item.list
+				}
+				
+				if(this.curNet != '' && this.curNet.coinId == item.coinId){
+					
+				}else{
+					this.curNet = ''
+				}
+				
 				this.show = false
 			}
 		},

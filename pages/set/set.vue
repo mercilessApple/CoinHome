@@ -8,12 +8,12 @@
     </view>
     <u-gap height="40rpx"></u-gap>
     <view class="nav">
-      <view class="item" v-for="(item,index) in nav" :key="index" @click="next(item)">
-        <view class="left">{{ item.name }}</view>
-        <view class="right">
-          <text>{{ item.val }}</text>
-          <u-icon name="arrow-right"></u-icon>
-        </view>
+      <view class="item" v-if="item.state" v-for="(item,index) in nav" :key="index" @click="next(item)">
+		  <view class="left">{{ item.name }}</view>
+		  <view class="right">
+		    <text>{{ item.val }}</text>
+		    <u-icon name="arrow-right"></u-icon>
+		  </view>
       </view>
     </view>
   </view>
@@ -23,10 +23,12 @@
 export default {
   data() {
     return {
+		showThemeBtn:false,
       nav: [{
         name: this.$t('语言'),
         val: uni.getLocale() == 'en' ? 'English' : '中文简体',
-        url: '/pages/language/language'
+        url: '/pages/language/language',
+		state:true
       },
         {
           name: this.$t('主题'),
@@ -36,31 +38,37 @@ export default {
           // #ifdef H5
           val: this.$t('自动'),
           // #endif
-          url: '/pages/theme/theme'
+          url: '/pages/theme/theme',
+		  state:false
         },
         {
           name: this.$t('清空缓存'),
-          val: '0kb'
+          val: '0kb',
+		  state:true
         },
         {
           name: this.$t('服务协议'),
-          val: ''
+          val: '',
+		  state:true
         },
         {
           name: this.$t('隐私声明'),
-          val: ''
+          val: '',
+		  state:true
         },
         {
           name: this.$t('关于我们'),
           val: '',
           url: '/pages/webview/webview',
-          params: this.utils.aboutUsURL
+          params: this.utils.aboutUsURL,
+		  state:true
         },
         // #ifdef APP-PLUS
         {
           name: this.$t('检查更新'),
           update: true,
           val: 'v' + plus.runtime.version,
+		  state:true
         },
         // #endif
       ]
@@ -78,7 +86,23 @@ export default {
     // #endif
   },
   onLoad() {
-
+		const sysInfo = uni.getSystemInfoSync()
+		if(sysInfo.platform == 'android'){
+			if(parseInt(sysInfo.osVersion) >= 10){
+				this.nav[1].state = true
+			}
+		}else{
+			if(parseInt(sysInfo.osVersion) >= 13 ){
+				this.nav[1].state = true
+			}
+		}
+		
+		// #ifdef APP-PLUS
+		let self = this
+		plus.runtime.getProperty(plus.runtime.appid, function (widgetInfo) {
+			self.nav[self.nav.length -1].val = 'v'+widgetInfo.version
+		})
+		// #endif
   },
   methods: {
     next(item) {

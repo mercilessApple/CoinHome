@@ -20,7 +20,7 @@
 			</view>
 		</view>
 		<view class="email">{{$t('sendCodeText',{
-			codeText:regEmail(userInfo.email)
+			codeText:userInfo.email ? regEmail(userInfo.email) : geTel(userInfo.phone)
 		})}}</view>
 
 		<view class="btn" @click="submit" :class="{
@@ -56,10 +56,11 @@
 					mask: true
 				})
 				checkVerificationCode({
-					phoneOrEmailStr: uni.getStorageSync('userInfo').email,
+					phoneOrEmailStr:this.userInfo.email ? this.userInfo.email : this.userInfo.phone,
 					code: this.code,
 					smsType: 1
 				}).then(() => {
+					uni.hideLoading()
 					uni.$u.route({
 						url: '/pages/modifyFundPassword/modifyFundPassword'
 					})
@@ -81,7 +82,7 @@
 					mask: true
 				})
 				sendVerificationCode({
-					phoneOrEmailStr: uni.getStorageSync('userInfo').email,
+					phoneOrEmailStr:this.userInfo.email ? this.userInfo.email : this.userInfo.phone,
 					smsType: 1
 				}).then(e => {
 					uni.showToast({

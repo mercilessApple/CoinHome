@@ -45,6 +45,7 @@ export const checkUpdate = (self, isToast = false) => {
                 deviceType: 2,
             }
         }).then(result => {
+			console.log(result)
             if (result.needUpdate && result.downloadUrl) {
                 uni.hideLoading()
                 uni.showModal({

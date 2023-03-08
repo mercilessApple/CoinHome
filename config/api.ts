@@ -43,13 +43,13 @@ export const queryAccountInfo = (params: any) => http.post('/api/account/query/i
 export const queryHotCoins = (params: any) => http.post('/api/account/query/hot/coins', params)
 
 // 查询充币币种信息
-export const queryDepositPayCoin = (params: any) => http.post('/api/account/pay/query/deposit/coin', params)
+export const queryDepositPayCoin = (params: any) => http.post('/api/account/query/deposit/coin', params)
 
 // 查询交易记录
 export const queryAccountTransfer = (params: any) => http.post('/api/account/query/transfer', params)
 
 // 查询提币币种信息
-export const queryWithdrawCoin = (params: any) => http.post('/api/account/pay/query/withdraw/coin', params)
+export const queryWithdrawCoin = (params: any) => http.post('/api/account/query/withdraw/coin', params)
 
 // 提币
 export const withdraw = (params: any) => http.post('/api/account/pay/withdraw', params)
@@ -146,4 +146,10 @@ export const getNewOne = (params: any, config: any) => http.post('/api/user/goog
 
 // 谷歌--绑定/开启/关闭/解绑
 export const googleUpdate = (params: any, config: any) => http.post('/api/user/google/update', params, config)
+
+
+export const phoneOrEmailCode = (params: any, config: any) => http.post('/api/user/phone-or-email/code', params, config)
+
+
+export const noviceGiftPack = (params: any, config: any) => http.post('/api/account/gift/state/novice-gift-pack', params, config)
 

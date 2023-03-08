@@ -2,7 +2,7 @@
 	<view>
 		<u-navbar bgColor="transparent" :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
 			<view class="u-nav-slot" slot="right">
-				<view @click="changeTheme">
+				<view @click="changeTheme" v-if="showThemeBtn">
 					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
 					<u-image v-else src="@/static/icon45.png" width="48rpx" height="48rpx"></u-image>
 				</view>
@@ -85,6 +85,7 @@
 	export default {
 		data() {
 			return {
+				showThemeBtn:false,
 				isLogin: uni.getStorageSync('token'),
 				userInfo: {
 					uid: 0,
@@ -122,19 +123,6 @@
 			};
 		},
 		onShow() {
-			// this.isLogin = uni.getStorageSync('token') ? true : false
-			// if (this.isLogin) {
-			// 	userInfo().then(e => {
-			// 		if (e.nickName == '') {
-			// 			e.nickName = uni.getStorageSync('randomNickName')
-			// 			uni.setStorageSync('userInfo', e)
-
-			// 		}
-			// 	})
-			// } else {
-			// 	this.userInfo.nickName = this.$t('请先登录')
-
-			// }
 			this.isLogin = !!uni.getStorageSync('token')
 			if (this.isLogin) {
 				if (uni.getStorageSync('userInfo')) {
@@ -178,6 +166,17 @@
 			// 		uni.setStorageSync('userInfo', this.userInfo)
 			// 	}
 			// })
+			
+			let sysInfo = uni.getSystemInfoSync()
+			if(sysInfo.platform == 'android'){
+				if(parseInt(sysInfo.osVersion) >= 10){
+					this.showThemeBtn = true
+				}
+			}else{
+				if(parseInt(sysInfo.osVersion) >= 13 ){
+					this.showThemeBtn = true
+				}
+			}
 		},
 		methods: {
 			toServer() {
@@ -283,11 +282,16 @@
 <style lang="scss">
 	.btn {
 		margin: 0 30rpx;
-		margin-top: 470rpx;
+		margin-top: 300rpx;
 		line-height: 90rpx;
 		background: #EEF0F2;
 		text-align: center;
 		border-radius: 8rpx;
+		/* #ifdef H5 */
+		position: fixed;
+		bottom: 60rpx;
+		width: 690rpx;
+		/* #endif */
 	}
 
 	.nav {
@@ -320,10 +324,6 @@
 		.u-alert--warning--light {
 			background-color: #F3F4F6;
 		}
-    .u-navbar__content,
-    .u-status-bar {
-      background-color: #FFFFFF !important;
-    }
 	}
 
 	.tip {
@@ -430,7 +430,18 @@
 			}
 		}
 	}
+@media (prefers-color-scheme: light){
+	/* #ifdef H5 */
+	::v-deep{
+		.u-navbar__content,
+		.u-status-bar {
+			background-color: #FFFFFF !important;
+		}
+	}
+	/* #endif */
 
+
+}
 	@media (prefers-color-scheme: dark) {
 
 		::v-deep {
@@ -472,4 +483,6 @@
 			background: #4A525D;
 		}
 	}
+	
+
 </style>

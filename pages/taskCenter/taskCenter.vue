@@ -11,36 +11,56 @@
 
 		<view class="content">
 			<view class="new-hand-task" v-show="uTabsIndex == 0">
-				<view class="item">
-					<view class="box-title">{{$t('任务奖励')}}:</view>
-					<view class="desc">价值50RMB等额的数字货币盲盒: BTC / ETH / USDT / GODE
-						/ BAYE等。</view>
-				</view>
-				<view class="item">
-					<view class="box-title">{{$t('任务规则')}}:</view>
-					<view class="rule">
-						<text>1.{{$t('完成账号注册')}} </text><text class="success">{{$t('已完成')}}</text>
+				<block v-if="noLogin">
+					<u-gap height="240rpx"></u-gap>
+					<u-empty :show="noLogin" :text="$t('请先登录')"></u-empty>
+				</block>
+				
+				<u-loading-icon mode="circle" :show="newTaskLoading && !noLogin"></u-loading-icon>
+				
+				<block v-if="!newTaskLoading && !noLogin">
+					<view class="item">
+						<view class="box-title">{{$t('任务奖励')}}:</view>
+						<view class="desc">{{$t('价值50RMB等额的数字货币盲盒: BTC / ETH / USDT / GODE/ BAYE等。')}}</view>
 					</view>
-					<view class="rule">
-						<text>2.{{$t('完成进阶身份验证')}} </text><text
-							@click="$u.route('/pages/authentication/authentication')">{{$t('去验证')}} ></text>
+					<view class="item">
+						<view class="box-title">{{$t('任务规则')}}:</view>
+						<view class="rule">
+							<text>1.{{$t('完成账号注册')}} </text><text :class="{
+							'success':newTaskData.completedRegister
+						}">{{$t('已完成')}}</text>
+						</view>
+						<view class="rule">
+							<text>2.{{$t('完成进阶身份验证')}} </text><text
+								@click="newTaskData.completeAdvancedAuthentication ? false:$u.route('/pages/authentication/authentication')"
+								:class="{
+							'success':newTaskData.completeAdvancedAuthentication
+						}">{{$t(newTaskData.completeAdvancedAuthentication? '已完成' :'去验证')}} ></text>
+						</view>
+						<view class="rule">
+							<text>3.{{$t('为您的账户注资')}} </text><text
+								@click="newTaskData.completeDeposit?false:$u.route('/pages/recharge/recharge')" :class="{
+							'success':newTaskData.completeDeposit
+						}">{{$t(newTaskData.completeDeposit ? '已完成':'去充值')}} ></text>
+						</view>
+						<view class="rule">
+							<text>4.{{$t('完成首次现货交易')}} </text><text @click="newTaskData.completeSpotTrade? false :toTrade()"
+								:class="{
+							'success':newTaskData.completeSpotTrade
+						}">{{$t(newTaskData.completeSpotTrade ?'已完成': '去交易')}} ></text>
+						</view>
 					</view>
-					<view class="rule">
-						<text>3.{{$t('为您的账户注资')}} </text><text
-							@click="$u.route('/pages/recharge/recharge')">{{$t('去充值')}} ></text>
-					</view>
-					<view class="rule">
-						<text>4.{{$t('完成首次现货交易')}} </text><text @click="toTrade">{{$t('去交易')}} ></text>
-					</view>
-				</view>
-				<div class="tip">
-					{{$t(`*注：在账户注册后7天内完成所有任务，即可获得奖励，奖励
+					<div class="tip">
+						{{$t(`*注：在账户注册后7天内完成所有任务，即可获得奖励，奖励
 					将自动投放至用户账户资产。`)}}
-				</div>
+					</div>
+				</block>
 			</view>
 
 			<view class="limit-task" v-show="uTabsIndex == 1">
-				<view class="item u-border-bottom">
+				<u-gap height="300rpx"></u-gap>
+				<u-empty :text="$t('暂无数据')"></u-empty>
+				<!-- <view class="item u-border-bottom">
 					<view class="upper">
 						<view class="left">
 							<u-image :src="inverseParams(require('@/static/icon57.png'),require('@/static/icon56.png'))"
@@ -93,7 +113,7 @@
 							领取时间：2029-02-28 06：22（UTC+0）
 						</view>
 					</view>
-				</view>
+				</view> -->
 			</view>
 		</view>
 
@@ -123,20 +143,50 @@
 </template>
 
 <script>
+	import {
+		noviceGiftPack
+	} from "@/config/api"
 	export default {
 		data() {
 			return {
 				showRule: false,
+				newTaskLoading:true,
 				showOverdue: false,
 				uTabsIndex: 0,
+				noLogin:true,
 				uTabs: [{
 						name: this.$t('新手任务')
 					},
 					{
 						name: this.$t('限时任务')
 					}
-				]
+				],
+				newTaskData: {
+					completeAdvancedAuthentication: false,
+					completeDeposit: false,
+					completeSpotTrade: false,
+					completedRegister: false
+				}
 			};
+		},
+		onLoad() {
+
+		},
+		onShow() {
+			if (!uni.getStorageSync('token')){
+				this.newTaskLoading = false
+				this.noLogin = true
+				 return
+			}
+			this.noLogin = false
+			noviceGiftPack({
+				userId: uni.getStorageSync('userInfo').userId
+			}).then(e => {
+				this.newTaskLoading = false
+				this.newTaskData = {
+					...e
+				}
+			}).catch(e=>this.newTaskLoading = false)
 		},
 		methods: {
 			toTrade() {

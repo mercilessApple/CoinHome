@@ -7,7 +7,6 @@
 
 	export default {
 		onLaunch: function() {
-			console.log('App Launch')
 			// #ifdef APP-PLUS
 			if (uni.getStorageSync('theme')) {
 				if (uni.getSystemInfoSync().theme == uni.getStorageSync('theme')) return
@@ -95,7 +94,7 @@
 									ping: new Date().valueOf()
 								})
 							})
-						}, 50000)
+						}, 5000)
 					});
 					uni.onSocketMessage((message) => {
 						const response = JSON.parse(message.data)
@@ -120,6 +119,8 @@
 		onShow: function() {
 			console.log('App Show')
 			this.createScoket()
+			
+			this.utils.checkUpdate(this)
 		},
 		onUnload() {
 			clearInterval(this.timer)
@@ -149,13 +150,15 @@
 		}
 	}
 input{
-  caret-color: #FEFA05;
+  caret-color: #000;
 }
 	@media (prefers-color-scheme: dark) {
 		page {
 			background-color: #1F282F;
 		}
-
+input{
+  caret-color: #FEFA05;
+}
 		::v-deep {
 			.input {
 				/* #ifdef H5 */

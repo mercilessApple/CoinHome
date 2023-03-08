@@ -92,11 +92,8 @@
 			},
 			submit() {
 				if (!this.succ) return
-				uni.$u.route({
-					url: '/pages/safeAuthentication/safeAuthentication',
-					params: {
-						phone: this.phone
-					}
+				uni.navigateTo({
+					url:'/pages/safeAuthentication/safeAuthentication?phone='+this.phone+'&phoneAreaCode='+encodeURIComponent(this.phoneAreaCode)
 				})
 				return
 				uni.showLoading({

@@ -60,6 +60,16 @@
 					</view>
 
 				</u-form-item>
+				
+				<u-form-item :label="$t('邀请码')" v-if="inviteCode != ''">
+					<view class="input-box">
+						<u-input readonly v-model="inviteCode" border="none">
+							
+						</u-input>
+					</view>
+				
+				</u-form-item>
+				
 				<view class="pwd-tip" v-if="showPwdTip">
 					{{$t("密码至少8位且必有数字+特殊字符+字母")}}
 				</view>
@@ -106,6 +116,7 @@
 		data(): DATA {
 			const that = (this as any)
 			return {
+				inviteCode:"",
 				showPwdTip: false,
 				time: 60,
 				current: 0,
@@ -151,8 +162,11 @@
 				}
 			};
 		},
-		onLoad() {
+		onLoad(options) {
 			self = (this as any)
+			if(options.inviteCode){
+				self.inviteCode = options.inviteCode
+			}
 		},
 		onUnload() {
 			self.time = 60;
@@ -243,6 +257,8 @@
 					data.loginPassword = MD5.instance.hex_md5(self.uFormModel.loginPassword).toUpperCase()
 					data.phoneAreaCode = self.phoneAreaCode
 					if(data.phone == '')delete data.phone
+					if(self.inviteCode)data.inviteCode = self.inviteCode
+					if(data.email === '')data.email = null
 					registered({
 						registerWay: self.current === 0 ? 2 : 1,
 						...data

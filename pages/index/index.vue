@@ -126,7 +126,6 @@
 	import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
 	import {
 		banners,
-		checkVersion,
 		announcements,
 		getOptionalMarket,
 		getTickerByPartitionMarket
@@ -197,7 +196,6 @@
 		},
 		onLoad() {
 			this.init()
-			this.utils.checkUpdate(this)
 		},
 		onHide() {
 

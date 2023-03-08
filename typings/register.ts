@@ -8,7 +8,8 @@ interface DATA {
 	time:number,
 	loading:boolean,
 	phoneAreaCode:string,
-	showPwdTip:boolean
+	showPwdTip:boolean,
+	inviteCode:string
 }
 interface uFormModel {
 	email: string,

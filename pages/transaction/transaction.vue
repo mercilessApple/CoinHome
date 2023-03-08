@@ -23,14 +23,14 @@
 			<view class="upper">
 				<view class="left">
 					<view class="bar">
-						<view @click="barIndex = 0" class="item" :class="{
+						<view @click="onBarIndexChange(0)" class="item" :class="{
 							active:barIndex == 0
 						}">{{ $t('买入') }}
 							<view class="triangle" :style="{
 								'border-left-color':barIndex == 1 ? '#F5475E' : '#2EBD87'
 							}"></view>
 						</view>
-						<view @click="barIndex = 1" class="item" :class="{
+						<view @click="onBarIndexChange(1)" class="item" :class="{
 							active:barIndex == 1
 						}">{{ $t('卖出') }}
 							<view class="triangle" :style="{
@@ -121,7 +121,7 @@
 							</view>
 						</view>
 					</view>
-					<u-gap height="30rpx"></u-gap>
+					<view style="flex: 1;"></view>
 					<view @click="submit" v-if="isLogin" class="btn" :style="{
 						'background':barIndex == 1 ? '#F5475E' : '#2EBD87'
 					}">
@@ -273,7 +273,7 @@
 						'height':marketPopupSliderHeight + 'px'
 					}" scroll-y>
 						<view @click="selectMarket(item,index)" :class="{
-							'active':marketItemIndex == index
+							'active':oriMarketItemIndex == index
 						}" class="item" v-for="(item,index) in marketList" :key="index">
 							<view class="left">
 								{{ item.coinMarket[0] }}
@@ -319,6 +319,7 @@
 				marketTabIndex: 1,
 				marketStatus: 'loading',
 				marketItemIndex: 0,
+				oriMarketItemIndex:0,
 				// marketItemIndex: 2,
 				marketList: [],
 				status: 'loading',
@@ -442,24 +443,23 @@
 			this.marketItemIndex = 0
 		},
 		watch: {
-			marketItemIndex(newValue, oldValue) {
-				let topic = this.oriMarketList[newValue].oriCoinMarketText.toLowerCase().replace(
+			marketItem(n,o){
+				let topic = n.oriCoinMarketText.toLowerCase().replace(
 					'/', '-')
-
-				let oldTopic = this.oriMarketList[oldValue].oriCoinMarketText.toLowerCase().replace(
-					'/', '-')
-
 				uni.sendSocketMessage({
 					data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
 						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
 						'-trade"}'
 				})
-
-				uni.sendSocketMessage({
-					data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
-						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + oldTopic +
-						'-trade"}'
-				})
+				if(o.oriCoinMarketText){
+					let oldTopic = o.oriCoinMarketText.toLowerCase().replace(
+						'/', '-')
+					uni.sendSocketMessage({
+						data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+							'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + oldTopic +
+							'-trade"}'
+					})
+				}
 			}
 		},
 		onShow() {
@@ -568,6 +568,10 @@
 			})
 		},
 		methods: {
+			onBarIndexChange(index){
+				this.barIndex = index
+				this.queryUserEntrustList()
+			},
 			onPriceChange(scene) {
 				this.onNumberChange('oriMarketList[marketItemIndex].price', scene, 'price')
 			},
@@ -637,6 +641,28 @@
 				}
 			},
 			submit() {
+				let total = this.utils.decimal(this.count * this.oriMarketList[this.marketItemIndex].price,this.oriMarketList[this.marketItemIndex].amountPrecision)
+				if(this.count == ''){
+					uni.showToast({
+						title:this.$t('请输入数量'),
+						icon:'none'
+					})
+					return
+				}
+				if(this.oriMarketList[this.marketItemIndex].price == ''){
+					uni.showToast({
+						title:this.$t('请输入价格'),
+						icon:'none'
+					})
+					return
+				}
+				if(this.getAccount().amount < total){
+					uni.showToast({
+						title:this.$t('余额不足，请确认账户资产后重新下单'),
+						icon:'none'
+					})
+					return
+				}
 				uni.showLoading({
 					mask: true
 				})
@@ -648,6 +674,9 @@
 					orderType: this.orderType
 				}).then(e => {
 					uni.hideLoading()
+					queryAccountInfo({
+						type: 1
+					}).then(e => this.coinAccountList = e.coinAccountList)
 				})
 			},
 			chooseProportion(item, index) {
@@ -656,12 +685,21 @@
 				}
 				this.blockIndex = index == this.blockIndex ? null : index
 				if (this.blockIndex != null) {
-					this.count = this.utils.decimal((this.getAccount().amount * item.key) / this.oriMarketList[this
-							.marketItemIndex]
-						.price, 5)
-
+					if(this.getAccount().amount == 0){
+						uni.showToast({
+							title:this.$t('余额不足，请确认账户资产后重新下单'),
+							icon:'none'
+						})
+						return
+					}
+					let price = this.oriMarketList[this.marketItemIndex].price
+					let va = this.utils.decimal((this.getAccount().amount * item.key) / price, this.oriMarketList[this.marketItemIndex].amountPrecision)
+					if(price == ''){
+						va = 0
+					}
+					this.count = va == 0 ? 1 : va
 				} else {
-					this.count = 1
+					this.count = ""
 				}
 			},
 			/**
@@ -758,14 +796,14 @@
 							.toLowerCase().replace(
 								'/', '-')
 						if (!coin) {
-							setTimeout(()=>{
-								uni.sendSocketMessage({
-									data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-										'","sendMsgSuccess":true,"topic":"alpha-market-depth-' +
-										topic +
-										'-trade"}'
-								})
-							},1000)
+							// setTimeout(()=>{
+							// 	uni.sendSocketMessage({
+							// 		data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+							// 			'","sendMsgSuccess":true,"topic":"alpha-market-depth-' +
+							// 			topic +
+							// 			'-trade"}'
+							// 	})
+							// },1000)
 							
 						}
 
@@ -794,6 +832,9 @@
 						}
 					}
 					return data[0]
+					// return {
+					// 	amount:100000
+					// }
 				}
 			},
 			open() {
@@ -811,11 +852,12 @@
 			 */
 			selectMarket(item, index) {
 				this.marketItemIndex = index
+				this.oriMarketItemIndex = index
 				this.marketItem = item
 				this.show = false
-				this.oriMarketList = this.marketList
+				// this.oriMarketList = this.marketList
 				this.getHandicap()
-				this.queryMarkets()
+				// this.queryMarkets()
 			},
 
 			/**
@@ -849,7 +891,7 @@
 						this.marketList = this.utils.fuzzyQuery(data, this.searchKey, 'oriCoinMarketText')
 					}
 				}
-
+			
 				fn(this.marketList)
 
 				// if (data == '') {
@@ -876,7 +918,7 @@
 					return
 				}
 				getUserEntrustList({
-					coinMarket: this.oriMarketList[this.marketItemIndex].oriCoinMarketText,
+					coinMarket: this.marketItem.oriCoinMarketText,
 					type: this.barIndex == 0 ? 1 : 2
 				}).then(res => {
 					this.tabs[0].name = this.$t('currentDelegation', {
@@ -903,9 +945,16 @@
 				this.marketStatus = 'loading'
 				this.marketList = []
 				this.marketTabIndex = index
-
-				this.queryMarkets()
-
+				// this.marketItemIndex = index
+				
+				this.queryMarkets(()=>{
+					let i= this.marketList.findIndex(item=>item.oriCoinMarketText == this.marketItem.oriCoinMarketText)
+					if(i === -1){
+						this.oriMarketItemIndex = null
+					}else{
+						this.oriMarketItemIndex = i
+					}
+				})
 			},
 			close() {
 
@@ -1309,7 +1358,8 @@
 
 			.left {
 				width: 60%;
-
+				display: flex;
+				flex-direction: column;
 				.btn {
 					line-height: 80rpx;
 					text-align: center;

@@ -39,7 +39,7 @@
 			<view class="item">
 				<view class="lab">{{$t('我的邀请链接')}}</view>
 				<view class="val">
-					<text>{{link}}</text>
+					<text>{{linkText}}</text>
 					<u-image @click="copy(link)" width="36rpx" height="36rpx"
 						:src="inverseParams(require('@/static/icon65.png'),require('@/static/icon68.png'))"></u-image>
 				</view>
@@ -65,14 +65,14 @@
 				<view class="context">
 					<view class="title">{{$t('面对面二维码邀请')}}</view>
 					<view class="qr-code">
-						<uqrcode :value="code" :size="upx" canvas-id="qrcode">
+						<uqrcode :value="link" :size="upx" canvas-id="qrcode">
 							<template v-slot:loading>
 								<u-loading-icon mode="circle"></u-loading-icon>
 							</template>
 						</uqrcode>
 					</view>
 					<view class="id">
-						{{$t('邀请码')}}ID:286593
+						{{$t('邀请码')}}ID:{{code}}
 					</view>
 				</view>
 			</view>
@@ -93,7 +93,7 @@
 		</u-popup>
 
 		<view class="uqrcode-box">
-			<uqrcode @complete="complete" :value="code" :size="upx" ref="uqrcode" canvas-id="qrcode">
+			<uqrcode @complete="complete" :value="link" :size="upx" ref="uqrcode" canvas-id="qrcode">
 			</uqrcode>
 		</view>
 	</view>
@@ -111,7 +111,8 @@
 				showPoster: false,
 				code: '',
 				showQRcode: false,
-				qrCodeUrl: ''
+				qrCodeUrl: '',
+				linkText: ''
 			};
 		},
 		onLoad() {
@@ -122,9 +123,77 @@
 				} = e
 				this.link = registrationLink
 				this.code = inviteCode
+
+				this.linkText = this.parseURLWithRegExp(registrationLink).origin
 			})
 		},
 		methods: {
+			parseURLWithRegExp  (url = location.href, base) {
+			  const pattern = /^(([^:/?#]+):)?\/\/(([^/?#]+):(.+)@)?([^/?#:]*)(:(\d+))?([^?#]*)(\\?([^#]*))?(#(.*))?/
+			  const getURLSearchParams = (url) => {
+			    return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce((a, v) => {
+			      return ((a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1)), a)
+			    }, {})
+			  }
+			  let matches,
+			    hostname,
+			    port,
+			    pathname,
+			    search,
+			    searchParams
+			
+			  // url 是为度路径时，忽略 base
+			  if (/^(([^:/?#]+):)/.test(url)) {
+			    base = ''
+			  }
+			
+			  // 设置了基准 URL
+			  if (base) {
+			    // 移除 base 最后的斜杠 ‘/’
+			    if (/[/]$/.test(base)) {
+			      base = base.replace(/[/]$/, '')
+			    }
+			
+			    // 确保 url 开始有斜杠
+			    if (!/^[/]/.test(url)) {
+			      url = '/' + url
+			    }
+			
+			    // 保证 URL 地址拼接后是一个正确的格式
+			    url = base + url
+			  }
+			
+			  matches = url.match(pattern)
+			  hostname = matches[6]
+			  port = matches[8] || ''
+			  pathname = matches[11] || '/'
+			  search = matches[10] || ''
+			  searchParams = (() => {
+			    const params = getURLSearchParams(url)
+			
+			    return {
+			      get (name) {
+			        return params[name] || ''
+			      }
+			    }
+			  })()
+			
+			  return {
+			    href: url,
+			    origin: (matches[1] ? matches[1] + '//' : '') + hostname,
+			    protocol: matches[2] || '',
+			    username: matches[4] || '',
+			    password: matches[5] || '',
+			    hostname,
+			    port,
+			    host: hostname + port,
+			    pathname,
+			    search,
+			    path: pathname + search,
+			    hash: matches[13] || '',
+			    searchParams
+			  }
+			},
 			copy(text) {
 				uni.setClipboardData({
 					data: text
@@ -157,7 +226,7 @@
 						}
 					}, );
 				} else {
-					const shareString = this.link + this.code
+					const shareString = this.link
 					uni.shareWithSystem({
 						type: 'text',
 						summary: shareString,
@@ -330,8 +399,8 @@
 			}
 
 			.val {
-				height: 80rpx;
-				padding: 0 30rpx;
+				// height: 80rpx;
+				padding: 30rpx;
 				background: #FFFFFF;
 				border-radius: 8rpx;
 				display: flex;
@@ -339,6 +408,8 @@
 				justify-content: space-between;
 
 				text {
+					word-break: break-all;
+					margin-right: 30rpx;
 					font-weight: 500;
 					color: #2D270D;
 					font-size: 30rpx;

@@ -28,6 +28,13 @@
 		},
 		onLoad(options) {
 			this.type = options.type
+
+      let smsType
+      if(this.type == 'GOOGLE_NO_BINDING')smsType = 6
+      if(this.type == 'GOOGLE_BINDING')smsType = 7
+      if(this.type == 'GOOGLE_CLOSE')smsType = 8
+      if(this.type == 'GOOGLE_OPEN')smsType = 7
+      this.smsType = smsType
 		},
 		methods: {
 			// GOOGLE_NO_BINDING 解绑     GOOGLE_BINDING 绑定     GOOGLE_CLOSE 关闭验证     GOOGLE_OPEN 开启验证
@@ -39,34 +46,12 @@
 					type: this.type,
 					googleCode: value
 				}).then((res) => {
-
-					if (this.type == 'GOOGLE_BINDING') { //	绑定时再调用下开启验证
-						googleUpdate({
-							type: 'GOOGLE_OPEN',
-							googleCode: value
-						}).then(() => {
-							uni.showToast({
-								icon: 'success'
-							})
-
-							setTimeout(() => {
-								uni.navigateBack({
-									delta: 2
-								})
-							}, 1500)
-						})
-						return
-					}
-
-					uni.showToast({
-						icon: 'success'
-					})
-
-					setTimeout(() => {
-						uni.navigateBack({
-							delta: 2
-						})
-					}, 1500)
+          uni.$u.route({
+            url:'/pages/googleCaptchaVerify/googleCaptchaVerify',
+            params:{
+              smsType:this.smsType
+            }
+          })
 				})
 			}
 		}

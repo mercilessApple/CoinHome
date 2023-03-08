@@ -36,12 +36,11 @@
 export default {
   data() {
     return {
-      // googleCaptchaState:1  //0未绑定  1开启/2关闭
       googleCaptchaState: uni.getStorageSync('userInfo').googleVerifyStatus    //谷歌验证状态，0为解绑/未绑定，1为绑定并开启，2为绑定但暂停验证
     };
   },
   onShow() {
-        userInfo().then(userInfo => this.googleCaptchaState = userInfo.googleVerifyStatus)
+    this.googleCaptchaState = uni.getStorageSync('userInfo').googleVerifyStatus
   },
   methods: {
     toGoogleCaptcha() {

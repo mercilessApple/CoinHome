@@ -39,35 +39,35 @@
 				<view class="item">{{$t('个人信息')}}</view>
 				<view class="item">{{$t('政府发行的身份证')}}</view>
 			</view>
-			<view class="item-box" style="display: none;">
+			<view class="item-box">
 				<view class="item-title">{{$t('功能与限制')}}</view>
 				<view class="item">
 					<view class="left">
-						<block v-if="tabIndex == 0 && verifiedAudit != 3">
+						<block v-if="tabIndex == 0 && (verifiedAudit != 3 && verifiedAudit!=null)">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
-						<block v-if="tabIndex == 1 && verifiedAudit == 4">
+						<block v-if="tabIndex == 1 && verifiedAudit == 4 && verifiedAudit!=null">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
 						<text>
-							{{$t('充值')}}</text>
+							{{$t('GRC20通道')}}</text>
 					</view>
 
 					<text>{{$t('无限额')}}</text>
 				</view>
 				<view class="item">
 					<view class="left">
-						<block v-if="tabIndex == 0 && verifiedAudit != 3">
+						<block v-if="tabIndex == 0 && verifiedAudit != 3 && verifiedAudit!=null">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
-						<block v-if="tabIndex == 1 && verifiedAudit == 4">
+						<block v-if="tabIndex == 1 && verifiedAudit == 4 && verifiedAudit!=null">
 							<u-icon name="checkmark-circle-fill" color="#2DBE87" style="margin-right:10rpx" />
 						</block>
 						<text>
-							{{$t('提现')}}</text>
+							{{$t('其他通道及币种')}}</text>
 					</view>
 
-					<text>300 USDT</text>
+					<text>{{$t('24小时限额')}}{{tabIndex == 0 ? 500 : 2000}} USDT</text>
 				</view>
 			</view>
 			<view class="item-box" v-if="verifiedAudit == 2 && tabIndex == 1">
@@ -129,6 +129,9 @@
 				} = e
 				this.verifiedAudit = verifiedAudit
 				this.failedReason = e.failedReason
+				let u = uni.getStorageSync('userInfo')
+				u.verifiedAudit = verifiedAudit
+				uni.setStorageSync('userInfo',u)
 			})
 		}
 	}

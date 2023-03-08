@@ -19,16 +19,21 @@
 			</view>
 			<view class="item">
 				<view class="left">{{$t('手机号码')}}</view>
-				<view class="right" @click="$u.route('/pages/bindPhoneNumber/bindPhoneNumber')">
+				<view class="right" @click="userInfo.phone?false:$u.route('/pages/bindPhoneNumber/bindPhoneNumber')">
 					<text>{{userInfo.phone || $t('未绑定')}}</text>
-					 <u-icon name="arrow-right"></u-icon>
+					 <u-icon v-if="!userInfo.phone"  name="arrow-right"></u-icon>
 				</view>
 			</view>
 			<view class="item">
 				<view class="left">{{$t('邮箱')}}</view>
-				<view class="right">
-					<text>{{userInfo.email}}</text>
-					<!-- <u-icon name="arrow-right"></u-icon> -->
+				<view class="right" @click="userInfo.email ? false:$u.route({
+					url:'/pages/safeAuthentication/safeAuthentication',
+					params:{
+						scene:'email'
+					}
+				})">
+					<text>{{userInfo.email || $t('未绑定')}}</text>
+					<u-icon v-if="!userInfo.email" name="arrow-right"></u-icon>
 				</view>
 			</view>
 		</view>

@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="coin-box">
 			<view class="left">
-				<u-image width="48rpx" height="48rpx" :src="curCoin.iconUrl || ''"></u-image>
+				<u-image v-if="curCoin != ''" width="48rpx" height="48rpx" :src="curCoin.iconUrl"></u-image>
 				<text>{{curCoin.coinName || $t('加载中...')}}</text>
 			</view>
 			<view class="right" @click="show = true">
@@ -93,7 +93,8 @@
 <script>
 	import {
 		queryAccountTransfer,
-		queryWithdrawCoin
+		queryWithdrawCoin,
+		queryDepositPayCoin
 	} from "@/config/api"
 	export default {
 		data() {
@@ -112,35 +113,42 @@
 				}
 			};
 		},
-		onLoad(options) {
+		async onLoad(options) {
 			this.pageNum = 1
-
-			queryWithdrawCoin().then(e => {
-				this.coinList = e
-				this.oriList = e
-
-				if (options.coinId == 'null') {
-					this.curCoin = e[0]
-				} else {
-					let cur = e.filter(item => item.coinId == options.coinId)
-					if(cur == ''){
-						this.curCoin = e[0]
-						return
-					}
-					this.curCoin = cur[0]
+			
+			let withdrawCoin = await queryWithdrawCoin()
+			let depositCoin = await queryDepositPayCoin()
+			
+			let response = [...withdrawCoin,...depositCoin]
+			
+			const map = new Map();
+			const newArr = response.filter(v => !map.has(v.coinId) && map.set(v.coinId, 1));
+			response = newArr
+			
+			this.coinList = response
+			this.oriList = response
+			
+			if (options.coinId == 'null') {
+				this.curCoin = response[0]
+			} else {
+				let cur = response.filter(item => item.coinId == options.coinId)
+				if(cur == ''){
+					this.curCoin = response[0]
+					return
 				}
-
-				this.coinId = this.curCoin.coinId
-				this.getList(e => {
-					this.coinInfo = {
-						sumCnhtAmount: e.sumCnhtAmount,
-						sumAmount: e.sumAmount,
-						amount: e.amount,
-						frozenAmount: e.frozenAmount,
-						coinName: e.coinName
-					}
-					this.list = e.pageList.records
-				})
+				this.curCoin = cur[0]
+			}
+			
+			this.coinId = this.curCoin.coinId
+			this.getList(e => {
+				this.coinInfo = {
+					sumCnhtAmount: e.sumCnhtAmount,
+					sumAmount: e.sumAmount,
+					amount: e.amount,
+					frozenAmount: e.frozenAmount,
+					coinName: e.coinName
+				}
+				this.list = e.pageList.records
 			})
 		},
 		onReachBottom() {
@@ -188,6 +196,13 @@
 				this.coinId = item.coinId
 				this.curCoin = item
 				this.getList(e => {
+					this.coinInfo = {
+						sumCnhtAmount: e.sumCnhtAmount,
+						sumAmount: e.sumAmount,
+						amount: e.amount,
+						frozenAmount: e.frozenAmount,
+						coinName: e.coinName
+					}
 					this.list = e.pageList.records
 				})
 			}
