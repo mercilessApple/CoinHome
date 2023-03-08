@@ -442,7 +442,33 @@
 		onLoad() {
 			this.marketItemIndex = 0
 		},
+		computed: {
+			alphaMarketTicker() {
+				return this.$store.state['alpha-market-ticker']
+			},
+			alphaMarketDepthTrade(){
+				return this.$store.state['alpha-market-depth-trade']
+			}
+		},
 		watch: {
+			alphaMarketDepthTrade(data,oldValue){
+				let {
+					asks,
+					bids
+				} = data
+				let newAsks = asks.slice(0, 5),
+					newBids = bids.slice(0, 5)
+				this.marketDeeps = {
+					lastPrice: data.lastPrice,
+					lastPriceCny: data.lastPriceCny,
+					asks: newAsks,
+					bids: newBids
+				}
+			},
+			alphaMarketTicker(data, oldValue) {
+				this.updateMarketList(this.marketList, data)
+				this.updateMarketList(this.oriMarketList, data)
+			},
 			marketItem(n,o){
 				let topic = n.oriCoinMarketText.toLowerCase().replace(
 					'/', '-')
@@ -547,25 +573,6 @@
 					this.init()
 				}
 			});
-
-			this.$onSocketMessage((data) => {
-				this.updateMarketList(this.marketList, data)
-				this.updateMarketList(this.oriMarketList, data)
-				if (data.asks != undefined) {
-					let {
-						asks,
-						bids
-					} = data
-					let newAsks = asks.slice(0, 5),
-						newBids = bids.slice(0, 5)
-					this.marketDeeps = {
-						lastPrice: data.lastPrice,
-						lastPriceCny: data.lastPriceCny,
-						asks: newAsks,
-						bids: newBids
-					}
-				}
-			})
 		},
 		methods: {
 			onBarIndexChange(index){

@@ -134,8 +134,13 @@
 		onUnload() {
 
 		},
-		onShow() {
-			this.$onSocketMessage((data) => {
+		computed: {
+			alphaMarketTicker() {
+				return this.$store.state['alpha-market-ticker']
+			}
+		},
+		watch: {
+			alphaMarketTicker(data, oldValue) {
 				if (this.list != '') {
 					const index = this.list.findIndex(item => item.coinId == data.coinId)
 					if (index == -1) return
@@ -143,7 +148,10 @@
 					this.list[index].rangeAbility = Number(data.rangeAbility)
 					this.list[index].lastPriceCny = Number(data.lastPriceCny)
 				}
-			})
+			}
+		},
+		onShow() {
+			
 		},
 		methods: {
 			onSearchChange(e) {

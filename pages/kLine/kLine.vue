@@ -253,7 +253,7 @@
 	export default {
 		data() {
 			let data = {
-				iconUrl:'',
+				iconUrl: '',
 				coinMarket: '',
 				tickerMarketInfo: {
 					highest: 0,
@@ -444,24 +444,33 @@
 				}
 				this.coinIntroduction = e
 				coinInfo({
-					coinId:e.coinId
-				}).then(({iconUrl})=>{
+					coinId: e.coinId
+				}).then(({
+					iconUrl
+				}) => {
 					this.iconUrl = iconUrl
+				})
+				
+				let topic = this.coinMarket.toLowerCase().replace('/', '-')
+				uni.sendSocketMessage({
+					data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+						'-trade"}'
 				})
 			})
 			// this.tickerMarket()
 		},
 
 		onShow() {
-			let topic = this.coinMarket.toLowerCase().replace('/', '-')
+			// let topic = this.coinMarket.toLowerCase().replace('/', '-')
 
-     setTimeout(()=>{
-        uni.sendSocketMessage({
-          data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-              '","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-              '-trade"}'
-        })
-      },1000)
+			// setTimeout(() => {
+			// 	uni.sendSocketMessage({
+			// 		data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+			// 			'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+			// 			'-trade"}'
+			// 	})
+			// }, 1000)
 
 			this.init()
 			if (this.isShowDeep) {
@@ -469,32 +478,6 @@
 				return
 			}
 			this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
-
-      this.$onSocketMessage((data) => {
-        if(data.asks != undefined){
-          let {
-            asks,
-            bids
-          } = data
-          let newAsks = asks.slice(0, 5),
-              newBids = bids.slice(0, 5)
-
-          this.market.asks = newAsks
-          this.market.bids = newBids
-          this.market.lastPrice = data.lastPrice
-          this.market.lastPriceCny = data.lastPriceCny
-          this.market.rangeAbility = data.rangeAbility
-        }else{
-
-        }
-
-        if (data.coinMarket == this.coinMarket) {
-          this.tickerMarketInfo.highest = data.highest
-          this.tickerMarketInfo.amount = data.amount
-          this.tickerMarketInfo.lowest = data.lowest
-          this.tickerMarketInfo.turnover = data.turnover
-        }
-      })
 		},
 		watch: {
 			theme(newValue, oldValue) {
@@ -513,10 +496,38 @@
 					return
 				}
 				this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
-			}
+			},
+			
+			alphaMarketDepthTrade(data,oldValue){
+				let {
+					asks,
+					bids
+				} = data
+				let newAsks = asks.slice(0, 5),
+					newBids = bids.slice(0, 5)
+				
+				this.market.asks = newAsks
+				this.market.bids = newBids
+				this.market.lastPrice = data.lastPrice
+				this.market.lastPriceCny = data.lastPriceCny
+				this.market.rangeAbility = data.rangeAbility
+			},
+			alphaMarketTicker(data, oldValue) {
+				if (data.coinMarket == this.coinMarket) {
+					this.tickerMarketInfo.highest = data.highest
+					this.tickerMarketInfo.amount = data.amount
+					this.tickerMarketInfo.lowest = data.lowest
+					this.tickerMarketInfo.turnover = data.turnover
+				}
+			},
 		},
-		onReady() {
-
+		computed: {
+			alphaMarketTicker() {
+				return this.$store.state['alpha-market-ticker']
+			},
+			alphaMarketDepthTrade(){
+				return this.$store.state['alpha-market-depth-trade']
+			}
 		},
 
 		// onHide() {
@@ -966,6 +977,7 @@
 
 		.tab-box {
 			display: flex;
+
 			&.info {
 				display: block;
 				padding-bottom: 20rpx;

@@ -269,7 +269,7 @@
 					font-size: 32rpx;
 					color: #2D270D;
 					width: 330rpx;
-					line-height: 64rpx;
+					line-height: 80rpx;
 					text-align: center;
 					border-radius: 8rpx;
 

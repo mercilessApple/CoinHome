@@ -1,10 +1,9 @@
 <script>
-	import Vue from 'vue'
 	import {
 		apiURL,
 		wsURL
 	} from '@/config'
-
+	import store from '@/store/index.js';
 	export default {
 		onLaunch: function() {
 			// #ifdef APP-PLUS
@@ -74,44 +73,45 @@
 					url: wsURL,
 				});
 
-				Vue.prototype.$onSocketMessage = (fn) => {
-					uni.onSocketOpen(() => {
+				uni.onSocketOpen(() => {
+					uni.sendSocketMessage({
+						data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+							'","sendMsgSuccess":true,"topic":"alpha-market-ticker"}'
+					})
+
+					// uni.sendSocketMessage({
+					// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+					// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
+					// })
+
+					clearInterval(this.timer)
+					// 维持心跳活动
+					this.timer = setInterval(() => {
 						uni.sendSocketMessage({
-							data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-								'","sendMsgSuccess":true,"topic":"alpha-market-ticker"}'
-						})
-
-						// uni.sendSocketMessage({
-						// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-						// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
-						// })
-
-						clearInterval(this.timer)
-						// 维持心跳活动
-						this.timer = setInterval(() => {
-							uni.sendSocketMessage({
-								data: JSON.stringify({
-									ping: new Date().valueOf()
-								})
+							data: JSON.stringify({
+								ping: new Date().valueOf()
 							})
-						}, 5000)
-					});
-					uni.onSocketMessage((message) => {
-						const response = JSON.parse(message.data)
-						const {
-							data
-						} = response
-						if (response.ping) {
-							return
-						}
-						fn(data)
-					});
-				}
-
-				// if (uni.getStorageSync('currentDayFlag')) {
-				// 	this.checkNotice()
-				// 	return
-				// }
+						})
+					}, 5000)
+				});
+				
+				uni.onSocketMessage((message) => {
+					const response = JSON.parse(message.data)
+					const {
+						data
+					} = response
+					if (response.ping) {
+						return
+					}
+					
+					// 以载荷形式分发
+					store.dispatch('onAlphaMarketTickerChange', data)
+					
+					if (data.asks != undefined) {
+						store.dispatch('onAlphaMarketDepthTradeChange', data)
+					}
+					
+				});
 
 				this.checkNotice()
 			}
@@ -119,7 +119,7 @@
 		onShow: function() {
 			console.log('App Show')
 			this.createScoket()
-			
+
 			this.utils.checkUpdate(this)
 		},
 		onUnload() {
@@ -149,16 +149,20 @@
 			background-color: transparent;
 		}
 	}
-input{
-  caret-color: #000;
-}
+
+	input {
+		caret-color: #000;
+	}
+
 	@media (prefers-color-scheme: dark) {
 		page {
 			background-color: #1F282F;
 		}
-input{
-  caret-color: #FEFA05;
-}
+
+		input {
+			caret-color: #FEFA05;
+		}
+
 		::v-deep {
 			.input {
 				/* #ifdef H5 */

@@ -130,7 +130,6 @@
 		getOptionalMarket,
 		getTickerByPartitionMarket
 	} from "@/config/api"
-
 	export default {
 		mixins: [MescrollMixin], // 使用mixin
 		data() {
@@ -203,8 +202,13 @@
 		onUnload() {
 
 		},
-		onShow() {
-			this.$onSocketMessage((data) => {
+		computed: {
+			alphaMarketTicker() {
+				return this.$store.state['alpha-market-ticker']
+			}
+		},
+		watch: {
+			alphaMarketTicker(data, oldValue) {
 				if (this.list != '') {
 					const index = this.list.findIndex(item => item.coinId == data.coinId)
 					if (index == -1) return
@@ -212,20 +216,23 @@
 					this.list[index].rangeAbility = Number(data.rangeAbility)
 					this.list[index].lastPriceCny = Number(data.lastPriceCny)
 				}
-			})
+			}
+		},
+		onShow() {
+			
 		},
 		methods: {
 			onSearchChange(e) {
 				if (e == '') {
 					this.open = false
 					this.list = this.oriList
-				} else{
+				} else {
 					this.open = true
 					let list = JSON.parse(JSON.stringify(this.oriList))
 					this.list = this.utils.fuzzyQuery(list, e, 'coinMarket')
-				} 
+				}
 			},
-		
+
 			toServer() {
 				if (!uni.getStorageSync('token')) {
 					uni.navigateTo({
