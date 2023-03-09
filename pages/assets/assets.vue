@@ -24,7 +24,7 @@
 					</view>
 				</view>
 				<view class="btn">
-					<view @click="toNext('/pages/recharge/recharge')">{{$t('充值')}}</view>
+					<view @click="toNext('/pages/rechargeDetail/rechargeDetail')">{{$t('充值')}}</view>
 					<view @click="toNext('/pages/rechargeDetail/rechargeDetail?coin=USDT&scene=withdraw')">{{$t('提现')}}
 					</view>
 				</view>

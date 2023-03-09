@@ -3,10 +3,10 @@
 		<u-navbar :leftIconColor="theme == 'light' ? '#303133' : '#fff'"
 			:bgColor="theme == 'light' ? '#fff' : '#1F282F'" placeholder title="" @rightClick="rightClick"
 			:autoBack="true">
-			<view class="navCenterSolt" slot='center'>
+			<view class="navCenterSolt" slot='center' @click="show = true">
 				<u-image v-if="theme == 'light'" src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
 				<u-image v-else src="/static/icon44.png" width="48rpx" height="48rpx"></u-image>
-				<text>{{market.symbolKey}}</text>
+				<text>{{tickerMarketInfo.coinMarket}}</text>
 			</view>
 			<view slot="right">
 				<u-image @click="add"
@@ -16,12 +16,13 @@
 		</u-navbar>
 		<view class="upper-box">
 			<view class="left">
-				<view class="amount">{{market.lastPrice}}</view>
+				<view class="amount">{{tickerMarketInfo.lastPrice}}</view>
 				<view class="unit">
-					≈ ¥{{market.lastPriceCny}} <text :class="{
-						add:market.rangeAbility >= 0 ,
-						err:market.rangeAbility < 0 ,
-					}">{{market.rangeAbility >=0 ? '+':''}}{{utils.decimal(market.rangeAbility * 100,2) + '%'}}</text>
+					≈ ¥{{tickerMarketInfo.lastPriceCny}} <text
+						:class="{
+						add:tickerMarketInfo.rangeAbility >= 0 ,
+						err:tickerMarketInfo.rangeAbility < 0 ,
+					}">{{tickerMarketInfo.rangeAbility >=0 ? '+':''}}{{utils.decimal(tickerMarketInfo.rangeAbility * 100,2) + '%'}}</text>
 				</view>
 			</view>
 			<view class="right">
@@ -106,17 +107,18 @@
 				<u-gap height="300rpx"></u-gap>
 			</block>
 
-			<view style="min-height: 480rpx" class="tab-box deal" v-show="tabIndex == 1">
+			<view style="min-height: 480rpx" class="tab-box deal" v-show="tabIndex == 1 && marketTradeList != ''">
+
 				<view class="tab-box-item">
 					<view class="title">
 						<text>{{$t('时间')}}</text>
 						<text>{{$t('方向')}}</text>
 					</view>
-					<view class="item" v-for="(item,index) in market.bids" :key="'time'+index">
-						<text>14:14:05</text><text>{{$t('买入')}}</text>
-					</view>
-					<view class="item" v-for="(item,index) in market.asks" :key="'type'+index">
-						<text>14:14:05</text><text class="err">{{$t('卖出')}}</text>
+
+					<view class="item" v-for="(item,index) in marketTradeList" :key="'time'+index">
+						<text>{{$moment(item.time * 1000).format('HH:mm:ss')}}</text><text :class="{
+							err:item.direction == 2
+						}">{{$t(item.direction == 1 ?'买入' : '卖出')}}</text>
 					</view>
 				</view>
 
@@ -126,15 +128,20 @@
 						<text>{{$t('价格')}}</text>
 						<text>{{$t('数量')}}</text>
 					</view>
-					<view class="item" v-for="(item,index) in market.bids" :key="'price'+index"><text
-							style="color: #2DBE87;">{{utils.decimal(item.trustPrice,5) }}</text><text>{{utils.decimal(item.cumulativeCommissionQuantity,5)}}</text>
-					</view>
-					<view class="item" v-for="(item,index) in market.asks" :key="'num'+index"><text
-							class="err">{{utils.decimal(item.trustPrice,5)}}</text><text>{{utils.decimal(item.cumulativeCommissionQuantity,5)}}</text>
+
+					<view class="item" v-for="(item,index) in marketTradeList" :key="'price'+index"><text :style="{
+								color: item.direction == 1 ?'#2DBE87' : ''
+							}" :class="{
+								err:item.direction == 2
+							}">{{item.price }}</text><text>{{item.amount}}</text>
 					</view>
 				</view>
 			</view>
-
+			<block v-if="tabIndex == 1 && marketTradeList == ''">
+				<u-gap height="300rpx"></u-gap>
+				<u-empty :text="$t('暂无数据')"></u-empty>
+				<u-gap height="300rpx"></u-gap>
+			</block>
 			<view class="tab-box info" v-show="tabIndex == 2">
 				<u-gap height="20rpx"></u-gap>
 				<view class="logo">
@@ -198,14 +205,63 @@
 		</view>
 		<u-gap height="120rpx"></u-gap>
 		<u-safe-bottom></u-safe-bottom>
+
+
+		<u-popup safeAreaInsetTop @open="open" bgColor="transparent" @close="close" :show="show" mode="left"
+			:customStyle="{
+			'border-radius':'0 60rpx 60rpx 0',
+			'width':'640rpx'
+		}">
+			<view class="popup">
+				<view class="title">{{ $t('市场') }}</view>
+				<view class="search">
+					<u-search @change="queryMarkets" v-model="searchKey" :color="theme == 'light' ? '' : '#fff'"
+						height="64rpx" placeholder="" :showAction="false"
+						:bgColor="theme == 'light' ? '#F6F6F6' : '#29313C'"></u-search>
+				</view>
+				<view class="popup-tab">
+					<u-tabs :current="marketTabIndex" :activeStyle="{
+						'color':theme == 'light' ? '#000000' : '#fff'
+					}" inactiveStyle="color:#848B9B" lineHeight="8rpx" lineWidth="48rpx" lineColor="#FEFA05" :list="popupTabs"
+						@click="chooseTabMarkets"></u-tabs>
+				</view>
+				<view class="list-tab">
+					<view>{{ $t('名称') }}</view>
+					<view>{{ $t('最新价格') }}/{{ $t('24h涨跌幅') }}</view>
+				</view>
+				<view class="list">
+					<scroll-view :style="{
+						'height':marketPopupSliderHeight + 'px'
+					}" scroll-y>
+						<view @click="selectMarket(item,index)" :class="{
+							'active':oriMarketItemIndex == index
+						}" class="item" v-for="(item,index) in marketList" :key="index">
+							<view class="left">
+								{{ item.coinMarket[0] }}
+								<text>/{{ item.coinMarket[1] }}</text>
+							</view>
+							<view class="right">
+								<view>{{ item.lastPrice }}</view>
+								<view :class="{
+									'err':item.rangeAbility < 0 && item.onDealing === 1
+								}">{{ item.rangeAbility >= 0 ? '+' : '' }}{{ utils.decimal(item.rangeAbility * 100, 2) }}%
+								</view>
+							</view>
+						</view>
+						<u-loadmore :status="marketStatus" :nomoreText="$t('nomoreText')"
+							:loadingText="$t('loadingText')" :loadmoreText="$t('loadmoreText')" />
+						<u-gap height="30rpx"></u-gap>
+					</scroll-view>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 
 </template>
 
 <script>
 	import {
-		JSCommon,
-		JSCHART_EVENT_ID
+		JSCommon
 	} from '@/uni_modules/jones-hqchart2/js_sdk/umychart.wechat.3.0.js'
 	import {
 		JSCommonHQStyle
@@ -224,7 +280,11 @@
 		addOptionalMarket,
 		getTickerMarket,
 		coinInfo,
-		deleteOptionalMarket
+		deleteOptionalMarket,
+		queryMarketPartition,
+		getOptionalMarket,
+		getTickerByPartitionMarket,
+		marketTrade
 	} from "@/config/api"
 
 
@@ -253,13 +313,33 @@
 	export default {
 		data() {
 			let data = {
+				marketTradeList: [],
+				marketStatus: 'loading',
+				marketList: [],
+				oriMarketList: [],
+				oriMarketItemIndex: 0,
+				popupTabs: [{
+						name: this.$t('自选')
+					},
+					// {
+					// 	name: 'GODE'
+					// },
+					// {
+					// 	name: 'USDT'
+					// }
+				],
+				searchKey: "",
+				marketTabIndex: 1,
+				marketPopupSliderHeight: 0,
+				show: false,
 				iconUrl: '',
 				coinMarket: '',
 				tickerMarketInfo: {
 					highest: 0,
 					amount: 0,
 					lowest: 0,
-					turnover: 0
+					turnover: 0,
+					coinMarket: this.$t('加载中...')
 				},
 				coinIntroduction: '',
 				tabs: [{
@@ -371,51 +451,7 @@
 				},
 				market: {
 					symbolKey: this.$t('加载中...'),
-					lastPrice: 0,
-					lastPriceCny: 0,
-					rangeAbility: 0,
-					asks: [{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						}
-					],
-					bids: [{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						},
-						{
-							trustPrice: 0,
-							cumulativeCommissionQuantity: 0
-						}
-					],
+
 				},
 				// PERIOD_ID: PERIOD_ID,
 				entrustList: {
@@ -450,15 +486,38 @@
 				}) => {
 					this.iconUrl = iconUrl
 				})
-				
-				let topic = this.coinMarket.toLowerCase().replace('/', '-')
-				uni.sendSocketMessage({
-					data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-						'-trade"}'
-				})
+
+				// let topic = this.coinMarket.toLowerCase().replace('/', '-')
+				// uni.sendSocketMessage({
+				// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+				// 		'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+				// 		'-trade"}'
+				// })
 			})
 			// this.tickerMarket()
+
+
+			queryMarketPartition().then(market => {
+				let popupTabs = market.map(item => {
+					return {
+						name: item
+					}
+				})
+				popupTabs.unshift({
+					name: this.$t('自选')
+				})
+				this.popupTabs = popupTabs
+
+				this.queryMarkets((e) => {
+					if (options.coinMarket) {
+						this.marketItemIndex = e.findIndex(item => item.oriCoinMarketText == options
+							.coinMarket)
+						this.oriMarketItemIndex = this.marketItemIndex
+					}
+					this.oriMarketList = e
+				})
+			})
+
 		},
 
 		onShow() {
@@ -497,20 +556,36 @@
 				}
 				this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
 			},
-			
-			alphaMarketDepthTrade(data,oldValue){
-				let {
-					asks,
-					bids
-				} = data
-				let newAsks = asks.slice(0, 5),
-					newBids = bids.slice(0, 5)
-				
-				this.market.asks = newAsks
-				this.market.bids = newBids
-				this.market.lastPrice = data.lastPrice
-				this.market.lastPriceCny = data.lastPriceCny
-				this.market.rangeAbility = data.rangeAbility
+			coinMarket(n, o) {
+
+				let topic = o.toLowerCase().replace('/', '-')
+				if (o != '') {
+					uni.sendSocketMessage({
+						data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+							'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
+							'-trade"}'
+					})
+				}
+
+				let ntopic = n.toLowerCase().replace('/', '-')
+				uni.sendSocketMessage({
+					data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
+						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + ntopic +
+						'-trade"}'
+				})
+			},
+			alphaMarketDepthTrade(data, oldValue) {
+				// let {
+				// 	asks,
+				// 	bids
+				// } = data
+				// let newAsks = asks.slice(0, 20),
+				// 	newBids = bids.slice(0, 20)
+				// this.market.asks = newAsks
+				// this.market.bids = newBids
+				// this.market.lastPrice = data.lastPrice
+				// this.market.lastPriceCny = data.lastPriceCny
+				// this.market.rangeAbility = data.rangeAbility
 			},
 			alphaMarketTicker(data, oldValue) {
 				if (data.coinMarket == this.coinMarket) {
@@ -518,14 +593,18 @@
 					this.tickerMarketInfo.amount = data.amount
 					this.tickerMarketInfo.lowest = data.lowest
 					this.tickerMarketInfo.turnover = data.turnover
+					uni.$emit('onAlphaMarketTicker', data)
 				}
-			},
+				this.updateMarketList(this.marketList, data)
+				this.updateMarketList(this.oriMarketList, data)
+
+			}
 		},
 		computed: {
 			alphaMarketTicker() {
 				return this.$store.state['alpha-market-ticker']
 			},
-			alphaMarketDepthTrade(){
+			alphaMarketDepthTrade() {
 				return this.$store.state['alpha-market-depth-trade']
 			}
 		},
@@ -558,18 +637,128 @@
 					'-trade"}'
 			})
 			if (g_KLine.JSChart) {
-				g_KLine.JSChart.StopAutoUpdate();
 				g_KLine.JSChart = null;
 			}
 
 			if (d_Line.JSChart) {
-				d_Line.JSChart.StopAutoUpdate();
+				d_Line.JSChart.StopAutoUpdate()
 				d_Line.JSChart = null;
 			}
-
-
 		},
 		methods: {
+			updateMarketList(list, data) {
+				if (list != '' && data.coinId != undefined) {
+					const index = list.findIndex(item => item.coinId == data.coinId)
+					if (index == -1) return
+					list[index].lastPrice = data.lastPrice
+					list[index].rangeAbility = data.rangeAbility
+					list[index].lastPriceCny = data.lastPriceCny
+				}
+			},
+			async queryMarkets(fn = () => {}) {
+				let data
+				if (this.marketTabIndex == 0) data = await getOptionalMarket()
+				else data = await getTickerByPartitionMarket({
+					partition: this.popupTabs[this.marketTabIndex].name
+				})
+
+				this.marketStatus = 'nomore'
+
+				if (data == '') {
+					this.marketList = []
+					return
+				} else {
+					data.forEach(item => {
+						if (item.coinMarket) {
+							item.oriCoinMarketText = item.coinMarket
+							item.coinMarket = item.coinMarket.split('/')
+						}
+						item.price = item.lastPrice
+					})
+
+					if (this.searchKey == '') {
+						this.marketList = data
+					} else {
+						// this.marketList = this.fuzzyQuery(data, this.searchKey)
+						this.marketList = this.utils.fuzzyQuery(data, this.searchKey, 'oriCoinMarketText')
+					}
+				}
+
+				fn(this.marketList)
+			},
+			selectMarket(item, index) {
+				this.marketItemIndex = index
+				this.oriMarketItemIndex = index
+				this.show = false
+				this.tickerMarketInfo = {
+					highest: 0,
+					amount: 0,
+					lowest: 0,
+					turnover: 0,
+					coinMarket: this.$t('加载中...')
+				}
+				this.coinMarket = item.oriCoinMarketText
+
+				if (this.isShowDeep) {
+					d_Line.JSChart.StopAutoUpdate()
+					d_Line.JSChart = null;
+					this.createDeepChart()
+				} else {
+					g_KLine.JSChart = null;
+					this.CreateKLineChart()
+				}
+
+				this.getHandicap()
+
+				this.tickerMarket()
+
+				let coin = this.coinMarket.split('/')
+				queryCoinIntroduction({
+					coinName: coin[0]
+				}).then(e => {
+					if (uni.getLocale() == 'zh') {
+						e.desc = e.coinIntroduction
+					} else {
+						e.desc = e.coinIntroductionEnglish
+					}
+					this.coinIntroduction = e
+					coinInfo({
+						coinId: e.coinId
+					}).then(({
+						iconUrl
+					}) => {
+						this.iconUrl = iconUrl
+					})
+				})
+			},
+			chooseTabMarkets({
+				index
+			}) {
+				if (index == this.marketTabIndex) return
+				this.marketStatus = 'loading'
+				this.marketList = []
+				this.marketTabIndex = index
+
+				this.queryMarkets(() => {
+					let i = this.marketList.findIndex(item => item.oriCoinMarketText == this.tickerMarketInfo
+						.coinMarket)
+					if (i === -1) {
+						this.oriMarketItemIndex = null
+					} else {
+						this.oriMarketItemIndex = i
+					}
+				})
+			},
+			close() {
+				this.show = false
+			},
+			open() {
+				if (this.marketPopupSliderHeight != 0) return
+				const query = uni.createSelectorQuery().in(this);
+				query.select('.popup .list').boundingClientRect(data => {
+					this.marketPopupSliderHeight = data.height
+				}).exec();
+			},
 			tickerMarket() {
 				getTickerMarket({
 					coinMarket: this.coinMarket
@@ -616,33 +805,42 @@
 					url: '/pages/transaction/transaction'
 				})
 			},
+			getHandicap() {
+				marketTrade({
+					coinMarket: this.coinMarket,
+					size: 20
+				}).then(e => {
+					this.marketTradeList = e
+					// return
+					// if (!Boolean(e)) {
+					// 	this.market.symbolKey = this.coinMarket
+					// 	return
+					// }
+					// let {
+					// 	asks,
+					// 	bids
+					// } = e
+					// let newAsks = asks.slice(0, 20),
+					// 	newBids = bids.slice(0, 20)
+					// e.asks = newAsks
+					// e.bids = newBids
+					// this.market = e
+				})
+			},
 			init() {
 				clearInterval(this.timer)
 				this.tickerMarket()
-				getMarketDeeps({
-					coinMarket: this.coinMarket,
-					type: 'detail'
-				}).then(e => {
-					if (!Boolean(e)) {
-						this.market.symbolKey = this.coinMarket
-						return
-					}
-					let {
-						asks,
-						bids
-					} = e
-					let newAsks = asks.slice(0, 5),
-						newBids = bids.slice(0, 5)
-					e.asks = newAsks
-					e.bids = newBids
-					this.market = e
-				})
+				this.getHandicap()
 
 				this.queryUserEntrustList()
 
-				this.timer = setInterval(this.queryUserEntrustList, 3000)
+				this.timer = setInterval(() => {
+					this.getHandicap()
+					this.queryUserEntrustList()
+				}, 1000)
 			},
 			queryUserEntrustList() {
+				if (!uni.getStorageSync('token')) return
 				getUserEntrustList({
 					coinMarket: this.coinMarket
 				}).then(e => {
@@ -750,26 +948,78 @@
 				this.KLine.Option.IsFullDraw = true; //每次手势移动全屏重绘
 				g_KLine.JSChart.SetOption(this.KLine.Option);
 
-				// //注册监听事件         
-				// g_KLine.JSChart.AddEventCallback({
-				// 	event: JSCommon.JSCHART_EVENT_ID.RECV_START_AUTOUPDATE,
-				// 	callback: this.startKlineAutoUpdate
-				// });
-				// g_KLine.JSChart.AddEventCallback({
-				// 	event: JSCommon.JSCHART_EVENT_ID.RECV_STOP_AUTOUPDATE,
-				// 	callback: this.stopKlineAutoUpdate
-				// });
+				//注册监听事件         
+				g_KLine.JSChart.AddEventCallback({
+					event: JSCommon.JSCHART_EVENT_ID.RECV_START_AUTOUPDATE,
+					callback: this.startAutoUpdate
+				});
+				g_KLine.JSChart.AddEventCallback({
+					event: JSCommon.JSCHART_EVENT_ID.RECV_STOP_AUTOUPDATE,
+					callback: this.stopAutoUpdate
+				});
 			},
-			// startKlineAutoUpdate(data) {
-			// 	console.log('[startAutoUpdate] data', data);
-			// 	//根据data.Stock.Period周期，使用websocket下载对应的当天日线或当天分钟数据
-			// 	//数据转换成hqchart接口，使用data.Callback(data) 更新到HQChart中
+			startAutoUpdate(event, DATA, obj) {
+				// console.log('[startAutoUpdate] data', data);
+				//根据data.Stock.Period周期，使用websocket下载对应的当天日线或当天分钟数据
+				//数据转换成hqchart接口，使用data.Callback(data) 更新到HQChart中
+				const self = this
+				uni.$on('onAlphaMarketTicker', function(data) {
+					if (self.isShowDeep) {
+						return
+					}
+					const timeKey = self.timeNav[self.timeIndex].key
+					let currentKLine = data.klines[timeKey]
+					let coin = self.coinMarket.split('/'),
+						response = {}
+					//	日线数据
+					if (DATA.Explain == "KLineChartContainer::RequestHistoryData") {
+						response = {
+							code: 0,
+							stock: [{
+								"symbol": coin[0] + coin[1] + '.BIT',
+								"name": currentKLine.coinMarket,
+								"date": Number(self.$moment(currentKLine.time * 1000).format(
+									'YYYYMMDD')),
+								"yclose": null,
+								"open": Number(currentKLine.open),
+								"high": Number(currentKLine.high),
+								"low": Number(currentKLine.low),
+								"price": Number(currentKLine.rangeAbilityAmount),
+								"vol": Number(currentKLine.amount),
+								"amount": Number(currentKLine.turnover)
+							}, ]
+						}
+					}
 
-			// 	console.log(this.KLine.Option.KLine.Period);
-			// },
-			// stopKlineAutoUpdate(data){
+					//	分钟数据
+					if (DATA.Explain == "KLineChartContainer::ReqeustHistoryMinuteData") {
+						response = {
+							code: 0,
+							"symbol": coin[0] + coin[1] + '.BIT',
+							"name": currentKLine.coinMarket,
+							data: [
+								[
+									Number(self.$moment(currentKLine.time * 1000).format(
+										'YYYYMMDD')), //日期
+									null, //前收盘价
+									Number(currentKLine.open), //开盘价
+									Number(currentKLine.high), //最高
+									Number(currentKLine.low), //最低
+									Number(currentKLine.close), //收盘价
+									Number(currentKLine.amount), //成交量
+									Number(currentKLine.turnover), //成交金额
+									Number(self.$moment(currentKLine.time * 1000).format(
+										'HHmm')), //日期格式
+								]
+							]
+						}
+					}
 
-			// },
+					DATA.Callback({
+						data: response
+					})
+				})
+			},
 			//K线周期切换
 			ChangeKLinePeriod(period, index) {
 				this.timeIndex = index
@@ -933,6 +1183,99 @@
 </script>
 
 <style lang="scss">
+	.popup {
+		display: flex;
+		flex-direction: column;
+		height: calc(100vh - var(--status-bar-height));
+		border-radius: 0 60rpx 60rpx 0;
+		background-color: #fff;
+		overflow: hidden;
+		position: relative;
+		z-index: 1;
+
+		.list {
+			flex: 1;
+
+			.item {
+				display: flex;
+				justify-content: space-between;
+				padding: 0 30rpx;
+				height: 96rpx;
+				align-items: center;
+
+				&.active {
+					background-color: #F6F6F6;
+				}
+
+				.right {
+					view {
+						&:first-child {
+							font-weight: bold;
+							color: #000000;
+							font-size: 30rpx;
+						}
+
+						&:last-child {
+							font-weight: bold;
+							text-align: right;
+							color: #2DBE87;
+							font-size: 24rpx;
+
+							&.err {
+								color: #F5475E;
+							}
+						}
+					}
+				}
+
+				.left {
+					font-weight: bold;
+					font-size: 30rpx;
+					padding-top: 20rpx;
+					align-self: flex-start;
+
+					text {
+						color: #848D96;
+						font-size: 24rpx;
+					}
+				}
+			}
+		}
+
+		.list-tab {
+			padding: 0 30rpx;
+			display: flex;
+			justify-content: space-between;
+			height: 92rpx;
+			align-items: center;
+			color: #BAB9BE;
+			font-size: 24rpx;
+		}
+
+		.popup-tab {
+			border-bottom: 2rpx solid #EFEFEF;
+		}
+
+		::v-deep {
+			.u-tabs__wrapper__nav__line {
+				// bottom: 0 !important;
+			}
+		}
+
+		.search {
+			margin-bottom: 15rpx;
+			padding: 0 30rpx;
+		}
+
+		.title {
+			padding: 0 30rpx;
+			padding-top: 70rpx;
+			font-weight: 500;
+			margin-bottom: 30rpx;
+			font-size: 48rpx;
+		}
+	}
+
 	.fix-bar {
 		position: fixed;
 		width: 100%;
@@ -1256,9 +1599,12 @@
 		.tab-content .tab-box.info .lab-item view:last-child,
 		.tab-content .tab-box.info .desc,
 		.tab-content .tab-box.info .logo text,
-		.other-box view.active {
+		.other-box view.active,
+		.popup .title,
+		.popup .list .item .right view:first-child {
 			color: #fff;
 		}
+
 
 		.fix-bar {
 			background: #29313C;
@@ -1267,6 +1613,29 @@
 		.tabs-box {
 			&.u-border-bottom {
 				border-color: #343B45 !important;
+			}
+		}
+
+		.popup .popup-tab {
+			border-bottom-color: #343B45;
+		}
+
+		.popup {
+			background-color: #1F282F;
+		}
+
+		.popup .list .item.active {
+			background-color: #29313C;
+		}
+
+		page {
+			::v-deep {
+
+				.u-popup {
+					.u-status-bar {
+						opacity: 0 !important;
+					}
+				}
 			}
 		}
 	}

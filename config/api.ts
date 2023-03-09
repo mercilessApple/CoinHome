@@ -153,3 +153,5 @@ export const phoneOrEmailCode = (params: any, config: any) => http.post('/api/us
 
 export const noviceGiftPack = (params: any, config: any) => http.post('/api/account/gift/state/novice-gift-pack', params, config)
 
+export const marketTrade = (params: any, config: any) => http.post('/api/market/trade', params, config)
+

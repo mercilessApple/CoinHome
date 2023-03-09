@@ -61,9 +61,9 @@
 
 				</u-form-item>
 				
-				<u-form-item :label="$t('邀请码')" v-if="inviteCode != ''">
+				<u-form-item :label="$t('推荐码（选填）')">
 					<view class="input-box">
-						<u-input readonly v-model="inviteCode" border="none">
+						<u-input v-model="inviteCode" border="none">
 							
 						</u-input>
 					</view>

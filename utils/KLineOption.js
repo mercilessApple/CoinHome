@@ -21,11 +21,14 @@ export const KLineOption = {
 				Change: false
 			},
 		],
-	IsAutoUpdate: true, //是自动更新数据
+	IsApiPeriod: true,
+	IsAutoUpdate: false, //是自动更新数据
 	// IsAutoUpdate: false, //是自动更新数据
 	AutoUpdateFrequency: 1000,
 	CorssCursorTouchEnd: true,
-	IsShowRightMenu: false, //是否显示右键菜单
+
+	IsShowRightMenu: true, //右键菜单
+	IsShowCorssCursorInfo: true, //是否显示十字光标的刻度信息
 	CorssCursorInfo: {
 		Left: 2,
 		Right: 2
@@ -33,37 +36,60 @@ export const KLineOption = {
 	Border: //边框
 	{
 		Left: 1,
-		Right: 2, //右边间距
-		Top: 0,
+		Right: 50, //右边间距
+		Top: 25,
 		Bottom: 25,
+	},
+	KLineTitle: //标题设置
+	{
+		IsShowName: true, //不显示股票名称
+		IsShowSettingInfo: true //不显示周期/复权
 	},
 
 	KLine: {
+		DragMode: 1,
 		Right: 1, //复权 0 不复权 1 前复权 2 后复权
 		Period: 0, //周期: 0 日线 1 周线 2 月线 3 年线 
-		PageSize: 30,
-		IsShowTooltip: false
+		PageSize: 20,
+		IsShowTooltip: true
 	},
 
 	Frame: //子框架设置 (Height 窗口高度比例值)
-		[{
+		[
+			// {
+			// 	SplitCount: 3,
+			// 	//Height:4,
+			// 	IsShowLeftText: true,
+			// 	IsShowRightText: false
+			// },
+			// {
+			// 	SplitCount: 2,
+			// 	//Height:2,
+			// 	IsShowLeftText: true,
+			// 	IsShowRightText: false
+			// },
+			// {
+			// 	SplitCount: 2,
+			// 	//Height:2,
+			// 	IsShowLeftText: true,
+			// 	IsShowRightText: false
+			// },
+			{
 				SplitCount: 3,
-				//Height:4,
-				IsShowLeftText: true,
-				IsShowRightText: false
+				StringFormat: 0,
+				IsShowLeftText: false
 			},
 			{
 				SplitCount: 2,
-				//Height:2,
-				IsShowLeftText: true,
-				IsShowRightText: false
+				StringFormat: 0,
+				IsShowLeftText: false
 			},
 			{
 				SplitCount: 2,
-				//Height:2,
-				IsShowLeftText: true,
-				IsShowRightText: false
+				StringFormat: 0,
+				IsShowLeftText: false
 			}
+
 		],
 
 	ExtendChart: [{

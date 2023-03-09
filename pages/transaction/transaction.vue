@@ -52,27 +52,27 @@
 					<u-gap height="16rpx"></u-gap>
 					<view class="number-box">
 						<!-- <block v-if="oriMarketList != ''"> -->
-							<!-- <u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
+						<!-- <u-number-box :color="theme == 'light' ? '#323233' : '#fff'"
 								:bgColor="theme == 'light' ? '#f6f6f6' : '#29313C'" inputWidth="286rpx"
 								v-model="oriMarketList[marketItemIndex].price">
 							</u-number-box> -->
 
 
-							<view @click="onPriceChange('minus')" class="icon">
-								<u-icon color="rgb(96, 98, 102)"
-									bold name="minus"></u-icon>
-							</view>
-							<block v-if="oriMarketList != ''">
-							<u-input :color="inverseParams('#000' , '#fff')" v-model="oriMarketList[marketItemIndex].price" inputAlign="center" border="none"
+						<view @click="onPriceChange('minus')" class="icon">
+							<u-icon color="rgb(96, 98, 102)" bold name="minus"></u-icon>
+						</view>
+						<block v-if="oriMarketList != ''">
+							<u-input :color="inverseParams('#000' , '#fff')"
+								v-model="oriMarketList[marketItemIndex].price" inputAlign="center" border="none"
 								type="digit">
 							</u-input>
-							</block>
-							<block v-else>
-								<view style="flex: 1;"></view>
-							</block>
-							<view @click="onPriceChange('plus')" class="icon">
-								<u-icon bold name="plus"></u-icon>
-							</view>
+						</block>
+						<block v-else>
+							<view style="flex: 1;"></view>
+						</block>
+						<view @click="onPriceChange('plus')" class="icon">
+							<u-icon bold name="plus"></u-icon>
+						</view>
 						<!-- </block> -->
 					</view>
 					<u-gap height="16rpx"></u-gap>
@@ -84,7 +84,8 @@
 						<view @click="onCountChange('minus')" class="icon">
 							<u-icon color="rgb(96, 98, 102)" bold name="minus"></u-icon>
 						</view>
-						<u-input :color="inverseParams('#000' , '#fff')" @blur="onCountBlur" v-model="count" inputAlign="center" border="none" type="digit"
+						<u-input :color="inverseParams('#000' , '#fff')" @blur="onCountBlur" v-model="count"
+							inputAlign="center" border="none" type="digit"
 							:placeholder="`${$t('数量')}${marketStatus == 'loading' ? '' : marketItem.coinMarket[0]}`">
 						</u-input>
 						<view @click="onCountChange('plus')" class="icon">
@@ -103,7 +104,8 @@
 
 					<view class="total-amount">
 						<block v-if="oriMarketList != ''">
-							<u-input readonly :value="utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision) == 0 ? '' : utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision)"
+							<u-input readonly
+								:value="utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision) == 0 ? '' : utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision)"
 								:color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
 								border="none" :placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
 							</u-input>
@@ -145,12 +147,14 @@
 					</view>
 					<view class="price-box">
 						<view>
-							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice"
+								v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
 								{{ utils.decimal(item.trustPrice, 4) }}
 							</view>
 						</view>
 						<view>
-							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice"
+								v-for="(item,index) in marketDeeps.asks" :key="index" class="price">
 								{{ utils.decimal(item.cumulativeCommissionQuantity, 4) }}
 							</view>
 						</view>
@@ -161,12 +165,14 @@
 					</view>
 					<view class="price-box bottom">
 						<view>
-							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice"
+								v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
 								{{ utils.decimal(item.trustPrice, 4) }}
 							</view>
 						</view>
 						<view>
-							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice" v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
+							<view @click="oriMarketList[marketItemIndex].price = item.trustPrice"
+								v-for="(item,index) in marketDeeps.bids" :key="index" class="price">
 								{{ utils.decimal(item.cumulativeCommissionQuantity, 4) }}
 							</view>
 						</view>
@@ -319,7 +325,7 @@
 				marketTabIndex: 1,
 				marketStatus: 'loading',
 				marketItemIndex: 0,
-				oriMarketItemIndex:0,
+				oriMarketItemIndex: 0,
 				// marketItemIndex: 2,
 				marketList: [],
 				status: 'loading',
@@ -423,6 +429,7 @@
 		},
 		onHide() {
 			clearInterval(this.timer)
+			if (this.oriMarketList == '') return
 			let topic = this.oriMarketList[this.marketItemIndex].oriCoinMarketText.toLowerCase().replace(
 				'/', '-')
 			uni.sendSocketMessage({
@@ -446,12 +453,12 @@
 			alphaMarketTicker() {
 				return this.$store.state['alpha-market-ticker']
 			},
-			alphaMarketDepthTrade(){
+			alphaMarketDepthTrade() {
 				return this.$store.state['alpha-market-depth-trade']
 			}
 		},
 		watch: {
-			alphaMarketDepthTrade(data,oldValue){
+			alphaMarketDepthTrade(data, oldValue) {
 				let {
 					asks,
 					bids
@@ -469,7 +476,7 @@
 				this.updateMarketList(this.marketList, data)
 				this.updateMarketList(this.oriMarketList, data)
 			},
-			marketItem(n,o){
+			marketItem(n, o) {
 				let topic = n.oriCoinMarketText.toLowerCase().replace(
 					'/', '-')
 				uni.sendSocketMessage({
@@ -477,14 +484,16 @@
 						'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
 						'-trade"}'
 				})
-				if(o.oriCoinMarketText){
-					let oldTopic = o.oriCoinMarketText.toLowerCase().replace(
-						'/', '-')
-					uni.sendSocketMessage({
-						data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
-							'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + oldTopic +
-							'-trade"}'
-					})
+				if (o.oriCoinMarketText != n.oriCoinMarketText) {
+					if (o.oriCoinMarketText) {
+						let oldTopic = o.oriCoinMarketText.toLowerCase().replace(
+							'/', '-')
+						uni.sendSocketMessage({
+							data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
+								'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + oldTopic +
+								'-trade"}'
+						})
+					}
 				}
 			}
 		},
@@ -575,9 +584,11 @@
 			});
 		},
 		methods: {
-			onBarIndexChange(index){
+			onBarIndexChange(index) {
 				this.barIndex = index
 				this.queryUserEntrustList()
+				this.count = ""
+				this.blockIndex = null
 			},
 			onPriceChange(scene) {
 				this.onNumberChange('oriMarketList[marketItemIndex].price', scene, 'price')
@@ -596,25 +607,26 @@
 
 			},
 			onNumberChange(num, scene, type) {
-				let count = type == 'price' ? String(this['oriMarketList'][this.marketItemIndex].price).split('.') : String(this[num]).split('.')
-					
+				let count = type == 'price' ? String(this['oriMarketList'][this.marketItemIndex].price).split('.') :
+					String(this[num]).split('.')
+
 				if (scene == 'minus') {
 					count[0] -= 1
-					if (count[0] < 0 ) {
+					if (count[0] < 0) {
 						if (type == 'price') this['oriMarketList'][this.marketItemIndex].price = 0
 						else this[num] = ''
 						return
 					}
-					if(count.length == 1 && count[0] ==0){
+					if (count.length == 1 && count[0] == 0) {
 						if (type == 'price') this['oriMarketList'][this.marketItemIndex].price = 0
 						else this[num] = ''
 						return
 					}
 				} else {
-					count[0] ++
+					count[0]++
 				}
-				count = count.join(count.length == 2 ? '.':'')
-				
+				count = count.join(count.length == 2 ? '.' : '')
+
 				if (type == 'price') this['oriMarketList'][this.marketItemIndex].price = count
 				else this[num] = count
 			},
@@ -648,28 +660,34 @@
 				}
 			},
 			submit() {
-				let total = this.utils.decimal(this.count * this.oriMarketList[this.marketItemIndex].price,this.oriMarketList[this.marketItemIndex].amountPrecision)
-				if(this.count == ''){
+				let total = this.utils.decimal(this.count * this.oriMarketList[this.marketItemIndex].price, this
+					.oriMarketList[this.marketItemIndex].amountPrecision)
+				if (this.count == '') {
 					uni.showToast({
-						title:this.$t('请输入数量'),
-						icon:'none'
+						title: this.$t('请输入数量'),
+						icon: 'none'
 					})
 					return
 				}
-				if(this.oriMarketList[this.marketItemIndex].price == ''){
+				if (this.oriMarketList[this.marketItemIndex].price == '') {
 					uni.showToast({
-						title:this.$t('请输入价格'),
-						icon:'none'
+						title: this.$t('请输入价格'),
+						icon: 'none'
 					})
 					return
 				}
-				if(this.getAccount().amount < total){
-					uni.showToast({
-						title:this.$t('余额不足，请确认账户资产后重新下单'),
-						icon:'none'
-					})
-					return
+				if (this.barIndex == 0) {
+					if (this.getAccount().amount < total) {
+						uni.showToast({
+							title: this.$t('余额不足，请确认账户资产后重新下单'),
+							icon: 'none'
+						})
+						return
+					}
+				} else {
+
 				}
+
 				uni.showLoading({
 					mask: true
 				})
@@ -691,17 +709,25 @@
 					return
 				}
 				this.blockIndex = index == this.blockIndex ? null : index
+				if (this.barIndex == 1) {
+					// 卖出
+					this.count = this.utils.decimal((this.getAccount().amount * item.key), this.oriMarketList[this
+						.marketItemIndex].amountPrecision)
+					return
+				}
 				if (this.blockIndex != null) {
-					if(this.getAccount().amount == 0){
+
+					if (this.getAccount().amount == 0) {
 						uni.showToast({
-							title:this.$t('余额不足，请确认账户资产后重新下单'),
-							icon:'none'
+							title: this.$t('余额不足，请确认账户资产后重新下单'),
+							icon: 'none'
 						})
 						return
 					}
 					let price = this.oriMarketList[this.marketItemIndex].price
-					let va = this.utils.decimal((this.getAccount().amount * item.key) / price, this.oriMarketList[this.marketItemIndex].amountPrecision)
-					if(price == ''){
+					let va = this.utils.decimal((this.getAccount().amount * item.key) / price, this.oriMarketList[this
+						.marketItemIndex].amountPrecision)
+					if (price == '') {
 						va = 0
 					}
 					this.count = va == 0 ? 1 : va
@@ -811,7 +837,7 @@
 							// 			'-trade"}'
 							// 	})
 							// },1000)
-							
+
 						}
 
 					})
@@ -839,9 +865,6 @@
 						}
 					}
 					return data[0]
-					// return {
-					// 	amount:100000
-					// }
 				}
 			},
 			open() {
@@ -898,7 +921,7 @@
 						this.marketList = this.utils.fuzzyQuery(data, this.searchKey, 'oriCoinMarketText')
 					}
 				}
-			
+
 				fn(this.marketList)
 
 				// if (data == '') {
@@ -953,12 +976,14 @@
 				this.marketList = []
 				this.marketTabIndex = index
 				// this.marketItemIndex = index
-				
-				this.queryMarkets(()=>{
-					let i= this.marketList.findIndex(item=>item.oriCoinMarketText == this.marketItem.oriCoinMarketText)
-					if(i === -1){
+
+				this.queryMarkets(() => {
+
+					let i = this.marketList.findIndex(item => item.oriCoinMarketText == this.marketItem
+						.oriCoinMarketText)
+					if (i === -1) {
 						this.oriMarketItemIndex = null
-					}else{
+					} else {
 						this.oriMarketItemIndex = i
 					}
 				})
@@ -1317,7 +1342,7 @@
 						>view {
 							&:first-child {
 								.price {
-									color: #F5475E;
+									color: #2DBE87;
 								}
 							}
 						}
@@ -1356,7 +1381,7 @@
 
 						&:first-child {
 							.price {
-								color: #2DBE87;
+								color: #F5475E;
 							}
 						}
 					}
@@ -1367,6 +1392,7 @@
 				width: 60%;
 				display: flex;
 				flex-direction: column;
+
 				.btn {
 					line-height: 80rpx;
 					text-align: center;

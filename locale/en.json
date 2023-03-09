@@ -318,5 +318,6 @@
 	"价值50RMB等额的数字货币盲盒: BTC / ETH / USDT / GODE/ BAYE等。":"Digital currency blind box with an equivalent value of 50RMB: BTC/ETH/USDT/GODE/ BAYE, etc.",
 	"余额不足，请确认账户资产后重新下单":"The balance is insufficient, please confirm the account assets and re-order",
 	"请输入数量":"Please enter quantity",
-	"请输入价格":"Please enter the price"
+	"请输入价格":"Please enter the price",
+	"推荐码（选填）":"Recommendation code (optional)"
 }

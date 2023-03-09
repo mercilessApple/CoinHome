@@ -14,11 +14,10 @@ export const serviceURL = 'http://192.168.2.24:8046/customer/service/chat?u=' + 
 // 帮助中心
 export const helpCenterURL = 'https://coinhome-1.gitbook.io/coinhome-bang-zhu-zhong-xin/'
 
+// 关于我们
 export const aboutUsURL = 'https://coinhome-1.gitbook.io/coinhome-bang-zhu-zhong-xin/coinhome-bang-zhu-zhong-xin/guan-yu-coinhome'
 
-// 长连接url
-// export const socketURL = 'ws://coinhome-api.godsfin.vip/ws/zh_cn/'
-
+// 模糊搜索
 export const fuzzyQuery = (list, keyWord, val) => {
     var arr = [];
     for (var i = 0; i < list.length; i++) {
@@ -45,7 +44,6 @@ export const checkUpdate = (self, isToast = false) => {
                 deviceType: 2,
             }
         }).then(result => {
-			console.log(result)
             if (result.needUpdate && result.downloadUrl) {
                 uni.hideLoading()
                 uni.showModal({
@@ -121,4 +119,5 @@ export const checkUpdate = (self, isToast = false) => {
     // #endif
 }
 
+// 密码正则表达式
 export const pwdREG = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[`~!@#$%^&*()_+<>?:"{},.\/\\;'[\]])[A-Za-z\d`~!@#$%^&*()_+<>?:"{},.\/\\;'[\]]{8,}$/

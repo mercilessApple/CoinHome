@@ -7,10 +7,10 @@
 				}">{{listItem.type == 2 ? $t('卖出'): $t('买入')}}</text> {{listItem.coinMarket[0]}}
 			</view>
 			<view class="right">
-				<text v-if="listItem.type == 1">{{$t('完全成交')}}</text>
-				<text v-if="listItem.type == 2">{{$t('部分成交')}}</text>
-				<text v-if="listItem.type == 3">{{$t('撤销中')}}</text>
-				<text v-if="listItem.type == 4">{{$t('撤销成功')}}</text>
+				<text v-if="(listItem.orderStatus || listItem.status) == 1">{{$t('完全成交')}}</text>
+				<text v-if="(listItem.orderStatus || listItem.status) == 2">{{$t('部分成交')}}</text>
+				<text v-if="(listItem.orderStatus || listItem.status) == 3">{{$t('撤销中')}}</text>
+				<text v-if="(listItem.orderStatus || listItem.status) == 4">{{$t('撤销成功')}}</text>
 			</view>
 		</view>
 		<view class="card" v-for="(item,index) in list" :key="index">
@@ -32,11 +32,11 @@
 			</view>
 			<view class="item">
 				<view>{{$t('实际成交')}}[{{listItem.coinMarket[0]}}]</view>
-				<view>{{utils.decimal(listItem.dealAmount,5)}}</view>
+				<view>{{item.amount}}</view>
 			</view>
 			<view class="item">
 				<view>{{$t('成交总额')}}[{{listItem.coinMarket[1]}}]</view>
-				<view>{{listItem.totalTurnover}}</view>
+				<view>{{item.amount * listItem.averagePrice}}</view>
 			</view>
 			<view class="item">
 				<view>{{$t('手续费')}}[{{listItem.coinMarket[1]}}]</view>
@@ -61,8 +61,18 @@
 		onLoad(options) {
 			const listItem = uni.getStorageSync('orderDetailItem')
 			this.entrustNo = options.entrustNo
-			console.log(listItem);
 			this.pageNum = 1
+			uni.showLoading({
+				mask: true
+			})
+			this.getList()
+		},
+		onReachBottom() {
+			if (this.loaded) return
+			uni.showLoading({
+				mask: true
+			})
+			this.pageNum++
 			this.getList()
 		},
 		onUnload() {
@@ -76,6 +86,11 @@
 					pageNum: this.pageNum,
 					pageSize: 10
 				}).then(e => {
+					uni.hideLoading()
+					if (e.records == '') {
+						this.loaded = true
+						return
+					}
 					this.list = this.list.concat(e.records)
 				})
 				// }
@@ -90,6 +105,7 @@
 		border-radius: 12rpx;
 		padding: 33rpx 30rpx;
 		margin-top: 33rpx;
+
 		.item {
 			display: flex;
 			padding: 33rpx 0;
@@ -118,6 +134,7 @@
 			justify-content: space-between;
 			// padding-bottom: 50rpx;
 			padding-bottom: 20rpx;
+
 			.left {
 				text {
 					color: #2DBE87;

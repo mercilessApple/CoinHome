@@ -153,7 +153,7 @@
 						name: this.$t('充币'),
 						icon: require("@/static/icon8.png"),
 						darkIcon: require("@/static/icon39.png"),
-						url: '/pages/recharge/recharge',
+						url: '/pages/rechargeDetail/rechargeDetail',
 						needLog: true
 					},
 					{
@@ -312,6 +312,8 @@
 					let addList = []
 					res.forEach(item => {
 						if (item.rangeAbility >= 0 && item.onDealing === 1) {
+							addList.unshift(item)
+						}else{
 							addList.push(item)
 						}
 					})
@@ -325,6 +327,8 @@
 					let addList = []
 					res.forEach(item => {
 						if (item.rangeAbility < 0 && item.onDealing === 1) {
+							addList.unshift(item)
+						}else{
 							addList.push(item)
 						}
 					})

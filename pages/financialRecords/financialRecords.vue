@@ -307,6 +307,7 @@
 					font-weight: 500;
 					color: #1F232C;
 					font-size: 32rpx;
+					text-align: right;
 				}
 
 				.left {

@@ -12,6 +12,7 @@
 				plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
 			}
 			// #endif
+			console.log('App Launch')
 		},
 		onError: (e) => {
 			console.log(e);
@@ -93,8 +94,9 @@
 							})
 						})
 					}, 5000)
+
 				});
-				
+
 				uni.onSocketMessage((message) => {
 					const response = JSON.parse(message.data)
 					const {
@@ -103,16 +105,14 @@
 					if (response.ping) {
 						return
 					}
-					
+
 					// 以载荷形式分发
 					store.dispatch('onAlphaMarketTickerChange', data)
-					
 					if (data.asks != undefined) {
 						store.dispatch('onAlphaMarketDepthTradeChange', data)
 					}
-					
-				});
 
+				});
 				this.checkNotice()
 			}
 		},

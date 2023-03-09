@@ -252,6 +252,7 @@
 					} else {
 						this.curCoin = e
 					}
+					this.chainList = this.curCoin[0].list
 				})
 			}
 		},
