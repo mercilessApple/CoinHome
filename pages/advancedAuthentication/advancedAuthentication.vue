@@ -74,21 +74,24 @@
 			chooseImage(scene) {
 				uni.chooseImage({
 					count: 1,
+					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 					success: ({
 						tempFilePaths
 					}) => {
-						console.log(tempFilePaths);
 						uni.showLoading({
 							title: this.$t('加载中...'),
 							mask: true
 						})
-						uploadFile({
-							filePath: tempFilePaths[0],
-							name: 'file'
-						}).then(e => {
-							this[scene] = e[0].url
-							uni.hideLoading()
-						})
+						setTimeout(() => {
+							uploadFile({
+								filePath: tempFilePaths[0],
+								name: 'file'
+							}).then(e => {
+								this[scene] = e[0].url
+								uni.hideLoading()
+							})
+						}, 500)
+						
 					}
 				})
 			}

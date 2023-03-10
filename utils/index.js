@@ -29,6 +29,7 @@ export const fuzzyQuery = (list, keyWord, val) => {
 }
 
 // 检测app更新
+let status = false
 export const checkUpdate = (self, isToast = false) => {
     // #ifdef APP-PLUS
     plus.runtime.getProperty(plus.runtime.appid, function (widgetInfo) {
@@ -46,6 +47,10 @@ export const checkUpdate = (self, isToast = false) => {
         }).then(result => {
             if (result.needUpdate && result.downloadUrl) {
                 uni.hideLoading()
+				if(status){		//	不需要再次弹起窗口
+					return
+				}
+				status = true
                 uni.showModal({
                     title: self.$t('发现新版本'),
                     content: result.detail,

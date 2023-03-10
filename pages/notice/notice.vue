@@ -26,8 +26,8 @@
 				</view>
 				<view class="right">
 					<view class="tip">{{item.title}}</view>
-					<view class="desc u-line-2">{{item.content}}</view>
-					<view class="time">{{item.createTime}}</view>
+					<!-- <view class="desc u-line-2">{{item.content}}</view> -->
+					<view class="time" style="margin-top: 15rpx;">{{item.createTime}}</view>
 				</view>
 			</view>
 		</view>

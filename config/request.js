@@ -34,6 +34,7 @@ module.exports = (vm) => {
 		if (data.code !== 1) {
 			if (data.code === 50) {
 				//	账号在其它地方登录时
+				uni.$u.toast(uni.getLocale() == 'zh' ? "检测到账号在其它设备登录，您已下线请重新登录":"The account has been detected to log in on another device. You are offline. Please log in again")
 				uni.removeStorageSync('token')
 				uni.removeStorageSync('userInfo')
 				// uni.navigateTo({
@@ -57,7 +58,7 @@ module.exports = (vm) => {
 		}
 		return data.data === undefined ? {} : data.data
 	}, (response) => {
-		uni.$u.toast(response.errMsg)
+		uni.$u.toast(uni.getLocale() == 'zh' ? "网络异常！请检查网络设置":"The network is abnormal! Please check the network Settings")
 		// 对响应错误做点什么 （statusCode !== 200）
 		return Promise.reject(response)
 	})

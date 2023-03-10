@@ -58,21 +58,17 @@
 						<u-image @click="isShowPwd = !isShowPwd" :src="require(`@/static/icon${isShowPwd ? 1 : 2}.png`)"
 							width="48rpx" height="48rpx"></u-image>
 					</view>
-
 				</u-form-item>
-				
-				<u-form-item :label="$t('推荐码（选填）')">
-					<view class="input-box">
-						<u-input v-model="inviteCode" border="none">
-							
-						</u-input>
-					</view>
-				
-				</u-form-item>
-				
 				<view class="pwd-tip" v-if="showPwdTip">
 					{{$t("密码至少8位且必有数字+特殊字符+字母")}}
 				</view>
+				
+				<u-form-item :label="$t('推荐码（选填）')">
+					<view class="input-box">
+						<u-input v-model="inviteCode" border="none"></u-input>
+					</view>
+				</u-form-item>
+	
 			</u--form>
 
 			<view class="clause">

@@ -20,8 +20,8 @@ function GetBlackStyle()
         SelectRectBGColor: "rgba(1,130,212,0.06)", //背景色
         //  SelectRectAlpha: 0.06;                  //透明度
 
-		UpBarColor: "#F5475E",
-		DownBarColor: "#2DBE87",
+		UpBarColor: "#2DBE87",
+		DownBarColor: "#F5475E",
         UnchagneBarColor: "rgb(199,199,199)",
 
         Minute: {
@@ -290,8 +290,8 @@ function GetWhiteStyle()
 
         // UpBarColor: "rgb(238,21,21)",
         // DownBarColor: "rgb(25,158,0)",
-		UpBarColor: "#F5475E",
-		DownBarColor: "#2DBE87",
+		UpBarColor: "#2DBE87",
+		DownBarColor: "#F5475E",
         UnchagneBarColor: "rgb(0,0,0)",
 
         Minute:

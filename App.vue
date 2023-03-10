@@ -71,7 +71,7 @@
 			},
 			createScoket() {
 				uni.connectSocket({
-					url: wsURL,
+					url: wsURL
 				});
 
 				uni.onSocketOpen(() => {
@@ -113,22 +113,44 @@
 					}
 
 				});
-				this.checkNotice()
+
+				uni.onSocketError((res) => {
+					uni.showModal({
+						title: this.$t('提示'),
+						content: this.$t('与服务器链接已断开，是否重连？'),
+						confirmText: this.$t('重连'),
+						cancelText: this.$t('忽略'),
+						success: (e) => {
+							if (e.confirm) {
+								uni.onSocketOpen(function() {
+									uni.closeSocket();
+								});
+								this.createScoket()
+							}
+						}
+					});
+					this.checkNotice()
+				})
 			}
 		},
 		onShow: function() {
 			console.log('App Show')
 			this.createScoket()
-
 			this.utils.checkUpdate(this)
 		},
 		onUnload() {
+			console.log('Unload')
 			clearInterval(this.timer)
-			uni.closeSocket();
+			uni.onSocketOpen(function () {
+			  uni.closeSocket();
+			});
 		},
 		onHide: function() {
+			console.log('Hide')
 			clearInterval(this.timer)
-			uni.closeSocket();
+			uni.onSocketOpen(function () {
+			  uni.closeSocket();
+			});
 		}
 	}
 </script>

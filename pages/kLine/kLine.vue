@@ -321,12 +321,6 @@
 				popupTabs: [{
 						name: this.$t('自选')
 					},
-					// {
-					// 	name: 'GODE'
-					// },
-					// {
-					// 	name: 'USDT'
-					// }
 				],
 				searchKey: "",
 				marketTabIndex: 1,
@@ -453,7 +447,6 @@
 					symbolKey: this.$t('加载中...'),
 
 				},
-				// PERIOD_ID: PERIOD_ID,
 				entrustList: {
 					bids: [],
 					asks: []
@@ -462,6 +455,8 @@
 			return data;
 		},
 		onLoad(options) {
+			this.orderTimer = null
+			this.tradeTimer = null
 			if (uni.getStorageSync('kLineIndex')) {
 				this.timeIndex = Number(uni.getStorageSync('kLineIndex'))
 			} else {
@@ -486,15 +481,8 @@
 				}) => {
 					this.iconUrl = iconUrl
 				})
-
-				// let topic = this.coinMarket.toLowerCase().replace('/', '-')
-				// uni.sendSocketMessage({
-				// 	data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-				// 		'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-				// 		'-trade"}'
-				// })
+	
 			})
-			// this.tickerMarket()
 
 
 			queryMarketPartition().then(market => {
@@ -521,16 +509,6 @@
 		},
 
 		onShow() {
-			// let topic = this.coinMarket.toLowerCase().replace('/', '-')
-
-			// setTimeout(() => {
-			// 	uni.sendSocketMessage({
-			// 		data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
-			// 			'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-			// 			'-trade"}'
-			// 	})
-			// }, 1000)
-
 			this.init()
 			if (this.isShowDeep) {
 				this.createDeepChart()
@@ -557,7 +535,6 @@
 				this.ChangeKLinePeriod(this.timeNav[this.timeIndex].id, this.timeIndex);
 			},
 			coinMarket(n, o) {
-
 				let topic = o.toLowerCase().replace('/', '-')
 				if (o != '') {
 					uni.sendSocketMessage({
@@ -574,26 +551,16 @@
 						'-trade"}'
 				})
 			},
-			alphaMarketDepthTrade(data, oldValue) {
-				// let {
-				// 	asks,
-				// 	bids
-				// } = data
-				// let newAsks = asks.slice(0, 20),
-				// 	newBids = bids.slice(0, 20)
-				// this.market.asks = newAsks
-				// this.market.bids = newBids
-				// this.market.lastPrice = data.lastPrice
-				// this.market.lastPriceCny = data.lastPriceCny
-				// this.market.rangeAbility = data.rangeAbility
-			},
 			alphaMarketTicker(data, oldValue) {
 				if (data.coinMarket == this.coinMarket) {
 					this.tickerMarketInfo.highest = data.highest
 					this.tickerMarketInfo.amount = data.amount
 					this.tickerMarketInfo.lowest = data.lowest
 					this.tickerMarketInfo.turnover = data.turnover
-					uni.$emit('onAlphaMarketTicker', data)
+
+					this.tickerMarketInfo.lastPrice = data.lastPrice
+					this.tickerMarketInfo.lastPriceCny = data.lastPriceCny
+					this.tickerMarketInfo.rangeAbility = data.rangeAbility
 				}
 				this.updateMarketList(this.marketList, data)
 				this.updateMarketList(this.oriMarketList, data)
@@ -604,32 +571,11 @@
 			alphaMarketTicker() {
 				return this.$store.state['alpha-market-ticker']
 			},
-			alphaMarketDepthTrade() {
-				return this.$store.state['alpha-market-depth-trade']
-			}
 		},
 
-		// onHide() {
-		// 	clearInterval(this.timer)
-		// 	if (g_KLine.JSChart) {
-		// 		g_KLine.JSChart.StopAutoUpdate();
-		// 		g_KLine.JSChart = null;
-		// 	}
-
-		// 	if (d_Line.JSChart) {
-		// 		d_Line.JSChart.StopAutoUpdate();
-		// 		d_Line.JSChart = null;
-		// 	}
-		// 	let topic = this.coinMarket.toLowerCase().replace('/', '-')
-		// 	uni.sendSocketMessage({
-		// 		data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
-		// 			'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
-		// 			'-trade"}'
-		// 	})
-		// },
-
 		onUnload() {
-			clearInterval(this.timer)
+			clearInterval(this.orderTimer)
+			clearInterval(this.tradeTimer)
 			let topic = this.coinMarket.toLowerCase().replace('/', '-')
 			uni.sendSocketMessage({
 				data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
@@ -637,6 +583,7 @@
 					'-trade"}'
 			})
 			if (g_KLine.JSChart) {
+				g_KLine.JSChart.StopAutoUpdate();
 				g_KLine.JSChart = null;
 			}
 
@@ -704,6 +651,7 @@
 					d_Line.JSChart = null;
 					this.createDeepChart()
 				} else {
+					g_KLine.JSChart.StopAutoUpdate();
 					g_KLine.JSChart = null;
 					this.CreateKLineChart()
 				}
@@ -828,16 +776,22 @@
 				})
 			},
 			init() {
-				clearInterval(this.timer)
+				if(this.tabIndex == 0)clearInterval(this.orderTimer)
+				else if(this.tabIndex == 1) clearInterval(this.tradeTimer)
+				
 				this.tickerMarket()
-				this.getHandicap()
-
-				this.queryUserEntrustList()
-
-				this.timer = setInterval(() => {
-					this.getHandicap()
+				
+				if(this.tabIndex == 0){
 					this.queryUserEntrustList()
-				}, 1000)
+					this.orderTimer = setInterval(() => {
+						this.queryUserEntrustList()
+					}, 1000)
+				}else if(this.tabIndex == 1){
+					this.getHandicap()
+					this.tradeTimer = setInterval(() => {
+						this.getHandicap()
+					}, 1000)
+				}
 			},
 			queryUserEntrustList() {
 				if (!uni.getStorageSync('token')) return
@@ -854,9 +808,26 @@
 				index
 			}) {
 				this.tabIndex = index
+				clearInterval(this.tradeTimer)
+				clearInterval(this.orderTimer)
+				if(index == 0){
+					this.getUserEntrustList()
+					this.orderTimer = setInterval(()=>{
+						this.getUserEntrustList()
+					},1000)
+				}else if(index == 1){
+					this.getHandicap()
+					this.tradeTimer = setInterval(()=>{
+						this.getHandicap()
+					},1000)
+				}
 			},
 			createDeep() {
 				this.isShowDeep = true
+				if (g_KLine.JSChart) {
+					g_KLine.JSChart.StopAutoUpdate();
+					g_KLine.JSChart = null;
+				}
 				setTimeout(() => {
 					this.createDeepChart()
 				}, 50)
@@ -948,77 +919,15 @@
 				this.KLine.Option.IsFullDraw = true; //每次手势移动全屏重绘
 				g_KLine.JSChart.SetOption(this.KLine.Option);
 
-				//注册监听事件         
-				g_KLine.JSChart.AddEventCallback({
-					event: JSCommon.JSCHART_EVENT_ID.RECV_START_AUTOUPDATE,
-					callback: this.startAutoUpdate
-				});
-				g_KLine.JSChart.AddEventCallback({
-					event: JSCommon.JSCHART_EVENT_ID.RECV_STOP_AUTOUPDATE,
-					callback: this.stopAutoUpdate
-				});
-			},
-			startAutoUpdate(event, DATA, obj) {
-				// console.log('[startAutoUpdate] data', data);
-				//根据data.Stock.Period周期，使用websocket下载对应的当天日线或当天分钟数据
-				//数据转换成hqchart接口，使用data.Callback(data) 更新到HQChart中
-				const self = this
-				uni.$on('onAlphaMarketTicker', function(data) {
-					if (self.isShowDeep) {
-						return
-					}
-					const timeKey = self.timeNav[self.timeIndex].key
-					let currentKLine = data.klines[timeKey]
-					let coin = self.coinMarket.split('/'),
-						response = {}
-					//	日线数据
-					if (DATA.Explain == "KLineChartContainer::RequestHistoryData") {
-						response = {
-							code: 0,
-							stock: [{
-								"symbol": coin[0] + coin[1] + '.BIT',
-								"name": currentKLine.coinMarket,
-								"date": Number(self.$moment(currentKLine.time * 1000).format(
-									'YYYYMMDD')),
-								"yclose": null,
-								"open": Number(currentKLine.open),
-								"high": Number(currentKLine.high),
-								"low": Number(currentKLine.low),
-								"price": Number(currentKLine.rangeAbilityAmount),
-								"vol": Number(currentKLine.amount),
-								"amount": Number(currentKLine.turnover)
-							}, ]
-						}
-					}
-
-					//	分钟数据
-					if (DATA.Explain == "KLineChartContainer::ReqeustHistoryMinuteData") {
-						response = {
-							code: 0,
-							"symbol": coin[0] + coin[1] + '.BIT',
-							"name": currentKLine.coinMarket,
-							data: [
-								[
-									Number(self.$moment(currentKLine.time * 1000).format(
-										'YYYYMMDD')), //日期
-									null, //前收盘价
-									Number(currentKLine.open), //开盘价
-									Number(currentKLine.high), //最高
-									Number(currentKLine.low), //最低
-									Number(currentKLine.close), //收盘价
-									Number(currentKLine.amount), //成交量
-									Number(currentKLine.turnover), //成交金额
-									Number(self.$moment(currentKLine.time * 1000).format(
-										'HHmm')), //日期格式
-								]
-							]
-						}
-					}
-
-					DATA.Callback({
-						data: response
-					})
-				})
+				// //注册监听事件         
+				// g_KLine.JSChart.AddEventCallback({
+				// 	event: JSCommon.JSCHART_EVENT_ID.RECV_START_AUTOUPDATE,
+				// 	callback: this.startAutoUpdate
+				// });
+				// g_KLine.JSChart.AddEventCallback({
+				// 	event: JSCommon.JSCHART_EVENT_ID.RECV_STOP_AUTOUPDATE,
+				// 	callback: this.stopAutoUpdate
+				// });
 			},
 			//K线周期切换
 			ChangeKLinePeriod(period, index) {
@@ -1042,14 +951,9 @@
 				g_KLine.JSChart.ChangeIndex(windowIndex, name);
 				this.otherNavIndex = index
 			},
-
-			//切换股票
-			ChangeSymbol: function(symbol) {
-				if (!g_KLine.JSChart) return;
-
-				g_KLine.JSChart.ChangeSymbol(symbol);
-			},
-			marketKline(type, dimension, fn) {
+			marketKline(type, fn) {
+				if (this.isShowDeep) return
+				let dimension = this.timeNav[this.timeIndex].key
 				getMarketKline({
 					coinMarket: this.coinMarket,
 					dimension
@@ -1057,7 +961,7 @@
 					let coin = this.coinMarket.split('/')
 					let formatData = res.map(item => {
 						let klineArray
-						if (type == 'ReqeustHistoryMinuteData') {
+						if (type == 'KLineChartContainer::ReqeustHistoryMinuteData') {
 							klineArray = [
 								Number(this.$moment(item.time * 1000).format('YYYYMMDD')), //日期
 								null, //前收盘价
@@ -1069,7 +973,7 @@
 								Number(item.turnover), //成交金额
 								Number(this.$moment(item.time * 1000).format('HHmm')), //日期格式
 							]
-						} else if (type == 'RequestHistoryData') {
+						} else if (type == 'KLineChartContainer::RequestHistoryData') {
 							klineArray = [
 								Number(this.$moment(item.time * 1000).format('YYYYMMDD')), //日期
 								null, //前收盘价
@@ -1084,6 +988,8 @@
 						return klineArray
 					})
 
+					formatData = formatData.reverse()
+
 					let data = {
 						symbol: coin[0] + coin[1] + '.BIT',
 						name: coin[0] + coin[1],
@@ -1091,36 +997,58 @@
 						data: formatData
 					}
 
-					if (type == 'RequestRealtimeData') { //	日线最新
-						const RequestRealtimeData = res[res.length - 1]
-						data = {
-							"code": 0,
-							stock: [{
+					if (type == 'KLineChartContainer::RequestRealtimeData') { //	日线最新
+						let arr = []
+						for (var i = 0; i <= 10; i++) {
+							let item = res[i]
+							arr.push({
 								"symbol": coin[0] + coin[1] + '.BIT',
-								"name": RequestRealtimeData.coinMarket,
-								"date": Number(this.$moment(RequestRealtimeData.time * 1000).format(
+								"name": item.coinMarket,
+								"date": Number(this.$moment(item.time *
+									1000).format(
 									'YYYYMMDD')),
 								"yclose": null,
-								"open": Number(RequestRealtimeData.open),
-								"high": Number(RequestRealtimeData.high),
-								"low": Number(RequestRealtimeData.low),
-								"price": Number(RequestRealtimeData.rangeAbilityAmount),
-								"vol": Number(RequestRealtimeData.amount),
-								"amount": Number(RequestRealtimeData.turnover)
-							}]
+								"open": Number(item.open),
+								"high": Number(item.high),
+								"low": Number(item.low),
+								"price": null,
+								"vol": Number(item.amount),
+								"amount": Number(item.turnover)
+							})
+
+						}
+
+						arr = arr.reverse()
+						data = {
+							"code": 0,
+							stock: arr
 						}
 					}
 
-					if (type == 'RequestMinuteRealtimeData') { //	最新分钟线
-						data = {
-							"code": 0,
-							data: []
+					if (type == 'KLineChartContainer::RequestMinuteRealtimeData') { //	最新分钟线
+						let arr = []
+						for (var i = 0; i <= 10; i++) {
+							let item = res[i]
+							arr.push([
+								Number(this.$moment(item.time * 1000).format('YYYYMMDD')), //日期
+								null, //前收盘价
+								Number(item.open), //开盘价
+								Number(item.high), //最高
+								Number(item.low), //最低
+								Number(item.close), //收盘价
+								Number(item.amount), //成交量
+								Number(item.turnover), //成交金额
+								Number(this.$moment(item.time * 1000).format('HHmm')), //日期格式
+							])
 						}
 
-						for (let i = 0; i <= 2; i++) //更新最新的3条数据
-						{
-							data.data.push(res[i]);
+						data = {
+							"code": 0,
+							"ver": 2,
+							data: arr
 						}
+
+						data.data = data.data.reverse()
 					}
 
 					fn(data)
@@ -1128,29 +1056,10 @@
 			},
 			NetworkFilter: function(data, callback) {
 				data.PreventDefault = true
-				switch (data.Name) {
-					case 'KLineChartContainer::ReqeustHistoryMinuteData':
-						this.marketKline('ReqeustHistoryMinuteData', this.timeNav[this.timeIndex].key, data =>
-							callback({
-								data
-							}))
-						break;
-					case 'KLineChartContainer::RequestMinuteRealtimeData':
-						this.marketKline('RequestMinuteRealtimeData', this.timeNav[this.timeIndex].key, data =>
-							callback({
-								data
-							}))
-						break
-					case 'KLineChartContainer::RequestHistoryData':
-						this.marketKline('RequestHistoryData', this.timeNav[this.timeIndex].key, data => callback({
-							data
-						}))
-						break
-					case 'KLineChartContainer::RequestRealtimeData':
-						this.marketKline('RequestRealtimeData', this.timeNav[this.timeIndex].key, data => callback({
-							data
-						}))
-				}
+				this.marketKline(data.Name, data =>
+					callback({
+						data
+					}))
 			},
 
 			//KLine事件
@@ -1183,6 +1092,12 @@
 </script>
 
 <style lang="scss">
+	.webview-box {
+		position: absolute;
+		width: 100%;
+		top: 100px;
+	}
+
 	.popup {
 		display: flex;
 		flex-direction: column;

@@ -319,5 +319,8 @@
 	"余额不足，请确认账户资产后重新下单":"The balance is insufficient, please confirm the account assets and re-order",
 	"请输入数量":"Please enter quantity",
 	"请输入价格":"Please enter the price",
-	"推荐码（选填）":"Recommendation code (optional)"
+	"推荐码（选填）":"Recommendation code (optional)",
+	"与服务器链接已断开，是否重连？":"The connection to the server has been disconnected. Do you want to reconnect?",
+	"重连":"Reconnect",
+	"忽略":"Ignore"
 }

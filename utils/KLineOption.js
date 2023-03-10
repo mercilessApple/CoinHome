@@ -22,8 +22,7 @@ export const KLineOption = {
 			},
 		],
 	IsApiPeriod: true,
-	IsAutoUpdate: false, //是自动更新数据
-	// IsAutoUpdate: false, //是自动更新数据
+	IsAutoUpdate: true, //是自动更新数据
 	AutoUpdateFrequency: 1000,
 	CorssCursorTouchEnd: true,
 
@@ -36,21 +35,22 @@ export const KLineOption = {
 	Border: //边框
 	{
 		Left: 1,
-		Right: 50, //右边间距
+		// Right: 50, //右边间距
 		Top: 25,
 		Bottom: 25,
+		AutoRight:{ Blank:10, MinWidth:30 },
 	},
 	KLineTitle: //标题设置
 	{
-		IsShowName: true, //不显示股票名称
-		IsShowSettingInfo: true //不显示周期/复权
+		IsShowName: true, 
+		IsShowSettingInfo: true 
 	},
 
 	KLine: {
 		DragMode: 1,
-		Right: 1, //复权 0 不复权 1 前复权 2 后复权
+		Right: 0, //复权 0 不复权 1 前复权 2 后复权
 		Period: 0, //周期: 0 日线 1 周线 2 月线 3 年线 
-		PageSize: 20,
+		PageSize: 30,
 		IsShowTooltip: true
 	},
 
