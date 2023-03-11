@@ -1,18 +1,19 @@
 export default {
 	data() {
 		return {
-			theme: uni.getSystemInfoSync().theme
+			
 		}
 	},
 	created() {
-		uni.onThemeChange(({
-			theme
-		}) => {
-			this.theme = theme
-		})
+
 	},
 	onShow() {
 
+	},
+	computed: {
+		theme() {
+			return this.$store.state['theme']
+		}
 	},
 	methods: {
 		/**

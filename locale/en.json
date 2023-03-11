@@ -322,5 +322,7 @@
 	"推荐码（选填）":"Recommendation code (optional)",
 	"与服务器链接已断开，是否重连？":"The connection to the server has been disconnected. Do you want to reconnect?",
 	"重连":"Reconnect",
-	"忽略":"Ignore"
+	"忽略":"Ignore",
+	"温馨提示":"Warm Prompt",
+	"您当前还未设置资金密码，请设置完成后再来进行体现。":"You have not set the fund password at present, please do not withdraw after setting it."
 }

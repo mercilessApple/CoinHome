@@ -52,7 +52,7 @@ export const queryAccountTransfer = (params) => http.post('/api/account/query/tr
 export const queryWithdrawCoin = (params) => http.post('/api/account/query/withdraw/coin', params)
 
 // 提币
-export const withdraw = (params) => http.post('/api/account/pay/withdraw', params)
+export const withdraw = (params) => http.post('/api/account/withdraw', params)
 
 // 用户--修改昵称
 export const updateNickName = (params) => http.post('/api/user/update/info', params)

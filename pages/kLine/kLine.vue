@@ -329,6 +329,9 @@
 				iconUrl: '',
 				coinMarket: '',
 				tickerMarketInfo: {
+					rangeAbility:0,
+					lastPriceCny:0,
+					lastPrice:0,
 					highest: 0,
 					amount: 0,
 					lowest: 0,

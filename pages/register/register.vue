@@ -149,9 +149,6 @@
 					// },
 					phone: {
 						required: true,
-						validator: (rule: any, value: string) => {
-							return (uni as any).$u.test.mobile(value);
-						},
 						message: that.$t('个人电话号码不正确'),
 						trigger: ['change', 'blur']
 					}

@@ -3,8 +3,8 @@
 		<u-navbar placeholder @rightClick="rightClick" bgColor="transparent">
 			<view class="u-nav-slot" slot="left">
 				<view class="nav-coin" @click="show = true">
-					<u-image v-if="theme == 'light'" src="/static/icon32.png" width="48rpx" height="48rpx"></u-image>
-					<u-image v-else src="/static/icon44.png" width="48rpx" height="48rpx"></u-image>
+					<u-image :src="inverseParams(require('@/static/icon32.png'),require('@/static/icon44.png'))"
+						width="48rpx" height="48rpx"></u-image>
 					<text class="name" v-if="marketStatus == 'loading'">{{ marketItem.coinMarket[0] }}</text>
 					<text class="name" v-else>{{ marketItem.coinMarket[0] }}/{{ marketItem.coinMarket[1] }}</text>
 					<text class="proportion" :class="{
@@ -104,10 +104,9 @@
 
 					<view class="total-amount">
 						<block v-if="oriMarketList != ''">
-							<u-input readonly
-								:value="utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision) == 0 ? '' : utils.decimal(count * oriMarketList[marketItemIndex].price,oriMarketList[marketItemIndex].amountPrecision)"
-								:color="theme == 'light' ? '#303103' : '#fff'" type="number" inputAlign="center"
-								border="none" :placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
+							<u-input readonly :value="totalAmount()" :color="theme == 'light' ? '#303103' : '#fff'"
+								type="number" inputAlign="center" border="none"
+								:placeholder="`${$t('总额')}(${marketItem.coinMarket[1]})`">
 							</u-input>
 						</block>
 					</view>
@@ -440,6 +439,9 @@
 		},
 		onUnload() {
 			clearInterval(this.timer)
+			if (this.oriMarketList == '') return
+			let topic = this.oriMarketList[this.marketItemIndex].oriCoinMarketText.toLowerCase().replace(
+				'/', '-')
 			uni.sendSocketMessage({
 				data: '{"cmd":"unsub","data":{},"id":"' + uni.$u.guid(20) +
 					'","sendMsgSuccess":true,"topic":"alpha-market-depth-' + topic +
@@ -584,6 +586,18 @@
 			});
 		},
 		methods: {
+			totalAmount() {
+				let {
+					price,
+					amountPrecision
+				} = this.oriMarketList[this.marketItemIndex]
+
+				let val = this.utils.decimal(this.count * price, amountPrecision)
+				
+				val = val <= 0 ? "" : val
+				
+				return val
+			},
 			onBarIndexChange(index) {
 				this.barIndex = index
 				this.queryUserEntrustList()
@@ -640,12 +654,16 @@
 				}
 			},
 			revoke(item) {
+				uni.showLoading({
+					mask: true
+				})
 				cancelEntrustOrder({
 					cancelEntrustList: [{
 						entrustNo: item.entrustNo
 					}]
 				}).then(e => {
-					item.orderStatus = 3
+					uni.hideLoading()
+					this.queryUserEntrustList()
 				})
 			},
 			toDetail(item) {
@@ -864,7 +882,10 @@
 							amount: 0
 						}
 					}
-					return data[0]
+					// return data[0]
+					return {
+						amount: 97
+					}
 				}
 			},
 			open() {

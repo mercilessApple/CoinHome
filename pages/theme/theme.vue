@@ -62,6 +62,7 @@
 				plus.nativeUI.setUiStyle(theme);
 				this.themeIndex = index
 				uni.setStorageSync('theme', theme)
+				this.$store.commit('onThemeChange',theme)
 				// #endif
 			}
 		},

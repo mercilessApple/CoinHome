@@ -61,7 +61,8 @@
 <script lang="ts">
 	import {
 		findPwdVerificationCode,
-		updateLoginPassword
+		updateLoginPassword,
+		checkVerificationCode
 	} from "@/config/api"
 	import {
 		MD5
@@ -129,22 +130,28 @@
 					title: '加载中...',
 					mask: true
 				})
-				updateLoginPassword({
-					newMd5LoginPassword: MD5.instance.hex_md5(self.newPassword).toUpperCase(),
-					confirmMd5LoginPassword: MD5.instance.hex_md5(self.newPasswordAgain).toUpperCase(),
-					type: 2,
-					phoneOrEmailStr: self.account
-				}).then((e: any) => {
-					console.log(e)
-					uni.showToast({
-						title: self.$t("操作成功！"),
-						icon: "success"
-					})
-					setTimeout(() => {
-						(uni as any).navigateBack({
-							delta: 2
+				
+				checkVerificationCode({
+					phoneOrEmailStr:self.account,
+					code:self.verificationCode,
+					smsType:2
+				}).then(()=>{
+					updateLoginPassword({
+						newMd5LoginPassword: MD5.instance.hex_md5(self.newPassword).toUpperCase(),
+						confirmMd5LoginPassword: MD5.instance.hex_md5(self.newPasswordAgain).toUpperCase(),
+						type: 2,
+						phoneOrEmailStr: self.account
+					}).then((e: any) => {
+						uni.showToast({
+							title: self.$t("操作成功！"),
+							icon: "success"
 						})
-					}, 1500)
+						setTimeout(() => {
+							(uni as any).navigateBack({
+								delta: 2
+							})
+						}, 1500)
+					})
 				})
 			},
 			geTel(tel: string) {
@@ -171,6 +178,7 @@
 				}
 			},
 			getVerificationCode() {
+				
 				if (self.time < 60) return
 
 				(uni as any).showLoading({

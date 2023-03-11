@@ -39,7 +39,7 @@
 						</view>
 						<view class="rule">
 							<text>3.{{$t('为您的账户注资')}} </text><text
-								@click="newTaskData.completeDeposit?false:$u.route('/pages/recharge/recharge')" :class="{
+								@click="newTaskData.completeDeposit?false:$u.route('/pages/rechargeDetail/rechargeDetail')" :class="{
 							'success':newTaskData.completeDeposit
 						}">{{$t(newTaskData.completeDeposit ? '已完成':'去充值')}} ></text>
 						</view>

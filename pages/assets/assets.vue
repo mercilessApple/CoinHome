@@ -25,7 +25,8 @@
 				</view>
 				<view class="btn">
 					<view @click="toNext('/pages/rechargeDetail/rechargeDetail')">{{$t('充值')}}</view>
-					<view @click="toNext('/pages/rechargeDetail/rechargeDetail?coin=USDT&scene=withdraw')">{{$t('提现')}}
+					<view @click="toWithdraw('/pages/rechargeDetail/rechargeDetail?coin=USDT&scene=withdraw')">
+						{{$t('提现')}}
 					</view>
 				</view>
 			</view>
@@ -47,9 +48,8 @@
 				<view class="right" :style="{
 					'width':open ? '70%':'200rpx'
 				}">
-					<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'"
-						@change="onSearchChange" :bgColor="theme == 'light' ? '#f2f2f2' : '#343A46'"
-						:placeholder="$t('搜索')" :showAction="false">
+					<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'" @change="onSearchChange"
+						:bgColor="theme == 'light' ? '#f2f2f2' : '#343A46'" :placeholder="$t('搜索')" :showAction="false">
 					</u-search>
 				</view>
 			</view>
@@ -83,6 +83,24 @@
 				<u-gap height="500rpx"></u-gap>
 			</block>
 		</view>
+
+
+
+		<u-popup :bgColor="inverseParams('#fff','#1F282F')" :show="visible" round="20rpx" mode="center">
+			<view class="popup">
+				<view class="popup-title">
+					{{ $t('温馨提示') }}
+				</view>
+				<view class="popup-content">
+					{{
+		       $t(`您当前还未设置资金密码，请设置完成后再来进行提现。`)
+		      }}
+				</view>
+
+				<view class="btn confirm" @click="toSet">{{ $t('去设置') }}</view>
+				<view class="btn cancel" @click="visible = false">{{ $t('取消') }}</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -96,6 +114,7 @@
 	export default {
 		data() {
 			return {
+				visible: false,
 				loading: true,
 				open: false,
 				showVal: true,
@@ -130,8 +149,9 @@
 					convertUsdtSumAccount: e.sumUsdtAmount || 0,
 					coinId: e.coinId
 				}
-				this.list = e.coinAccountList
-				this.oriList = this.list
+				this.oriList = e.coinAccountList
+				this.list = this.checkboxGroup.indexOf('') == -1 ? e.coinAccountList : e.coinAccountList.filter(
+					item => Number(item.amount) != 0)
 				this.loading = false
 			}).catch(() => {
 				this.loading = false
@@ -145,19 +165,41 @@
 			// })
 		},
 		methods: {
+			toSet() {
+				uni.$u.route('/pages/fundPassword/fundPassword')
+				this.visible = false
+			},
+			toWithdraw(url) {
+				if (uni.getStorageSync('token')) {
+					const {
+						fundsPasswordStatus
+					} = uni.getStorageSync('userInfo')
+					if (fundsPasswordStatus == 0) {
+						this.visible = true
+					} else {
+						uni.navigateTo({
+							url
+						})
+					}
+				} else {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+				}
+			},
 			onCheckChange(e) {
-				if(!uni.getStorageSync('token'))return
+				if (!uni.getStorageSync('token')) return
 				if (e.indexOf('') == -1) {
 					this.list = this.oriList
 				} else {
 					this.list = this.list.filter(item => Number(item.amount) != 0)
 				}
 			},
-		
+
 			onSearchChange(e) {
 				if (e == '') this.open = false
 				else this.open = true
-				if(!uni.getStorageSync('token'))return
+				if (!uni.getStorageSync('token')) return
 				if (e == '') {
 					this.list = this.oriList || []
 					this.checkboxGroup = []
@@ -178,6 +220,47 @@
 </script>
 
 <style lang="scss">
+	.popup {
+		padding: 0 40rpx;
+		width: 520rpx;
+
+		.popup-title {
+			font-weight: 500;
+			color: #23212C;
+			padding-top: 40rpx;
+			font-size: 32rpx;
+			text-align: center;
+		}
+
+		.popup-content {
+			font-weight: 400;
+			margin-top: 46rpx;
+			color: #23212C;
+			font-size: 26rpx;
+			margin-bottom: 40rpx;
+		}
+
+		.btn {
+			font-weight: 500;
+			font-size: 32rpx;
+			text-align: center;
+			color: #FE9205;
+
+			&.confirm {
+				color: #2D270D;
+				background: #FEFA05;
+				line-height: 80rpx;
+
+				border-radius: 8rpx;
+			}
+
+			&.cancel {
+				padding-top: 24rpx;
+				padding-bottom: 34rpx;
+			}
+		}
+	}
+
 	.list {
 		background-color: #fff;
 		padding: 30rpx;
@@ -345,6 +428,11 @@
 		.content,
 		.list {
 			background-color: #1F282F;
+		}
+
+		.popup .popup-title,
+		.popup .popup-content {
+			color: #fff;
 		}
 	}
 </style>

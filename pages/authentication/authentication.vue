@@ -124,7 +124,6 @@
 		},
 		onShow() {
 			userInfo().then(e => {
-				e.verifiedAudit = 2
 				const {
 					verifiedAudit
 				} = e

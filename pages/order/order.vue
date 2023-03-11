@@ -74,7 +74,9 @@
 							<text v-if="(item.orderStatus || item.status) == 2">{{$t('部分成交')}}</text>
 							<text v-if="(item.orderStatus || item.status) == 3">{{$t('撤销中')}}</text>
 							<text v-if="(item.orderStatus || item.status) == 4">{{$t('撤销成功')}}</text>
-							<u-icon size="20rpx" name="arrow-right"></u-icon>
+							<u-icon
+								v-if="(item.orderStatus || item.status) == 1 || (item.orderStatus || item.status) == 2"
+								size="20rpx" name="arrow-right"></u-icon>
 						</view>
 					</block>
 
@@ -86,12 +88,12 @@
 					</block>
 					<block v-if="tabIndex == 1">
 						<view class="right-box-item">
-							<view>{{$t('委托数量')}}[{{item.coinMarket[1]}}]</view>
+							<view>{{$t('委托数量')}}[{{item.coinMarket[0]}}]</view>
 							<view>{{item.turnover}}</view>
 						</view>
 						<u-gap height="30rpx"></u-gap>
 						<view class="right-box-item">
-							<view>{{$t('实际成交')}}[{{item.coinMarket[1]}}]</view>
+							<view>{{$t('实际成交')}}[{{item.coinMarket[0]}}]</view>
 							<view>{{item.volume}}</view>
 						</view>
 					</block>
@@ -142,7 +144,7 @@
 		methods: {
 			revoke(item) {
 				uni.showLoading({
-					mask:true
+					mask: true
 				})
 				cancelEntrustOrder({
 					cancelEntrustList: [{
@@ -150,7 +152,8 @@
 					}]
 				}).then(e => {
 					uni.hideLoading()
-					item.orderStatus = 3
+					this.pageNum = 1
+					this.getList()
 				})
 			},
 			toNext(item) {

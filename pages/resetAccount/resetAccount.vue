@@ -39,6 +39,20 @@
 					})
 					return
 				}
+
+				if (this.phoneOrEmail.indexOf('@') == -1) {
+					//	输入的手机号
+				} else {
+					// 输入的邮箱
+					if(!this.utils.emailREG.test(this.phoneOrEmail)){
+						uni.showToast({
+							title: this.$t("请输入正确的邮箱格式"),
+							icon: 'none'
+						})
+						return
+					}
+				}
+
 				uni.$u.route({
 					url: '/pages/accountVerification/accountVerification',
 					params: {
@@ -121,8 +135,9 @@
 		.input-box {
 
 			background: #29313C !important;
-			::v-deep{
-				input{
+
+			::v-deep {
+				input {
 					color: #fff !important;
 				}
 			}

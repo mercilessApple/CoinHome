@@ -4,9 +4,9 @@
 			<u-navbar bgColor="transparent" leftIcon="" placeholder :bgColor="theme == 'light' ? '#F6F6F6' : '#171E28'">
 				<view class="u-nav-slot" slot="center">
 					<view class="search">
-						<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'"
-							@change="onSearchChange" height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'"
-							placeholder="" :showAction="false">
+						<u-search v-model="key" :color="theme == 'light' ? '' :'#fff'" @change="onSearchChange"
+							height="64rpx" :bgColor="theme == 'light' ? '#EBECF0' : '#343A46'" placeholder=""
+							:showAction="false">
 						</u-search>
 					</view>
 				</view>
@@ -20,78 +20,84 @@
 			</view>
 		</view>
 		<view class="context">
-			<mescroll-body ref="mescrollRef" @init="mescrollInit" top="0" bottom="0" :down="downOption"
-				@down="downCallback" @up="upCallback">
-				<view class="list-tab" v-if="curNow === 1">
-					<view class="item" :class="{
+			<!-- <mescroll-body ref="mescrollRef" @init="mescrollInit" top="0" bottom="0" :down="downOption"
+				@down="downCallback" @up="upCallback"> -->
+			<view class="list-tab" v-if="curNow === 1">
+				<view class="item" :class="{
 						active:index === listTabIndex
 					}" v-for="(item,index) in listTab" @click="onListTabChange(index)" :key="index">{{ item }}
-					</view>
 				</view>
-				<view class="list" :style="{
+			</view>
+			<view class="list" :style="{
 					'margin-top':curNow === 1 ? '20rpx':'40rpx'
 				}">
-					<view>
-						<view class="name">{{ $t('名称/成交量') }}</view>
-						<view class="column">
-							<view class="val" @click="$u.route({
+				<view>
+
+					<view class="float-box">
+						<u-loading-icon mode="circle" :show="loading"></u-loading-icon>
+						<u-empty :show="list == '' && !loading" :text="$t('暂无数据')"></u-empty>
+					</view>
+
+					<view class="name">{{ $t('名称/成交量') }}</view>
+					<view class="column">
+						<view class="val" @click="$u.route({
 								url:'/pages/kLine/kLine',
 								params:{
 									coinMarket:item.coinMarketText
 								}
 							})" v-for="(item,index) in list" :key="index">
-								<view class="val-box">
-									<view class="unit">{{ item.coinMarket[0] }}
-										<text>/{{ item.coinMarket[1] }}</text>
-									</view>
-									<view class="volume">
-										{{ $t('成交额') }} {{ item.turnover }}
-									</view>
+							<view class="val-box">
+								<view class="unit">{{ item.coinMarket[0] }}
+									<text>/{{ item.coinMarket[1] }}</text>
+								</view>
+								<view class="volume">
+									{{ $t('成交额') }} {{ item.turnover }}
 								</view>
 							</view>
 						</view>
 					</view>
-					<view>
-						<view class="name">{{ $t('最新价格') }}</view>
-						<view class="column">
-							<view class="val" @click="$u.route({
+				</view>
+				<view>
+					<view class="name">{{ $t('最新价格') }}</view>
+					<view class="column">
+						<view class="val" @click="$u.route({
 								url:'/pages/kLine/kLine',
 								params:{
 									coinMarket:item.coinMarketText
 								}
 							})" v-for="(item,index) in list" :key="index">
-								<view class="box">
-									<view :class="{
+							<view class="box">
+								<view :class="{
 									green:item.rangeAbility >= 0 && item.onDealing === 1,
 									red:item.rangeAbility < 0 && item.onDealing === 1,
 									gray:item.onDealing !== 1
 								}">{{ item.lastPrice }}
-									</view>
-									<view>¥{{ item.lastPriceCny }}</view>
 								</view>
+								<view>¥{{ item.lastPriceCny }}</view>
 							</view>
 						</view>
 					</view>
-					<view>
-						<view class="name">{{ $t('24h涨跌幅') }}</view>
-						<view class="column">
-							<view class="val" @click="$u.route({
+				</view>
+				<view>
+					<view class="name">{{ $t('24h涨跌幅') }}</view>
+					<view class="column">
+						<view class="val" @click="$u.route({
 								url:'/pages/kLine/kLine',
 								params:{
 									coinMarket:item.coinMarketText
 								}
 							})" v-for="(item,index) in list" :key="index">
-								<view class="btn" :class="{
+							<view class="btn" :class="{
 		 						green:item.rangeAbility >= 0 && item.onDealing === 1,
 		 						red:item.rangeAbility < 0 && item.onDealing === 1,
 		 						gray:item.onDealing !== 1
 		 					}">{{ item.rangeAbility >= 0 ? '+' : '' }}{{ utils.decimal(item.rangeAbility * 100, 2) }}%
-								</view>
 							</view>
 						</view>
 					</view>
 				</view>
-			</mescroll-body>
+			</view>
+			<!-- </mescroll-body> -->
 		</view>
 	</view>
 </template>
@@ -122,7 +128,8 @@
 				},
 				list: [],
 				curNow: 1,
-				key: ''
+				key: '',
+				loading: true
 			};
 		},
 		onLoad() {
@@ -151,7 +158,12 @@
 			}
 		},
 		onShow() {
-			
+			queryMarketPartition().then(e => {
+				this.listTab = e
+				this.getList(res => {
+					this.list = res
+				}, 'onshow')
+			})
 		},
 		methods: {
 			onSearchChange(e) {
@@ -162,11 +174,10 @@
 				let list = JSON.parse(JSON.stringify(this.oriList))
 				this.list = this.utils.fuzzyQuery(list, e, 'coinMarketText')
 			},
-		
+
 			onListTabChange(index) {
 				this.listTabIndex = index
 				this.list = []
-				this.mescroll.resetUpScroll() // 再刷新列表数据
 			},
 			onTabsChange({
 				index
@@ -176,10 +187,12 @@
 				}
 				this.curNow = index
 				this.list = []
-				this.mescroll.resetUpScroll() // 再刷新列表数据
-
+				this.getList(res => {
+					this.list = res
+				})
 			},
-			async getList(fn = () => {}) {
+			async getList(fn = () => {}, scene = "") {
+				if (scene == '') this.loading = true
 				let res;
 				if (this.curNow === 0) res = await getOptionalMarket()
 				else if (this.curNow === 1) res =
@@ -194,28 +207,9 @@
 					}
 				})
 				this.oriList = res || []
+				this.loading = false
 				fn(res)
 			},
-			init() {
-				this.getList(e => this.list = e)
-			},
-			/*下拉刷新的回调 */
-			downCallback() {
-				this.init()
-				setTimeout(() => {
-					this.mescroll.endSuccess()
-				}, 1000)
-			},
-			// /*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
-			upCallback(page) {
-				queryMarketPartition().then(e => {
-					this.listTab = e
-					this.getList(res => {
-						this.list = res
-						this.mescroll.endSuccess(res.length, false)
-					})
-				})
-			}
 		},
 	}
 </script>
@@ -293,12 +287,25 @@
 		background-color: #fff;
 		overflow: hidden;
 		border-radius: 60rpx 60rpx 0 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.list {
 		padding: 0 30rpx;
 		display: flex;
-		margin-top: 40rpx;
+		// margin-top: 40rpx;
+		// height: calc(100vh - (195px + var(--status-bar-height)));
+		flex: 1;
+		overflow: auto;
+		position: relative;
+
+		.float-box {
+			position: absolute;
+			top: 200rpx;
+			left: 50%;
+			transform: translateX(-50%);
+		}
 
 		>view {
 			.val {

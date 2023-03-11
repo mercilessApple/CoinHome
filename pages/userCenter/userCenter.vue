@@ -231,6 +231,7 @@
 				// #ifdef APP-PLUS
 				plus.nativeUI.setUiStyle(uni.getSystemInfoSync().theme == 'light' ? 'dark' : 'light');
 				uni.setStorageSync('theme', uni.getSystemInfoSync().theme)
+				this.$store.commit('onThemeChange',uni.getSystemInfoSync().theme)
 				// #endif
 			},
 			exit() {

@@ -8,7 +8,8 @@ Vue.use(Vuex); //vue的插件机制
 const store = new Vuex.Store({
 	state: { //存放状态
 		"alpha-market-ticker": "",
-		"alpha-market-depth-trade": ""
+		"alpha-market-depth-trade": "",
+		"theme": ""
 	},
 	mutations: {
 		onAlphaMarketTickerRender(state, payload) {
@@ -16,6 +17,9 @@ const store = new Vuex.Store({
 		},
 		onAlphaMarketDepthTradeRender(state, payload) {
 			state['alpha-market-depth-trade'] = payload
+		},
+		onThemeChange(state, payload) {
+			state['theme'] = payload
 		}
 	},
 	actions: {

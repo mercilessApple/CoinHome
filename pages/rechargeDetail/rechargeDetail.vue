@@ -55,7 +55,7 @@
 				</view>
 				<view class="withdraw amount" v-if="curCoin != ''">
 					<view class="tit">{{$t('提币数额')}}</view>
-					<u-input :color="theme == 'light' ? '' : '#fff'" v-model="withdrawalAmount" type="number"
+					<u-input @blur="onWithdrawalAmountBlur" :color="theme == 'light' ? '' : '#fff'" v-model="withdrawalAmount" type="number"
 						fontSize="26rpx" :placeholder="$t('请输入提币数量')" :customStyle="{
 						background: theme == 'light' ? '#F6F6F6' : '#29313C',
 						height:'90rpx',
@@ -68,7 +68,7 @@
 							</view>
 						</template>
 					</u-input>
-					<view class="withdraw-tip"><text>{{$t('余额')}}：{{curCoin[0].amount}}</text>
+					<view class="withdraw-tip"><text style="margin-right: 10rpx;">{{$t('余额')}}：{{curCoin[0].amount}}</text>
 						{{curCoin[0].coinName}}
 					</view>
 				</view>
@@ -168,9 +168,9 @@
 		<view class="btn-content" v-if="scene == 'withdraw' && curCoin != ''">
 			<view class="box">
 				<view class="btn-tip">
-					<text>{{$t('手续费')}}：</text>{{curCoin[0].tranOutFee || 0}} {{curCoin[0].coinName}}
+					<text>{{$t('手续费')}}：</text>{{serviceCharge()}} {{curCoin[0].coinName}}
 					<text
-						style="margin-left: 60rpx;">{{$t('实际到账')}}：</text>{{curCoin[0].amount - (curCoin[0].tranOutFee || 0)}}
+						style="margin-left: 60rpx;">{{$t('实际到账')}}：</text>{{utils.decimal(curCoin[0].amount - withdrawalAmount -serviceCharge(),curCoin[0].decimalPlaces)}}
 					{{curCoin[0].coinName}}
 				</view>
 				<view @click="submit">
@@ -232,6 +232,7 @@
 						this.curCoin = e
 					}
 					this.chainList = e[0].chainNamelist
+					this.curNet = this.chainList[0]
 				})
 			}else{
 				queryDepositPayCoin().then(e => {
@@ -253,10 +254,27 @@
 						this.curCoin = e
 					}
 					this.chainList = this.curCoin[0].list
+					this.curNet = this.chainList[0]
 				})
 			}
 		},
 		methods: {
+			onWithdrawalAmountBlur(e){
+				if(Number(e) > Number(this.curCoin[0].amount)){
+					this.withdrawalAmount = this.curCoin[0].amount
+				}
+			},
+			serviceCharge(){
+				if(this.curNet.tranOutFee.indexOf('%')){
+					if(this.withdrawalAmount == ''){
+						return 0
+					}
+					let tranOutFee = this.curNet.tranOutFee.replace('%','')
+					return this.utils.decimal(Number(this.withdrawalAmount) * Number(tranOutFee),this.curCoin[0].decimalPlaces)
+				}else{
+					return this.curNet.tranOutFee
+				}
+			},
 			finish() {
 				uni.showLoading({
 					title: this.$t('加载中...'),
@@ -370,16 +388,13 @@
 				// this.chainList = this.oriChainList.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
 				if(this.scene == 'withdraw'){
 					this.chainList = item.chainNamelist
+					this.beneficiaryAddress = ""
+					this.withdrawalAmount = ""
 				}else{
 					this.chainList = item.list
 				}
 				
-				if(this.curNet != '' && this.curNet.coinId == item.coinId){
-					
-				}else{
-					this.curNet = ''
-				}
-				
+				this.curNet = this.chainList[0]
 				this.show = false
 			}
 		},
@@ -389,7 +404,7 @@
 <style lang="scss">
 	::v-deep {
 		.u-code-input__item {
-			background: #F6F6F6;
+			background: #F6F6F6 !important;
 		}
 	}
 
@@ -547,7 +562,7 @@
 						&:first-child {
 							font-weight: 500;
 							color: #929BA2;
-
+							text-align: right;
 							font-size: 24rpx;
 						}
 					}
@@ -723,7 +738,7 @@
 		::v-deep {
 
 			.u-modal__button-group__wrapper--hover {
-				background-color: transparent;
+				background-color: transparent !important;
 			}
 
 			.u-line {
@@ -731,11 +746,11 @@
 			}
 
 			.u-code-input__item {
-				background: #29313C;
+				background: #29313C !important;
 			}
 
 			.u-popup__content {
-				background-color: #1F282F;
+				background-color: #1F282F !important;
 			}
 
 			.u-code-input__item__dot {

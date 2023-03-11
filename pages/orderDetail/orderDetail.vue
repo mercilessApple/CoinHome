@@ -39,7 +39,7 @@
 				<view>{{item.amount * listItem.averagePrice}}</view>
 			</view>
 			<view class="item">
-				<view>{{$t('手续费')}}[{{listItem.coinMarket[1]}}]</view>
+				<view>{{$t('手续费')}}[{{listItem.coinMarket[0]}}]</view>
 				<view>{{item.fee}}</view>
 			</view>
 		</view>

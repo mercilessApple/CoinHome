@@ -28,7 +28,12 @@
 				</view>
 			</view>
 			<view class="btn-box">
-				<view @click="$u.route('/pages/recharge/recharge')">{{$t('充值')}}</view>
+				<view @click="$u.route({
+					url:'/pages/rechargeDetail/rechargeDetail',
+					params:{
+						coin:coinInfo.coinName
+					}
+				})">{{$t('充值')}}</view>
 				<view @click="$u.route({
 					url:'/pages/rechargeDetail/rechargeDetail',
 					params:{
@@ -36,7 +41,7 @@
 						scene:'withdraw'
 					}
 				})">{{$t('提币')}}</view>
-				<view>{{$t('交易')}}</view>
+				<view @click="toTrade">{{$t('交易')}}</view>
 			</view>
 		</view>
 		<view class="content">
@@ -168,6 +173,11 @@
 			})
 		},
 		methods: {
+			toTrade(){
+				uni.switchTab({
+					url:'/pages/transaction/transaction'
+				})
+			},
 			getList(fn) {
 				queryAccountTransfer({
 					coinId: this.coinId,

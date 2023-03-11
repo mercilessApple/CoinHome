@@ -8,10 +8,24 @@
 		onLaunch: function() {
 			// #ifdef APP-PLUS
 			if (uni.getStorageSync('theme')) {
-				if (uni.getSystemInfoSync().theme == uni.getStorageSync('theme')) return
-				plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
+				if(uni.getSystemInfoSync().theme != uni.getStorageSync('theme')){
+					plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
+				}
 			}
+			store.commit('onThemeChange', uni.getSystemInfoSync().theme)
 			// #endif
+			
+			
+			// #ifdef H5
+			store.commit('onThemeChange', uni.getSystemInfoSync().theme)
+			uni.onThemeChange(function(res) {
+				console.log(res.theme);
+				store.commit('onThemeChange', res.theme)
+			});
+			// #endif
+
+			this.timer = null
+			this.errTip = false
 			console.log('App Launch')
 		},
 		onError: (e) => {
@@ -70,6 +84,7 @@
 				})
 			},
 			createScoket() {
+				const self = this
 				uni.connectSocket({
 					url: wsURL
 				});
@@ -85,9 +100,9 @@
 					// 		'","sendMsgSuccess":true,"topic":"alpha-user-center-announcement"}'
 					// })
 
-					clearInterval(this.timer)
+					clearInterval(self.timer)
 					// 维持心跳活动
-					this.timer = setInterval(() => {
+					self.timer = setInterval(() => {
 						uni.sendSocketMessage({
 							data: JSON.stringify({
 								ping: new Date().valueOf()
@@ -115,42 +130,45 @@
 				});
 
 				uni.onSocketError((res) => {
+					if (self.errTip) {
+						return
+					}
+					self.errTip = true
 					uni.showModal({
-						title: this.$t('提示'),
-						content: this.$t('与服务器链接已断开，是否重连？'),
-						confirmText: this.$t('重连'),
-						cancelText: this.$t('忽略'),
+						title: self.$t('提示'),
+						content: self.$t('与服务器链接已断开，是否重连？'),
+						confirmText: self.$t('重连'),
+						cancelText: self.$t('忽略'),
 						success: (e) => {
 							if (e.confirm) {
-								uni.onSocketOpen(function() {
-									uni.closeSocket();
-								});
-								this.createScoket()
+								self.errTip = false
+								uni.closeSocket();
+								setTimeout(() => {
+									self.createScoket()
+								})
 							}
 						}
 					});
-					this.checkNotice()
+					self.checkNotice()
 				})
 			}
 		},
 		onShow: function() {
 			console.log('App Show')
-			this.createScoket()
+			setTimeout(() => {
+				this.createScoket()
+			}, 0)
 			this.utils.checkUpdate(this)
 		},
 		onUnload() {
 			console.log('Unload')
 			clearInterval(this.timer)
-			uni.onSocketOpen(function () {
-			  uni.closeSocket();
-			});
+			uni.closeSocket();
 		},
 		onHide: function() {
 			console.log('Hide')
 			clearInterval(this.timer)
-			uni.onSocketOpen(function () {
-			  uni.closeSocket();
-			});
+			uni.closeSocket();
 		}
 	}
 </script>
