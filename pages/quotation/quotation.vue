@@ -33,7 +33,7 @@
 				}">
 				<view>
 
-					<view class="float-box">
+					<view class="float-box" v-if="list == '' || loading">
 						<u-loading-icon mode="circle" :show="loading"></u-loading-icon>
 						<u-empty :show="list == '' && !loading" :text="$t('暂无数据')"></u-empty>
 					</view>

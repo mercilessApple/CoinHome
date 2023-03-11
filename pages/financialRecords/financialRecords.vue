@@ -56,9 +56,12 @@
 						{{item.amount}}
 					</view>
 				</view>
-				<block v-if="list == ''">
+				
+				
+				<block v-if="list == '' || loading">
 					<u-gap height="300rpx"></u-gap>
-					<u-empty :text="$t('暂无数据')"></u-empty>
+					<u-empty :text="$t('暂无数据')" :show="list == '' && !loading"></u-empty>
+					<u-loading-icon mode="circle" :show="loading"></u-loading-icon>
 				</block>
 			</view>
 			<u-popup @close="show = false" :show="show" round="20rpx" closeable
@@ -109,6 +112,7 @@
 				list: [],
 				curCoin: '',
 				key: '',
+				loading:true,
 				coinInfo: {
 					sumCnhtAmount: 0,
 					sumAmount: 0,
@@ -179,12 +183,14 @@
 				})
 			},
 			getList(fn) {
+				this.loading = true
 				queryAccountTransfer({
 					coinId: this.coinId,
 					pageSize: 10,
 					pageNum: this.pageNum,
 					accountType: 1
 				}).then(e => {
+					this.loading = false
 					fn(e)
 				})
 			},

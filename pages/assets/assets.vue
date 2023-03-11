@@ -139,7 +139,9 @@
 				return
 			}
 			this.isLogin = true
-			this.loading = true
+			if(this.oriList == ''){
+				this.loading = true
+			}
 			queryAccountInfo({
 				type: 1
 			}).then(e => {
@@ -163,6 +165,7 @@
 			// queryDepositPayCoin().then(e => {
 			// 	this.curCoin = e.filter(item => item.coinName == 'USDT')
 			// })
+			this.loading = true
 		},
 		methods: {
 			toSet() {
