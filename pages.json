@@ -95,8 +95,7 @@
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
-				"navigationStyle": "custom",
-				"disableScroll": true
+				"navigationStyle": "custom"
 			}
 
 		}, {

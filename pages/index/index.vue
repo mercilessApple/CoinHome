@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<u-navbar bgColor="transparent" leftIcon="">
+		<u-navbar :bgColor="inverseParams('#FFFFFF','#1F282F')" leftIcon="">
 			<view slot="left">
 				<u-image @click="toUserCenter"
 					:src="require(theme == 'light' ? '@/static/icon4.png' : '@/static/icon37.png')" width="48rpx"
@@ -536,11 +536,6 @@
 		.mescroll-bottombar {
 			height: 0 !important;
 		}
-
-		.u-navbar__content,
-		.u-status-bar {
-			background-color: #FFFFFF !important;
-		}
 	}
 
 	.u-nav-slot {
@@ -566,11 +561,6 @@
 				.u-search__content,
 				.u-search__content__input {
 					background-color: #2C303C !important;
-				}
-
-				.u-navbar__content,
-				.u-status-bar {
-					background-color: #1F282F !important;
 				}
 			}
 

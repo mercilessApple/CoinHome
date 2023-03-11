@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar bgColor="transparent" :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
+		<u-navbar :bgColor="inverseParams('#fff','#1F282F')" :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
 			<view class="u-nav-slot" slot="right">
 				<view @click="changeTheme" v-if="showThemeBtn">
 					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
@@ -431,18 +431,7 @@
 			}
 		}
 	}
-@media (prefers-color-scheme: light){
-	/* #ifdef H5 */
-	::v-deep{
-		.u-navbar__content,
-		.u-status-bar {
-			background-color: #FFFFFF !important;
-		}
-	}
-	/* #endif */
 
-
-}
 	@media (prefers-color-scheme: dark) {
 
 		::v-deep {
@@ -452,11 +441,6 @@
 
 			.u-alert--warning--light {
 				background-color: #29313C !important;
-			}
-
-			.u-navbar__content,
-			.u-status-bar {
-				background-color: #1F282F !important;
 			}
 		}
 

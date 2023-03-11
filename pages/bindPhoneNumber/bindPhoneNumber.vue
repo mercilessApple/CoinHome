@@ -54,62 +54,17 @@
 			this.timer = null
 		},
 		methods: {
-			counDown() {
-				const self = this
-				self.time--
-				if (self.time <= 0) {
-					clearInterval(this.timer)
-					self.time = 60
-				}
-			},
-			getVerificationCode() {
-				const self = this
-				if (self.time < 60) return
-				if (!this.$u.test.mobile(this.phone)) {
-					uni.showToast({
-						title: this.$t("个人电话号码不正确"),
-						icon: "none"
-					})
-					return
-				}
-				uni.showLoading({
-					title: this.$t("正在发送..."),
-					mask: true
-				});
-				verificationCode({
-					phone: self.phone,
-					phoneOrEmail: 1,
-					smsType: 4,
-					phoneAreaCode: self.phoneAreaCode
-				}).then(() => {
-					uni.showToast({
-						title: this.$t("发送成功"),
-						icon: "success"
-					});
-					self.counDown()
-					this.timer = setInterval(self.counDown, 1000)
-				})
-			},
 			submit() {
 				if (!this.succ) return
 				uni.navigateTo({
 					url:'/pages/safeAuthentication/safeAuthentication?phone='+this.phone+'&phoneAreaCode='+encodeURIComponent(this.phoneAreaCode)
 				})
-				return
-				uni.showLoading({
-					title: this.$t("加载中..."),
-					mask: true
-				});
-				updatePhone({
-					phone: this.phone,
-					phoneAreaCode: this.phoneAreaCode,
-					phoneOrEmail: 1,
-					code: ''
-				})
 			},
 			input(e) {
 				this.phone = e
-				this.succ = this.$u.test.mobile(e)
+				if(e != ''){
+					this.succ = true
+				}
 			}
 		},
 	}

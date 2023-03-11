@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar placeholder @rightClick="rightClick" bgColor="transparent">
+		<u-navbar placeholder @rightClick="rightClick" :bgColor="inverseParams('#f6f6f6','#171E28')">
 			<view class="u-nav-slot" slot="left">
 				<view class="nav-coin" @click="show = true">
 					<u-image :src="inverseParams(require('@/static/icon32.png'),require('@/static/icon44.png'))"
@@ -720,6 +720,7 @@
 					queryAccountInfo({
 						type: 1
 					}).then(e => this.coinAccountList = e.coinAccountList)
+					this.queryUserEntrustList()
 				})
 			},
 			chooseProportion(item, index) {
@@ -1040,14 +1041,6 @@
 		::v-deep {
 			.u-tabs__wrapper__nav__line {
 				bottom: 0 !important;
-			}
-
-			.u-navbar {
-
-				.u-navbar__content,
-				.u-status-bar {
-					background-color: #f6f6f6 !important;
-				}
 			}
 		}
 	}
@@ -1689,14 +1682,6 @@
 			background-color: #171E28;
 
 			::v-deep {
-				.u-navbar {
-
-					.u-navbar__content,
-					.u-status-bar {
-						background-color: #171E28 !important;
-					}
-				}
-
 				.u-popup {
 					.u-status-bar {
 						opacity: 0 !important;

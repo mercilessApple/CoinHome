@@ -1262,6 +1262,7 @@
 							max-width: 70%;
 							word-break: break-all;
 							font-size: 30rpx;
+							text-align: right;
 						}
 
 						&:first-child {
