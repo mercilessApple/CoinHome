@@ -471,7 +471,7 @@
 			queryCoinIntroduction({
 				coinName: coin[0]
 			}).then(e => {
-				if (uni.getLocale() == 'zh') {
+				if (uni.getLocale() == 'zh-Hans') {
 					e.desc = e.coinIntroduction
 				} else {
 					e.desc = e.coinIntroductionEnglish
@@ -667,7 +667,7 @@
 				queryCoinIntroduction({
 					coinName: coin[0]
 				}).then(e => {
-					if (uni.getLocale() == 'zh') {
+					if (uni.getLocale() == 'zh-Hans') {
 						e.desc = e.coinIntroduction
 					} else {
 						e.desc = e.coinIntroductionEnglish

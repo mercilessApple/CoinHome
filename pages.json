@@ -79,7 +79,7 @@
 		}, {
 			"path": "pages/assets/assets",
 			"style": {
-				"navigationBarTitleText": "%assets%",
+				"navigationBarTitleText": "%index.assets%",
 				"enablePullDownRefresh": false,
 				"backgroundColor": "@tradeBG",
 				"navigationBarBackgroundColor": "@tradeBG"

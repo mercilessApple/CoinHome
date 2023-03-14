@@ -16,7 +16,7 @@
 				</view>
 			</view>
 			<!-- #ifdef APP-PLUS -->
-			<view class="item">
+			<view class="item" @click="checkUpdate">
 				<view class="left">{{ $t('检查更新') }}</view>
 				<view class="right">
 					<text>{{ version }}</text>
@@ -106,10 +106,10 @@
 			// #endif
 		},
 		methods: {
+			checkUpdate(){
+				this.utils.checkUpdate(this, true)
+			},
 			next(item) {
-				if (item.update) {
-					this.utils.checkUpdate(this, true)
-				}
 				if (item.url) {
 					if (item.params) {
 						uni.$u.route({

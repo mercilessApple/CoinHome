@@ -13,7 +13,7 @@
 			<u--form :model="uFormModel" ref="uForm">
 				<u-form-item :label="$t('密码')" prop="loginPassword">
 					<view class="input-box pwd">
-						<input class="input" :type="isShowPwd ? 'text':'password'" v-model="uFormModel.loginPassword" />
+						<input @confirm="next" class="input" :type="isShowPwd ? 'text':'password'" v-model="uFormModel.loginPassword" />
 						<u-image @click="isShowPwd = !isShowPwd" :src="require(`@/static/icon${isShowPwd ? 1 : 2}.png`)"
 							width="48rpx" height="48rpx"></u-image>
 					</view>

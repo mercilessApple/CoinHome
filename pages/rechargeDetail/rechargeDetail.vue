@@ -265,8 +265,8 @@
 		},
 		methods: {
 			actualReceipt() {
-				let amount = this.curCoin[0].amount
-				return this.utils.decimal(Number(amount) - this.serviceCharge(), this.curCoin[0].decimalPlaces)
+				let total = this.utils.decimal(Number(this.withdrawalAmount) - this.serviceCharge(), this.curCoin[0].decimalPlaces)
+				return total < 0 || this.withdrawalAmount == '' ? 0 : total
 			},
 			onWithdrawalAmountBlur(e) {
 				if (Number(e) > Number(this.curCoin[0].amount)) {
@@ -444,6 +444,7 @@
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
+
 				text {
 					color: #B7BABF;
 				}

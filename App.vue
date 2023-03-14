@@ -27,7 +27,6 @@
 			this.timer = null
 			this.once = true
 			this.close = false
-			this.errTip = false
 			console.log('App Launch')
 		},
 		onError: (e) => {
@@ -108,7 +107,7 @@
 					self.timer = setInterval(() => {
 						uni.sendSocketMessage({
 							data: JSON.stringify({
-								running: new Date().valueOf()
+								poing: new Date().valueOf()
 							})
 						})
 					}, 5000)
@@ -133,22 +132,21 @@
 				});
 
 				uni.onSocketError((res) => {
-					if (self.errTip) {
-						return
-					}
-					self.errTip = true
-					uni.showModal({
-						title: self.$t('提示'),
-						content: self.$t('与服务器链接已断开，是否重连？'),
-						confirmText: self.$t('重连'),
-						cancelText: self.$t('忽略'),
-						success: (e) => {
-							if (e.confirm) {
-								self.createScoket()
-							}
-						}
-					});
-					self.checkNotice()
+					console.log(res)
+					// uni.showModal({
+					// 	title: self.$t('提示'),
+					// 	content: self.$t('与服务器链接已断开，是否重连？'),
+					// 	confirmText: self.$t('重连'),
+					// 	cancelText: self.$t('忽略'),
+					// 	success: (e) => {
+					// 		if (e.confirm) {
+					// 			self.createScoket()
+					// 		}
+					// 	}
+					// });
+					setTimeout(()=>{
+						self.createScoket()
+					},50)
 				})
 
 				uni.onSocketClose(function(res) {
@@ -174,7 +172,7 @@
 					}
 				}, 50)
 			}
-
+			this.checkNotice()
 			this.utils.checkUpdate(this)
 		},
 		onUnload() {
@@ -208,7 +206,7 @@
 	}
 
 	input {
-		caret-color: #000;
+		caret-color: #1F282F;
 	}
 
 	@media (prefers-color-scheme: dark) {

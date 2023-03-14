@@ -10,18 +10,13 @@
 				<u--form :model="uFormModel" ref="uForm">
 					<u-form-item :label="$t('请输入您的邮箱/手机号码')" prop="phoneOrEmail">
 						<view class="input-box">
-							<u--input type="" v-model="uFormModel.phoneOrEmail" border="none"></u--input>
+							<u--input @confirm="next" v-model="uFormModel.phoneOrEmail" border="none">
+							</u--input>
 						</view>
 					</u-form-item>
 				</u--form>
 			</view>
-			<view class="next" @click="uFormModel.phoneOrEmail ? $u.route({
-				url:'/pages/login1/login1',
-				params:{
-					phoneOrEmail:uFormModel.phoneOrEmail,
-					scene
-				}
-			}) : $u.toast($t('请输入您的邮箱/手机号码'))">
+			<view class="next" @click="next">
 				{{$t('下一步')}}
 			</view>
 
@@ -34,7 +29,7 @@
 	export default {
 		data() {
 			return {
-				scene:'',
+				scene: '',
 				uFormModel: {
 					phoneOrEmail: ""
 				}
@@ -42,7 +37,22 @@
 		},
 		onLoad(options) {
 			this.scene = options.scene || ''
-		}
+		},
+		methods: {
+			next() {
+				if (this.uFormModel.phoneOrEmail) {
+					uni.$u.route({
+						url: '/pages/login1/login1',
+						params: {
+							phoneOrEmail: this.uFormModel.phoneOrEmail,
+							scene: this.scene
+						}
+					})
+				} else {
+					uni.$u.toast(this.$t('请输入您的邮箱/手机号码'))
+				}
+			}
+		},
 	}
 </script>
 
@@ -114,13 +124,14 @@
 	}
 
 	@media (prefers-color-scheme: dark) {
-		page{
-			::v-deep{
-				.u-input__content__field-wrapper__field{
+		page {
+			::v-deep {
+				.u-input__content__field-wrapper__field {
 					color: #fff !important;
 				}
 			}
 		}
+
 		.content {
 			.form {
 				.input-box {

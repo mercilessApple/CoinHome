@@ -9,7 +9,7 @@
 			<u--form ref="uForm">
 				<u-form-item :label="$t('请输入您的邮箱/手机号码')" prop="phoneOrEmail">
 					<view class="input-box">
-						<u--input v-model="phoneOrEmail" border="none"></u--input>
+						<u--input @confirm="next" v-model="phoneOrEmail" border="none"></u--input>
 					</view>
 				</u-form-item>
 			</u--form>
