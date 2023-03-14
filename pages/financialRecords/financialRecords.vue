@@ -79,7 +79,7 @@
 							<view class="item" v-for="(item,index) in coinList" :key="index" @click="select(item)">
 								<view class="left">
 									<u-image width="48rpx" height="48rpx" :src="item.iconUrl"></u-image>
-									<text>{{item.coinName}}</text>
+									<view class="text">{{item.coinName}}</view>
 								</view>
 								<view class="right">
 									<view>{{$t('可用余额')}}</view>
@@ -390,8 +390,8 @@
 				.left {
 					display: flex;
 					align-items: center;
-
-					text {
+					
+					.text {
 						font-size: 32rpx;
 						margin-left: 20rpx;
 						font-weight: 500;

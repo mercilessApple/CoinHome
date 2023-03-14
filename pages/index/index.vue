@@ -195,6 +195,8 @@
 		},
 		onLoad() {
 			this.init()
+			
+	
 		},
 		onHide() {
 
@@ -219,7 +221,11 @@
 			}
 		},
 		onShow() {
-			
+			if(this.list != ''){
+				this.getList(res => {
+					this.list = res
+				})
+			}
 		},
 		methods: {
 			onSearchChange(e) {

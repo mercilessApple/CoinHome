@@ -55,8 +55,9 @@
 				</view>
 				<view class="withdraw amount" v-if="curCoin != ''">
 					<view class="tit">{{$t('提币数额')}}</view>
-					<u-input @blur="onWithdrawalAmountBlur" :color="theme == 'light' ? '' : '#fff'" v-model="withdrawalAmount" type="number"
-						fontSize="26rpx" :placeholder="$t('请输入提币数量')" :customStyle="{
+					<u-input @blur="onWithdrawalAmountBlur" :color="theme == 'light' ? '' : '#fff'"
+						v-model="withdrawalAmount" type="number" fontSize="26rpx" :placeholder="$t('请输入提币数量')"
+						:customStyle="{
 						background: theme == 'light' ? '#F6F6F6' : '#29313C',
 						height:'90rpx',
 						'padding':'0 30rpx'
@@ -68,7 +69,8 @@
 							</view>
 						</template>
 					</u-input>
-					<view class="withdraw-tip"><text style="margin-right: 10rpx;">{{$t('余额')}}：{{curCoin[0].amount}}</text>
+					<view class="withdraw-tip"><text
+							style="margin-right: 10rpx;">{{$t('余额')}}：{{curCoin[0].amount}}</text>
 						{{curCoin[0].coinName}}
 					</view>
 				</view>
@@ -168,10 +170,13 @@
 		<view class="btn-content" v-if="scene == 'withdraw' && curCoin != ''">
 			<view class="box">
 				<view class="btn-tip">
-					<text>{{$t('手续费')}}：</text>{{serviceCharge()}} {{curCoin[0].coinName}}
-					<text
-						style="margin-left: 60rpx;">{{$t('实际到账')}}：</text>{{utils.decimal(curCoin[0].amount - withdrawalAmount -serviceCharge(),curCoin[0].decimalPlaces)}}
-					{{curCoin[0].coinName}}
+					<view>
+						<text>{{$t('手续费')}}：</text>{{serviceCharge()}} {{curCoin[0].coinName}}
+					</view>
+					<view>
+						<text
+							style="margin-left: 60rpx;">{{$t('实际到账')}}：</text>{{actualReceipt()}}{{curCoin[0].coinName}}
+					</view>
 				</view>
 				<view @click="submit">
 					{{$t('提交')}}
@@ -215,12 +220,12 @@
 		onLoad(options) {
 			this.coin = options.coin
 			this.scene = options.scene || ''
-			
-			if(options.scene == 'withdraw'){
+
+			if (options.scene == 'withdraw') {
 				queryWithdrawCoin().then(e => {
 					this.coinList = e
 					this.oriList = e
-				
+
 					if (options.coin) {
 						let find = e.filter(item => item.coinName == options.coin)
 						if (find == '') {
@@ -234,11 +239,11 @@
 					this.chainList = e[0].chainNamelist
 					this.curNet = this.chainList[0]
 				})
-			}else{
+			} else {
 				queryDepositPayCoin().then(e => {
 					this.coinList = e
 					this.oriList = e
-					
+
 					if (options.coin) {
 						let find = e.filter(item => item.coinName == options.coin)
 						if (find == '') {
@@ -259,19 +264,24 @@
 			}
 		},
 		methods: {
-			onWithdrawalAmountBlur(e){
-				if(Number(e) > Number(this.curCoin[0].amount)){
+			actualReceipt() {
+				let amount = this.curCoin[0].amount
+				return this.utils.decimal(Number(amount) - this.serviceCharge(), this.curCoin[0].decimalPlaces)
+			},
+			onWithdrawalAmountBlur(e) {
+				if (Number(e) > Number(this.curCoin[0].amount)) {
 					this.withdrawalAmount = this.curCoin[0].amount
 				}
 			},
-			serviceCharge(){
-				if(this.curNet.tranOutFee.indexOf('%')){
-					if(this.withdrawalAmount == ''){
+			serviceCharge() {
+				if (this.curNet.tranOutFee.indexOf('%') != -1) {
+					if (this.withdrawalAmount == '') {
 						return 0
 					}
-					let tranOutFee = this.curNet.tranOutFee.replace('%','')
-					return this.utils.decimal(Number(this.withdrawalAmount) * Number(tranOutFee),this.curCoin[0].decimalPlaces)
-				}else{
+					let tranOutFee = this.curNet.tranOutFee.replace('%', '')
+					return this.utils.decimal(Number(this.withdrawalAmount) * Number(tranOutFee), this.curCoin[0]
+						.decimalPlaces)
+				} else {
 					return this.curNet.tranOutFee
 				}
 			},
@@ -386,14 +396,15 @@
 			select(item) {
 				this.curCoin = [item]
 				// this.chainList = this.oriChainList.filter(item => item.coinId == this.curCoin[0].coinId)[0].list
-				if(this.scene == 'withdraw'){
+				if (this.scene == 'withdraw') {
 					this.chainList = item.chainNamelist
 					this.beneficiaryAddress = ""
 					this.withdrawalAmount = ""
-				}else{
+					this.password = ""
+				} else {
 					this.chainList = item.list
 				}
-				
+
 				this.curNet = this.chainList[0]
 				this.show = false
 			}
@@ -430,7 +441,9 @@
 				font-size: 24rpx;
 				font-weight: 500;
 				color: #0F0F0F;
-
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
 				text {
 					color: #B7BABF;
 				}

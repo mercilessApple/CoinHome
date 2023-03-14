@@ -13,23 +13,23 @@ const vConsole = new VConsole();
 
 const i18nConfig = {
 	locale: uni.getLocale(),
+	silentTranslationWarn: true,
 	messages
 }
 
 // #ifndef VUE3
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
-Vue.use(uView)
-
 Vue.use(VueI18n)
+Vue.use(uView)
 Vue.mixin(Mixin)
 const i18n = new VueI18n(i18nConfig)
 Vue.config.productionTip = false
 App.mpType = 'app'
 
 const app = new Vue({
-	store,
 	i18n,
+	store,
 	...App
 })
 

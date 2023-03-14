@@ -8,14 +8,14 @@
 		onLaunch: function() {
 			// #ifdef APP-PLUS
 			if (uni.getStorageSync('theme')) {
-				if(uni.getSystemInfoSync().theme != uni.getStorageSync('theme')){
+				if (uni.getSystemInfoSync().theme != uni.getStorageSync('theme')) {
 					plus.nativeUI.setUiStyle(uni.getStorageSync('theme'));
 				}
 			}
 			store.commit('onThemeChange', uni.getSystemInfoSync().theme)
 			// #endif
-			
-			
+
+
 			// #ifdef H5
 			store.commit('onThemeChange', uni.getSystemInfoSync().theme)
 			uni.onThemeChange(function(res) {
@@ -25,6 +25,8 @@
 			// #endif
 
 			this.timer = null
+			this.once = true
+			this.close = false
 			this.errTip = false
 			console.log('App Launch')
 		},
@@ -90,6 +92,7 @@
 				});
 
 				uni.onSocketOpen(() => {
+					self.once = false
 					uni.sendSocketMessage({
 						data: '{"cmd":"sub","data":{},"id":"' + uni.$u.guid(20) +
 							'","sendMsgSuccess":true,"topic":"alpha-market-ticker"}'
@@ -105,7 +108,7 @@
 					self.timer = setInterval(() => {
 						uni.sendSocketMessage({
 							data: JSON.stringify({
-								ping: new Date().valueOf()
+								running: new Date().valueOf()
 							})
 						})
 					}, 5000)
@@ -141,23 +144,37 @@
 						cancelText: self.$t('忽略'),
 						success: (e) => {
 							if (e.confirm) {
-								self.errTip = false
-								uni.closeSocket();
-								setTimeout(() => {
-									self.createScoket()
-								})
+								self.createScoket()
 							}
 						}
 					});
 					self.checkNotice()
 				})
-			}
+
+				uni.onSocketClose(function(res) {
+					console.log('WebSocket 已关闭！');
+					self.close = true
+				});
+			},
 		},
 		onShow: function() {
 			console.log('App Show')
-			setTimeout(() => {
+			const self = this
+			let searchTimer = null
+			if (this.once) {
+				//	第一次访问直接创建socket
 				this.createScoket()
-			}, 0)
+			} else {
+				// 多次时,轮询检查socket是否正常关闭,关闭后再重新生成
+				searchTimer = setInterval(() => {
+					if (self.close) {
+						self.close = false
+						clearInterval(searchTimer)
+						self.createScoket()
+					}
+				}, 50)
+			}
+
 			this.utils.checkUpdate(this)
 		},
 		onUnload() {

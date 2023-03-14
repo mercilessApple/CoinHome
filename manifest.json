@@ -2,11 +2,50 @@
     "name" : "CoinHome",
     "appid" : "__UNI__08DC253",
     "description" : "",
-    "versionName" : "2.0.1",
+    "versionName" : "2.0.3",
     "versionCode" : "100",
     "transformPx" : false,
-    "locale" : "zh",
     "app-plus" : {
+        "locales" : {
+            "en" : {
+                "android" : {
+                    "permissionExternalStorage" : {
+                        "request" : "none",
+                        "prompt" : "To save information such as the running status, you need to obtain the permission to read and write the mobile phone storage (the system prompts you to access photos, media content, and files on the device)."
+                    },
+                    "permissionPhoneState" : {
+                        "request" : "none",
+                        "prompt" : "To ensure normal and safe use of the device, you need to obtain the permission to use the device identifier (some mobile phones prompt you to obtain the mobile phone number). Please allow."
+                    }
+                },
+                "ios" : {
+                    "privacyDescription" : {
+                        "NSPhotoLibraryUsageDescription" : "For users to change the profile picture, upload the picture and scan the QR code",
+                        "NSPhotoLibraryAddUsageDescription" : "For saving QR code, pictures",
+                        "NSCameraUsageDescription" : "It is used to shoot the profile picture and scan the QR code"
+                    }
+                }
+            },
+            "zh" : {
+                "android" : {
+                    "permissionExternalStorage" : {
+                        "request" : "none",
+                        "prompt" : "应用保存运行状态等信息，需要获取读写手机存储（系统提示为访问设备上的照片、媒体内容和文件）权限，请允许。"
+                    },
+                    "permissionPhoneState" : {
+                        "request" : "none",
+                        "prompt" : "为保证您正常、安全地使用，需要获取设备识别码（部分手机提示为获取手机号码）使用权限，请允许。"
+                    }
+                },
+                "ios" : {
+                    "privacyDescription" : {
+                        "NSPhotoLibraryUsageDescription" : "用于用户更换头像，上传图片扫描二维码使用",
+                        "NSPhotoLibraryAddUsageDescription" : "用于保存二维码，图片",
+                        "NSCameraUsageDescription" : "用于拍摄头像，扫描二维码使用"
+                    }
+                }
+            }
+        },
         "compatible" : {
             "ignoreVersion" : true
         },
@@ -37,11 +76,11 @@
             "android" : {
                 "permissionExternalStorage" : {
                     "request" : "none",
-                    "prompt" : "%permissionExternalStorage%"
+                    "prompt" : "应用保存运行状态等信息，需要获取读写手机存储（系统提示为访问设备上的照片、媒体内容和文件）权限，请允许。"
                 },
                 "permissionPhoneState" : {
                     "request" : "none",
-                    "prompt" : "%permissionPhoneState%"
+                    "prompt" : "为保证您正常、安全地使用，需要获取设备识别码（部分手机提示为获取手机号码）使用权限，请允许。"
                 },
                 "permissions" : [
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
@@ -66,9 +105,9 @@
             "ios" : {
                 "dSYMs" : false,
                 "privacyDescription" : {
-                    "NSPhotoLibraryUsageDescription" : "%NSPhotoLibraryUsageDescription%",
-                    "NSPhotoLibraryAddUsageDescription" : "%NSPhotoLibraryAddUsageDescription%",
-                    "NSCameraUsageDescription" : "%NSCameraUsageDescription%"
+                    "NSPhotoLibraryUsageDescription" : "用于用户更换头像，上传图片扫描二维码使用",
+                    "NSPhotoLibraryAddUsageDescription" : "用于保存二维码，图片",
+                    "NSCameraUsageDescription" : "用于拍摄头像，扫描二维码使用"
                 },
                 "idfa" : false
             },
@@ -138,6 +177,5 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "2",
-    "fallbackLocale" : "zh"
+    "vueVersion" : "2"
 }

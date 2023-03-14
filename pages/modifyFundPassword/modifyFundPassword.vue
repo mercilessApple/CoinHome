@@ -21,6 +21,7 @@
 
 <script>
 	import {
+		userInfo,
 		updateFundsPassword
 	} from "@/config/api"
 	import {
@@ -56,13 +57,26 @@
 					title: '加载中...',
 					mask: true
 				})
+				
+				const {
+					fundsPasswordStatus
+				} = uni.getStorageSync('userInfo')
 				updateFundsPassword({
 					newMd5FundsPassword,
 					confirmMd5FundsPassword,
-					type: 1
+					type:fundsPasswordStatus == 0 ? 1 : 2
 				}).then(e => {
 					uni.showToast({
 						title: this.$t('操作成功！')
+					})
+
+					userInfo().then(info => {
+						const {
+							fundsPasswordStatus
+						} = info
+						let u = uni.getStorageSync('userInfo')
+						u.fundsPasswordStatus = fundsPasswordStatus
+						uni.setStorageSync('userInfo', u)
 					})
 
 					setTimeout(() => {

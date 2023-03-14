@@ -61,7 +61,10 @@
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom",
-				"backgroundColor": "@tradeBG"
+				"backgroundColor": "@tradeBG",
+				"app-plus": {
+					"bounce": "none"
+				}
 			}
 
 		}, {
@@ -362,26 +365,26 @@
 		"list": [{
 				"iconPath": "static/tabbar/index.png",
 				"selectedIconPath": "@indexSelectIcon",
-				"text": "%index%",
+				"text": "%index.home%",
 				"pagePath": "pages/index/index"
 			},
 			{
 				"iconPath": "static/tabbar/quotation.png",
 				"selectedIconPath": "@quotationSelectIcon",
-				"text": "%quotation%",
+				"text": "%index.quotation%",
 				"pagePath": "pages/quotation/quotation"
 			},
 
 			{
 				"iconPath": "static/tabbar/transaction.png",
 				"selectedIconPath": "@transactionSelectIcon",
-				"text": "%transaction%",
+				"text": "%index.transaction%",
 				"pagePath": "pages/transaction/transaction"
 			},
 			{
 				"iconPath": "static/tabbar/assets.png",
 				"selectedIconPath": "@assetsSelectIcon",
-				"text": "%assets%",
+				"text": "%index.assets%",
 				"pagePath": "pages/assets/assets"
 			}
 		]
@@ -391,6 +394,5 @@
 		"navigationBarTitleText": "%navigationBarTitleText%",
 		"navigationBarBackgroundColor": "@navigationBarBackgroundColor",
 		"backgroundColor": "@backgroundColor"
-	},
-	"uniIdRouter": {}
+	}
 }

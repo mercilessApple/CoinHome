@@ -62,7 +62,7 @@
 							<u-icon color="rgb(96, 98, 102)" bold name="minus"></u-icon>
 						</view>
 						<block v-if="oriMarketList != ''">
-							<u-input :color="inverseParams('#000' , '#fff')"
+							<u-input @blur="onPriceBlur" :color="inverseParams('#000' , '#fff')"
 								v-model="oriMarketList[marketItemIndex].price" inputAlign="center" border="none"
 								type="digit">
 							</u-input>
@@ -84,7 +84,7 @@
 						<view @click="onCountChange('minus')" class="icon">
 							<u-icon color="rgb(96, 98, 102)" bold name="minus"></u-icon>
 						</view>
-						<u-input :color="inverseParams('#000' , '#fff')" @blur="onCountBlur" v-model="count"
+						<u-input :value="count" :color="inverseParams('#000' , '#fff')" @blur="onCountBlur"
 							inputAlign="center" border="none" type="digit"
 							:placeholder="`${$t('数量')}${marketStatus == 'loading' ? '' : marketItem.coinMarket[0]}`">
 						</u-input>
@@ -274,9 +274,9 @@
 					<view>{{ $t('最新价格') }}/{{ $t('24h涨跌幅') }}</view>
 				</view>
 				<view class="list">
-					<scroll-view :style="{
+					<!-- <scroll-view :style="{
 						'height':marketPopupSliderHeight + 'px'
-					}" scroll-y>
+					}" scroll-y> -->
 						<view @click="selectMarket(item,index)" :class="{
 							'active':oriMarketItemIndex == index
 						}" class="item" v-for="(item,index) in marketList" :key="index">
@@ -295,7 +295,7 @@
 						<u-loadmore :status="marketStatus" :nomoreText="$t('nomoreText')"
 							:loadingText="$t('loadingText')" :loadmoreText="$t('loadmoreText')" />
 						<u-gap height="30rpx"></u-gap>
-					</scroll-view>
+					<!-- </scroll-view> -->
 				</view>
 			</view>
 		</u-popup>
@@ -371,7 +371,7 @@
 				number: 1,
 				showMoreSelect: false,
 				userEntrustList: [],
-				marketPopupSliderHeight: 0,
+				// marketPopupSliderHeight: 0,
 				marketItem: {
 					coinMarket: [this.$t('加载中...'), ''],
 					rangeAbility: null,
@@ -586,13 +586,24 @@
 			});
 		},
 		methods: {
+			onPriceBlur(){
+				this.oriMarketList[this.marketItemIndex].price = this.utils.decimal(this.oriMarketList[this.marketItemIndex].price, this.oriMarketList[this.marketItemIndex].pricePrecision)
+			},
+			onCountInput(e){
+				let that = this
+				 e = (e.match(/^\d*(\.?\d{0,2})/g)[0]) || null
+					      this.$nextTick(() => {
+					      		that.count= e
+					      })
+
+			},
 			totalAmount() {
 				let {
 					price,
-					amountPrecision
+					pricePrecision
 				} = this.oriMarketList[this.marketItemIndex]
 
-				let val = this.utils.decimal(this.count * price, amountPrecision)
+				let val = this.utils.decimal(this.count * price, pricePrecision)
 				
 				val = val <= 0 ? "" : val
 				
@@ -687,9 +698,23 @@
 					})
 					return
 				}
+				if (this.count < 0) {
+					uni.showToast({
+						title: this.$t('数量不能为负数！'),
+						icon: 'none'
+					})
+					return
+				}
 				if (this.oriMarketList[this.marketItemIndex].price == '') {
 					uni.showToast({
 						title: this.$t('请输入价格'),
+						icon: 'none'
+					})
+					return
+				}
+				if (this.oriMarketList[this.marketItemIndex].price < 0) {
+					uni.showToast({
+						title: this.$t('价格不能为负数！'),
 						icon: 'none'
 					})
 					return
@@ -863,7 +888,9 @@
 				})
 
 
-				this.timer = setInterval(this.queryUserEntrustList, 3000)
+				this.timer = setInterval(()=>{
+					this.queryUserEntrustList()
+				}, 3000)
 				if (this.isLogin) {
 					queryAccountInfo({
 						type: 1
@@ -883,18 +910,15 @@
 							amount: 0
 						}
 					}
-					// return data[0]
-					return {
-						amount: 97
-					}
+					return data[0]
 				}
 			},
 			open() {
-				if (this.marketPopupSliderHeight != 0) return
-				const query = uni.createSelectorQuery().in(this);
-				query.select('.popup .list').boundingClientRect(data => {
-					this.marketPopupSliderHeight = data.height
-				}).exec();
+				// if (this.marketPopupSliderHeight != 0) return
+				// 	const query = uni.createSelectorQuery().in(this);
+				// 	query.select('.popup .list').boundingClientRect(data => {
+				// 		this.marketPopupSliderHeight = data.height
+				// 	}).exec();
 			},
 
 			/**
@@ -1058,7 +1082,7 @@
 
 		.list {
 			flex: 1;
-
+			overflow: auto;
 			.item {
 				display: flex;
 				justify-content: space-between;

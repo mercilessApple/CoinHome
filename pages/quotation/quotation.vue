@@ -154,6 +154,7 @@
 					this.list[index].lastPrice = Number(data.lastPrice)
 					this.list[index].rangeAbility = Number(data.rangeAbility)
 					this.list[index].lastPriceCny = Number(data.lastPriceCny)
+					this.list[index].turnover = Number(data.turnover)
 				}
 			}
 		},

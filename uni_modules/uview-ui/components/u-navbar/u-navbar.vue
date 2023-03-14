@@ -10,14 +10,14 @@
 		<view :class="[fixed && 'u-navbar--fixed']">
 			<u-status-bar
 				v-if="safeAreaInsetTop"
-				:bgColor="bgColor"
+				:bgColor="themeColor == '' ? bgColor : themeColor"
 			></u-status-bar>
 			<view
 				class="u-navbar__content"
 				:class="[border && 'u-border-bottom']"
 				:style="{
 					height: $u.addUnit(height),
-					backgroundColor: bgColor,
+					backgroundColor: themeColor == '' ? bgColor : themeColor,
 				}"
 			>
 				<view

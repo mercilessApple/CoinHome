@@ -2,15 +2,15 @@
 	<view>
 		<u-navbar :leftIconColor="inverseParams('#303133','#fff')" title="" :autoBack="true" placeholder="">
 		</u-navbar>
-		
+
 		<view class="title">
 			{{$t('语言')}}
 		</view>
 
 		<view class="nav">
-			<view class="item" @click="setLang('zh')">
+			<view class="item" @click="setLang('zh-Hans')">
 				<view class="left">中文简体</view>
-				<view class="right" v-if="lang == 'zh'">
+				<view class="right" v-if="lang == 'zh-Hans'">
 					<u-icon color="#FE9205" name="checkmark"></u-icon>
 				</view>
 			</view>
@@ -28,39 +28,54 @@
 	export default {
 		data() {
 			return {
-				lang: uni.getLocale() == 'en' ? 'en' : 'zh'
+				lang: uni.getLocale() == 'en' ? 'en' : 'zh-Hans'
 			};
 		},
 		onLoad() {
-			
+			this.isAndroid = uni.getSystemInfoSync().platform.toLowerCase() === 'android'
 		},
 		methods: {
 			setLang(lang) {
 				if (this.lang == lang) return
+				
 				uni.showModal({
 					title: this.$t('提示'),
 					content: this.$t('应用此设置将重启App'),
 					success: (res) => {
 						if (res.confirm) {
-							this.$i18n.locale = lang;
-							this.lang = lang
 							// #ifdef APP-PLUS
-							if (uni.getSystemInfoSync().platform.toLowerCase() === 'android') {
+							if(this.isAndroid){
 								uni.setLocale(lang);
-							} else {
+							}else{
 								uni.setLocale(lang);
 								plus.runtime.restart()
 							}
 							// #endif
-
+							
 							// #ifdef H5
 							uni.setLocale(lang);
 							location.reload()
 							// #endif
+						
 						}
 					}
 				})
-
+				
+				// if (uni.getSystemInfoSync().platform.toLowerCase() === 'android') {
+				// 	uni.showModal({
+				// 		title: this.$t('提示'),
+				// 		content: this.$t('应用此设置将重启App'),
+				// 		success: (res) => {
+				// 			if (res.confirm) {
+				// 				uni.setLocale(lang);
+				// 			}
+				// 		}
+				// 	})
+				// } else {
+				// 	this.lang = lang
+				// 	uni.setLocale(lang);
+				// 	this.$i18n.locale = lang;
+				// }
 			}
 		},
 	}
@@ -96,7 +111,9 @@
 		.nav .item .left {
 			color: #fff;
 		}
-		::v-deep{
+
+		::v-deep {
+
 			.u-navbar__content,
 			.u-status-bar {
 				background-color: #1F282F !important;

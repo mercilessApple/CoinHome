@@ -1,6 +1,9 @@
 <template>
 	<view>
-		<u-navbar :bgColor="inverseParams('#fff','#1F282F')" :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title="" :autoBack="true" placeholder>
+		<u-navbar :class="{
+			set
+		}" :themeColor="inverseParams('#fff','#1F282F')" :leftIconColor="theme == 'light' ? '#303133' : '#fff'" title=""
+			:autoBack="true" placeholder>
 			<view class="u-nav-slot" slot="right">
 				<view @click="changeTheme" v-if="showThemeBtn">
 					<u-image v-if="theme == 'dark'" src="@/static/icon15.png" width="48rpx" height="48rpx"></u-image>
@@ -81,11 +84,14 @@
 		signOut,
 		getNickName
 	} from "@/config/api"
-  import {helpCenterURL} from "@/utils";
+	import {
+		helpCenterURL
+	} from "@/utils";
 	export default {
 		data() {
 			return {
-				showThemeBtn:false,
+				set: false,
+				showThemeBtn: false,
 				isLogin: uni.getStorageSync('token'),
 				userInfo: {
 					uid: 0,
@@ -166,17 +172,21 @@
 			// 		uni.setStorageSync('userInfo', this.userInfo)
 			// 	}
 			// })
-			
+
 			let sysInfo = uni.getSystemInfoSync()
-			if(sysInfo.platform == 'android'){
-				if(parseInt(sysInfo.osVersion) >= 10){
+			if (sysInfo.platform == 'android') {
+				if (parseInt(sysInfo.osVersion) >= 10) {
 					this.showThemeBtn = true
 				}
-			}else{
-				if(parseInt(sysInfo.osVersion) >= 13 ){
+			} else {
+				if (parseInt(sysInfo.osVersion) >= 13) {
 					this.showThemeBtn = true
 				}
 			}
+
+			setTimeout(() => {
+				this.set = true
+			}, 1000)
 		},
 		methods: {
 			toServer() {
@@ -231,7 +241,7 @@
 				// #ifdef APP-PLUS
 				plus.nativeUI.setUiStyle(uni.getSystemInfoSync().theme == 'light' ? 'dark' : 'light');
 				uni.setStorageSync('theme', uni.getSystemInfoSync().theme)
-				this.$store.commit('onThemeChange',uni.getSystemInfoSync().theme)
+				this.$store.commit('onThemeChange', uni.getSystemInfoSync().theme)
 				// #endif
 			},
 			exit() {
@@ -432,6 +442,19 @@
 		}
 	}
 
+	@media (prefers-color-scheme: light) {
+		.u-navbar {
+			&.set {
+				::v-deep {
+					.u-navbar__content,
+					.u-status-bar {
+						background-color: #fff !important;
+					}
+				}
+			}
+		}
+	}
+
 	@media (prefers-color-scheme: dark) {
 
 		::v-deep {
@@ -441,6 +464,11 @@
 
 			.u-alert--warning--light {
 				background-color: #29313C !important;
+			}
+
+			.u-navbar__content,
+			.u-status-bar {
+				background-color: #1F282F !important;
 			}
 		}
 
@@ -468,6 +496,4 @@
 			background: #4A525D;
 		}
 	}
-	
-
 </style>

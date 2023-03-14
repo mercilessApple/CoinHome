@@ -61,8 +61,11 @@
 				// #ifdef APP-PLUS
 				plus.nativeUI.setUiStyle(theme);
 				this.themeIndex = index
+				if (theme == 'auto') {
+					theme = uni.getSystemInfoSync().theme
+				}
 				uni.setStorageSync('theme', theme)
-				this.$store.commit('onThemeChange',theme)
+				this.$store.commit('onThemeChange', theme)
 				// #endif
 			}
 		},
@@ -99,12 +102,14 @@
 		.nav .item .left {
 			color: #fff;
 		}
-		::v-deep{
+
+		::v-deep {
+
 			.u-navbar__content,
 			.u-status-bar {
 				background-color: #1F282F !important;
 			}
 		}
-	
+
 	}
 </style>

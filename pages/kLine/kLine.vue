@@ -230,9 +230,9 @@
 					<view>{{ $t('最新价格') }}/{{ $t('24h涨跌幅') }}</view>
 				</view>
 				<view class="list">
-					<scroll-view :style="{
+					<!-- <scroll-view :style="{
 						'height':marketPopupSliderHeight + 'px'
-					}" scroll-y>
+					}" scroll-y> -->
 						<view @click="selectMarket(item,index)" :class="{
 							'active':oriMarketItemIndex == index
 						}" class="item" v-for="(item,index) in marketList" :key="index">
@@ -251,7 +251,7 @@
 						<u-loadmore :status="marketStatus" :nomoreText="$t('nomoreText')"
 							:loadingText="$t('loadingText')" :loadmoreText="$t('loadmoreText')" />
 						<u-gap height="30rpx"></u-gap>
-					</scroll-view>
+					<!-- </scroll-view> -->
 				</view>
 			</view>
 		</u-popup>
@@ -324,7 +324,7 @@
 				],
 				searchKey: "",
 				marketTabIndex: 1,
-				marketPopupSliderHeight: 0,
+				// marketPopupSliderHeight: 0,
 				show: false,
 				iconUrl: '',
 				coinMarket: '',
@@ -704,11 +704,11 @@
 				this.show = false
 			},
 			open() {
-				if (this.marketPopupSliderHeight != 0) return
-				const query = uni.createSelectorQuery().in(this);
-				query.select('.popup .list').boundingClientRect(data => {
-					this.marketPopupSliderHeight = data.height
-				}).exec();
+				// if (this.marketPopupSliderHeight != 0) return
+				// const query = uni.createSelectorQuery().in(this);
+				// query.select('.popup .list').boundingClientRect(data => {
+				// 	this.marketPopupSliderHeight = data.height
+				// }).exec();
 			},
 			tickerMarket() {
 				getTickerMarket({
@@ -814,9 +814,9 @@
 				clearInterval(this.tradeTimer)
 				clearInterval(this.orderTimer)
 				if(index == 0){
-					this.getUserEntrustList()
+					this.queryUserEntrustList()
 					this.orderTimer = setInterval(()=>{
-						this.getUserEntrustList()
+						this.queryUserEntrustList()
 					},1000)
 				}else if(index == 1){
 					this.getHandicap()
@@ -1113,7 +1113,7 @@
 
 		.list {
 			flex: 1;
-
+			overflow: auto;
 			.item {
 				display: flex;
 				justify-content: space-between;
@@ -1172,13 +1172,14 @@
 
 		.popup-tab {
 			border-bottom: 2rpx solid #EFEFEF;
-		}
-
-		::v-deep {
-			.u-tabs__wrapper__nav__line {
-				// bottom: 0 !important;
+			::v-deep {
+				.u-tabs__wrapper__nav__line {
+					bottom: 0 !important;
+				}
 			}
 		}
+
+
 
 		.search {
 			margin-bottom: 15rpx;

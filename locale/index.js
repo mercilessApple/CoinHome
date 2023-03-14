@@ -1,6 +1,6 @@
 import en from './en.json'
-import zh from './zh.json'
+import zhHans from './zh-Hans.json'
 export default {
 	en,
-	zh
+	"zh-Hans":zhHans
 }

@@ -74,7 +74,6 @@
 			chooseImage(scene) {
 				uni.chooseImage({
 					count: 1,
-					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 					success: ({
 						tempFilePaths
 					}) => {
